@@ -1,0 +1,6 @@
+.vs
+
+bin
+obj
+
+src/libs/SoloX.ActionDispatch.Core/SoloX.ActionDispatch.Core.xml

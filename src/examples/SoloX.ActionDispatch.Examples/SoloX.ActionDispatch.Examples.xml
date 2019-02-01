@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SoloX.ActionDispatch.Examples</name>
+    </assembly>
+    <members>
+        <member name="T:SoloX.ActionDispatch.Examples.ExampleAction">
+            <summary>
+            Example action.
+            </summary>
+        </member>
+        <member name="M:SoloX.ActionDispatch.Examples.ExampleAction.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SoloX.ActionDispatch.Examples.ExampleAction"/> class.
+            </summary>
+        </member>
+        <member name="M:SoloX.ActionDispatch.Examples.ExampleAction.Apply(SoloX.ActionDispatch.Core.IDispatcher{SoloX.ActionDispatch.Examples.ExampleState},SoloX.ActionDispatch.Examples.ExampleState)">
+            <inheritdoc />
+        </member>
+        <member name="T:SoloX.ActionDispatch.Examples.ExampleState">
+            <summary>
+            Root state object.
+            </summary>
+        </member>
+        <member name="P:SoloX.ActionDispatch.Examples.ExampleState.Count">
+            <summary>
+            Gets or sets state count.
+            </summary>
+        </member>
+        <member name="T:SoloX.ActionDispatch.Examples.Program">
+            <summary>
+            Example program.
+            </summary>
+        </member>
+        <member name="M:SoloX.ActionDispatch.Examples.Program.Main">
+            <summary>
+            Main program entry point.
+            </summary>
+        </member>
+        <member name="M:SoloX.ActionDispatch.Examples.Program.Dispose">
+            <inheritdoc/>
+        </member>
+    </members>
+</doc>
