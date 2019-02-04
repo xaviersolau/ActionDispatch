@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace SoloX.ActionDispatch.Core
@@ -25,13 +26,23 @@ namespace SoloX.ActionDispatch.Core
         /// <summary>
         /// Dispatch an action on a current state.
         /// </summary>
-        /// <param name="action">The action to apply.</param>
-        void Dispatch(IAction<TRootState> action);
+        /// <typeparam name="TState">The target state type.</typeparam>
+        /// <param name="actionBehavior">The action behavior to apply.</param>
+        /// <param name="selector">The target state selector expression.</param>
+        void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector);
+
+        /// <summary>
+        /// Dispatch an action on a current state.
+        /// </summary>
+        /// <typeparam name="TState">The target state type.</typeparam>
+        /// <param name="actionBehavior">The asynchronous action behavior to apply.</param>
+        /// <param name="selector">The target state selector expression.</param>
+        void Dispatch<TState>(IActionBehaviorAsync<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector);
 
         /// <summary>
         /// Add an action observer.
         /// </summary>
         /// <param name="observer">The observer to add.</param>
-        void AddObserver(Func<IObservable<IAction<TRootState>>, IObservable<IAction<TRootState>>> observer);
+        void AddObserver(Func<IObservable<IAction<TRootState, IActionBehavior>>, IObservable<IAction<TRootState, IActionBehavior>>> observer);
     }
 }

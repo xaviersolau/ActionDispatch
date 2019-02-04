@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SoloX.ActionDispatch.Core;
 using SoloX.ActionDispatch.Core.Impl;
+using SoloX.ActionDispatch.Core.Impl.Action;
 
 namespace SoloX.ActionDispatch.Examples
 {
@@ -59,9 +60,9 @@ namespace SoloX.ActionDispatch.Examples
         {
             var dispatcher = this.Service.GetService<IDispatcher<ExampleState>>();
 
-            dispatcher.AddObserver(obs => obs.Do(a => this.logger.LogWarning($"Processing action: {a}")));
+            dispatcher.AddObserver(obs => obs.Do(a => this.logger.LogWarning($"Processing action with behavior: {a.Behavior}")));
 
-            dispatcher.Dispatch(new ExampleAction());
+            dispatcher.Dispatch(new ExampleActionBehavior(), s => s);
         }
     }
 }

@@ -10,6 +10,7 @@
     <PackageProjectUrl>https://github.com/xaviersolau/ActionDispatch</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/xaviersolau/ActionDispatch.git</RepositoryUrl>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

@@ -13,7 +13,7 @@ using System.Text;
 namespace SoloX.ActionDispatch.Core
 {
     /// <summary>
-    /// Base action interface.
+    /// Base action interface with a target state type specified.
     /// </summary>
     /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
     public interface IAction<TRootState>
@@ -31,12 +31,13 @@ namespace SoloX.ActionDispatch.Core
     /// Base action interface with a target state type specified.
     /// </summary>
     /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
-    /// <typeparam name="TTargetState">Type of the targeted state object.</typeparam>
-    public interface IAction<TRootState, TTargetState> : IAction<TRootState>
+    /// <typeparam name="TActionBehavior">Type of the targeted state object.</typeparam>
+    public interface IAction<TRootState, out TActionBehavior> : IAction<TRootState>
+        where TActionBehavior : IActionBehavior
     {
         /// <summary>
-        /// Gets the target state selector.
+        /// Gets action behavior.
         /// </summary>
-        Expression<Func<TRootState, TTargetState>> StateSelector { get; }
+        TActionBehavior Behavior { get; }
     }
 }

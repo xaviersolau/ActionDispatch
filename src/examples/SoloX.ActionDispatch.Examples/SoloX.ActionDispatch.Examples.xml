@@ -4,17 +4,12 @@
         <name>SoloX.ActionDispatch.Examples</name>
     </assembly>
     <members>
-        <member name="T:SoloX.ActionDispatch.Examples.ExampleAction">
+        <member name="T:SoloX.ActionDispatch.Examples.ExampleActionBehavior">
             <summary>
             Example action.
             </summary>
         </member>
-        <member name="M:SoloX.ActionDispatch.Examples.ExampleAction.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:SoloX.ActionDispatch.Examples.ExampleAction"/> class.
-            </summary>
-        </member>
-        <member name="M:SoloX.ActionDispatch.Examples.ExampleAction.Apply(SoloX.ActionDispatch.Core.IDispatcher{SoloX.ActionDispatch.Examples.ExampleState},SoloX.ActionDispatch.Examples.ExampleState)">
+        <member name="M:SoloX.ActionDispatch.Examples.ExampleActionBehavior.Apply(SoloX.ActionDispatch.Examples.ExampleState)">
             <inheritdoc />
         </member>
         <member name="T:SoloX.ActionDispatch.Examples.ExampleState">

@@ -1,29 +1,25 @@
 ﻿// ----------------------------------------------------------------------
-// <copyright file="UnhandledExceptionAction.cs" company="SoloX Software">
+// <copyright file="UnhandledExceptionBehavior.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // ----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
 
 namespace SoloX.ActionDispatch.Core.Impl.Action
 {
     /// <summary>
-    /// Action to dispatch to report an unhandled exception.
+    /// Action behavior to report an unhandled exception.
     /// </summary>
     /// <typeparam name="TRootState">The state root type.</typeparam>
-    public class UnhandledExceptionAction<TRootState> : ActionBase<TRootState, TRootState>
+    public class UnhandledExceptionBehavior<TRootState> : IActionBehavior<TRootState, TRootState>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UnhandledExceptionAction{TRootState}"/> class.
+        /// Initializes a new instance of the <see cref="UnhandledExceptionBehavior{TRootState}"/> class.
         /// </summary>
         /// <param name="exception">The thrown exception.</param>
-        public UnhandledExceptionAction(Exception exception)
-            : base(s => s)
+        public UnhandledExceptionBehavior(Exception exception)
         {
             this.Exception = exception;
         }
@@ -33,11 +29,11 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
         /// </summary>
         public Exception Exception { get; }
 
-        /// <inheritdoc />
-        public override TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState state)
+        /// <inheritdoc/>
+        public TRootState Apply(TRootState state)
         {
-            // nothing to do...
-            return state;
+            // Nothing to do.
+            return default;
         }
     }
 }

@@ -12,40 +12,34 @@ using System.Text;
 
 namespace SoloX.ActionDispatch.Core.Impl.Action
 {
-    /// <summary>
-    /// Action base implementation.
-    /// </summary>
-    /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
-    public abstract class ActionBase<TRootState> : IAction<TRootState>
+    /// <inheritdoc/>
+    public sealed class ActionBase<TRootState, TState> : AActionBase<TRootState, TState>, IAction<TRootState, IActionBehavior<TRootState, TState>>
     {
         /// <summary>
-        /// Gets or sets action state.
+        /// Initializes a new instance of the <see cref="ActionBase{TRootState, TState}"/> class.
         /// </summary>
-        public ActionState State { get; set; }
-
-        /// <inheritdoc/>
-        public abstract TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState state);
-    }
-
-#pragma warning disable SA1402 // File may only contain a single type
-    /// <summary>
-    /// Action base implementation.
-    /// </summary>
-    /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
-    /// <typeparam name="TTargetState">Type of the targeted state object.</typeparam>
-    public abstract class ActionBase<TRootState, TTargetState> : ActionBase<TRootState>, IAction<TRootState, TTargetState>
-#pragma warning restore SA1402 // File may only contain a single type
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ActionBase{TRootState, TTargetState}"/> class.
-        /// </summary>
-        /// <param name="stateSelector">expression path to target the state.</param>
-        protected ActionBase(Expression<Func<TRootState, TTargetState>> stateSelector)
+        /// <param name="behavior">The action behavior.</param>
+        /// <param name="stateSelector">The action state selector expression.</param>
+        public ActionBase(
+            IActionBehavior<TRootState, TState> behavior,
+            Expression<Func<TRootState, TState>> stateSelector)
+            : base(stateSelector)
         {
-            this.StateSelector = stateSelector;
+            this.Behavior = behavior;
         }
 
         /// <inheritdoc/>
-        public Expression<Func<TRootState, TTargetState>> StateSelector { get; }
+        public IActionBehavior<TRootState, TState> Behavior { get; }
+
+        /// <inheritdoc/>
+        public override TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState state)
+        {
+            var oldActionState = this.SelectorFunc(state);
+
+            // TODO implement clone and patch state.
+            this.Behavior.Apply(oldActionState);
+
+            return default;
+        }
     }
 }

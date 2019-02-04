@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
@@ -27,11 +28,12 @@ namespace SoloX.ActionDispatch.Core.Impl
         private readonly object syncObject = new object();
 
         private readonly ILogger<Dispatcher<TRootState>> logger;
-        private readonly BehaviorSubject<TRootState> state;
-        private readonly Subject<IAction<TRootState>> action;
-        private readonly Subject<IAction<TRootState>> listenerActions;
 
-        private readonly List<IAction<TRootState>> actionsToDispatch = new List<IAction<TRootState>>();
+        private readonly BehaviorSubject<TRootState> state;
+        private readonly Subject<IAction<TRootState, IActionBehavior>> action;
+        private readonly Subject<IAction<TRootState, IActionBehavior>> listenerActions;
+
+        private readonly List<IAction<TRootState, IActionBehavior>> actionsToDispatch = new List<IAction<TRootState, IActionBehavior>>();
         private readonly List<IDisposable> listenerActionSubscriptions = new List<IDisposable>();
         private readonly IDisposable actionSubscription;
 
@@ -45,9 +47,10 @@ namespace SoloX.ActionDispatch.Core.Impl
         public Dispatcher(TRootState initialState, ILogger<Dispatcher<TRootState>> logger)
         {
             this.logger = logger;
+
             this.state = new BehaviorSubject<TRootState>(initialState);
-            this.action = new Subject<IAction<TRootState>>();
-            this.listenerActions = new Subject<IAction<TRootState>>();
+            this.action = new Subject<IAction<TRootState, IActionBehavior>>();
+            this.listenerActions = new Subject<IAction<TRootState, IActionBehavior>>();
             this.actionSubscription = this.action.AsObservable().Subscribe(this.ActionSubscriber);
         }
 
@@ -63,59 +66,39 @@ namespace SoloX.ActionDispatch.Core.Impl
         public IObservable<TRootState> State => this.state.AsObservable();
 
         /// <inheritdoc />
-        public void Dispatch(IAction<TRootState> action)
+        public void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
         {
-            var actionBase = (ActionBase<TRootState>)action;
-
-            if (actionBase.State != ActionState.None)
-            {
-                throw new ArgumentException("Error: Action state must be None in order to be dispatched.");
-            }
-
-            IAction<TRootState>[] postDispatchRequests;
-
-            lock (this.syncObject)
-            {
-                this.action.OnNext(actionBase);
-                postDispatchRequests = this.actionsToDispatch.ToArray();
-                this.actionsToDispatch.Clear();
-            }
-
-            if (actionBase.State == ActionState.Success)
-            {
-                this.listenerActions.OnNext(actionBase);
-            }
-
-            actionBase.State = ActionState.None;
-
-            foreach (var postDispatchRequest in postDispatchRequests)
-            {
-                this.Dispatch(postDispatchRequest);
-            }
+            this.Dispatch(new ActionBase<TRootState, TState>(actionBehavior, selector));
         }
 
         /// <inheritdoc />
-        public void AddObserver(Func<IObservable<IAction<TRootState>>, IObservable<IAction<TRootState>>> observer)
+        public void Dispatch<TState>(IActionBehaviorAsync<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
+        {
+            this.Dispatch(new ActionBaseAsync<TRootState, TState>(actionBehavior, selector));
+        }
+
+        /// <inheritdoc />
+        public void AddObserver(Func<IObservable<IAction<TRootState, IActionBehavior>>, IObservable<IAction<TRootState, IActionBehavior>>> observer)
         {
             var subscription = observer(this.listenerActions.AsObservable())
-                .CatchAndContinue<IAction<TRootState>, Exception>(e =>
+                .CatchAndContinue<IAction<TRootState, IActionBehavior>, Exception>(e =>
                 {
                     // we can use Dispatch as action listener are used outside of the _syncObject lock monitor
                     this.logger.LogError(e, $"ERROR in action listener");
-                    this.Dispatch(new UnhandledExceptionAction<TRootState>(e));
+                    this.Dispatch(CreateUnhandledExceptionAction(e));
                 })
                 .Subscribe(action =>
                 {
-                    var actionBase = (ActionBase<TRootState>)action;
+                    var actionBase = (AActionBase<TRootState>)action;
                     if (actionBase.State == ActionState.None)
                     {
-                        Task.Run(() => this.Dispatch(actionBase), CancellationToken.None)
+                        Task.Run(() => this.Dispatch(action), CancellationToken.None)
                             .ContinueWith(
                                 (t) =>
                                 {
                                     // dispatch an UnhandledExceptionAction (since we are not in the lock monitor we can call Dispatch directly)
                                     this.logger.LogError(t.Exception, "ERROR while dispatching actions from observer");
-                                    this.Dispatch(new UnhandledExceptionAction<TRootState>(t.Exception));
+                                    this.Dispatch(CreateUnhandledExceptionAction(t.Exception));
                                 },
                                 CancellationToken.None,
                                 TaskContinuationOptions.OnlyOnFaulted,
@@ -130,6 +113,40 @@ namespace SoloX.ActionDispatch.Core.Impl
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispatch an action on a current state.
+        /// </summary>
+        /// <param name="action">The action to apply.</param>
+        internal void Dispatch(IAction<TRootState, IActionBehavior> action)
+        {
+            var actionBase = (AActionBase<TRootState>)action;
+            if (actionBase.State != ActionState.None)
+            {
+                throw new ArgumentException("Error: Action state must be None in order to be dispatched.");
+            }
+
+            IAction<TRootState, IActionBehavior>[] postDispatchRequests;
+
+            lock (this.syncObject)
+            {
+                this.action.OnNext(action);
+                postDispatchRequests = this.actionsToDispatch.ToArray();
+                this.actionsToDispatch.Clear();
+            }
+
+            if (actionBase.State == ActionState.Success)
+            {
+                this.listenerActions.OnNext(action);
+            }
+
+            actionBase.State = ActionState.None;
+
+            foreach (var postDispatchRequest in postDispatchRequests)
+            {
+                this.Dispatch(postDispatchRequest);
+            }
         }
 
         /// <summary>
@@ -150,18 +167,23 @@ namespace SoloX.ActionDispatch.Core.Impl
             }
         }
 
-        private void PostDispatch(IAction<TRootState> action)
+        private static IAction<TRootState, IActionBehavior> CreateUnhandledExceptionAction(Exception exception)
+        {
+            return new ActionBase<TRootState, TRootState>(new UnhandledExceptionBehavior<TRootState>(exception), s => s);
+        }
+
+        private void PostDispatch(IAction<TRootState, IActionBehavior> action)
         {
             this.actionsToDispatch.Add(action);
         }
 
-        private void ActionSubscriber(IAction<TRootState> action)
+        private void ActionSubscriber(IAction<TRootState, IActionBehavior> action)
         {
-            var actionBase = (ActionBase<TRootState>)action;
+            var actionBase = (AActionBase<TRootState>)action;
             try
             {
                 var oldState = this.state.Value;
-                var newState = actionBase.Apply(this, oldState);
+                var newState = action.Apply(this, oldState);
                 actionBase.State = ActionState.Success;
                 if (newState != null && !ReferenceEquals(oldState, newState))
                 {
@@ -175,7 +197,7 @@ namespace SoloX.ActionDispatch.Core.Impl
 
                 // We are already in a dispatch operation so we need to post a dispatch in order to properly
                 // terminate the current one inside the _syncObject lock monitor.
-                this.PostDispatch(new UnhandledExceptionAction<TRootState>(e));
+                this.PostDispatch(CreateUnhandledExceptionAction(e));
             }
         }
     }
