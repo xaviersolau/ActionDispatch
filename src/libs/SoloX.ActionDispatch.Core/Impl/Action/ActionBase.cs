@@ -13,7 +13,7 @@ using System.Text;
 namespace SoloX.ActionDispatch.Core.Impl.Action
 {
     /// <inheritdoc/>
-    public sealed class ActionBase<TRootState, TState> : AActionBase<TRootState, TState>, IAction<TRootState, IActionBehavior<TRootState, TState>>
+    internal sealed class ActionBase<TRootState, TState> : AActionBase<TRootState, TState>, IAction<TRootState, IActionBehavior<TRootState, TState>>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionBase{TRootState, TState}"/> class.
@@ -34,7 +34,7 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
         /// <inheritdoc/>
         public override TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState state)
         {
-            var oldActionState = this.SelectorFunc(state);
+            var oldActionState = this.GetAndCloneTargetState(state);
 
             // TODO implement clone and patch state.
             this.Behavior.Apply(oldActionState);

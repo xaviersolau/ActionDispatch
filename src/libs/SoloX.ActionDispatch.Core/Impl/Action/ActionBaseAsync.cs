@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace SoloX.ActionDispatch.Core.Impl.Action
 {
     /// <inheritdoc/>
-    public sealed class ActionBaseAsync<TRootState, TState> : AActionBase<TRootState, TState>, IAction<TRootState, IActionBehaviorAsync<TRootState, TState>>
+    internal sealed class ActionBaseAsync<TRootState, TState> : AActionBase<TRootState, TState>, IAction<TRootState, IActionBehaviorAsync<TRootState, TState>>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionBaseAsync{TRootState, TState}"/> class.
@@ -36,7 +36,7 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
         /// <inheritdoc/>
         public override TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState state)
         {
-            var oldActionState = this.SelectorFunc(state);
+            var oldActionState = this.GetAndCloneTargetState(state);
 
             Task.Run(
                 async () =>
@@ -54,9 +54,6 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
                 CancellationToken.None,
                 TaskContinuationOptions.OnlyOnFaulted,
                 TaskScheduler.Current);
-
-            // TODO implement clone and patch state.
-            this.Behavior.Apply(dispatcher, this.SelectorFunc(state));
 
             return default;
         }

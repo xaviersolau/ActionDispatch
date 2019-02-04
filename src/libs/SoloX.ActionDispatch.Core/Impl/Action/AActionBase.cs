@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 namespace SoloX.ActionDispatch.Core.Impl.Action
 {
     /// <inheritdoc/>
-    public abstract class AActionBase<TRootState> : IAction<TRootState>
+    internal abstract class AActionBase<TRootState> : IAction<TRootState>
     {
         /// <summary>
         /// Gets or sets action state.
@@ -24,9 +24,11 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
 
 #pragma warning disable SA1402 // File may only contain a single type
     /// <inheritdoc/>
-    public abstract class AActionBase<TRootState, TState> : AActionBase<TRootState>
+    internal abstract class AActionBase<TRootState, TState> : AActionBase<TRootState>
 #pragma warning restore SA1402 // File may only contain a single type
     {
+        private Func<TRootState, TState> selectorFunc;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AActionBase{TRootState, TState}"/> class.
         /// </summary>
@@ -35,7 +37,7 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
         {
             this.Selector = stateSelector;
 
-            this.SelectorFunc = stateSelector.Compile();
+            this.selectorFunc = stateSelector.Compile();
         }
 
         /// <summary>
@@ -44,8 +46,14 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
         internal LambdaExpression Selector { get; }
 
         /// <summary>
-        /// Gets action state selector delegate Func.
+        /// Gets and clones the target state.
         /// </summary>
-        protected Func<TRootState, TState> SelectorFunc { get; }
+        /// <param name="state">The root state.</param>
+        /// <returns>The cloned target state.</returns>
+        protected TState GetAndCloneTargetState(TRootState state)
+        {
+            var oldTargetState = this.selectorFunc(state);
+            return oldTargetState;
+        }
     }
 }

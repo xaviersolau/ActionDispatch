@@ -116,10 +116,33 @@ namespace SoloX.ActionDispatch.Core.Impl
         }
 
         /// <summary>
+        /// Dispose method.
+        /// </summary>
+        /// <param name="isDispose">Tells if the method is called by Dispose method (finalizer otherwise).</param>
+        protected virtual void Dispose(bool isDispose)
+        {
+            if (isDispose && !this.isDisposed)
+            {
+                this.isDisposed = true;
+                this.state.Dispose();
+                this.action.Dispose();
+                this.listenerActions.Dispose();
+
+                this.listenerActionSubscriptions.ForEach(subscription => subscription.Dispose());
+                this.listenerActionSubscriptions.Clear();
+            }
+        }
+
+        private static IAction<TRootState, IActionBehavior> CreateUnhandledExceptionAction(Exception exception)
+        {
+            return new ActionBase<TRootState, TRootState>(new UnhandledExceptionBehavior<TRootState>(exception), s => s);
+        }
+
+        /// <summary>
         /// Dispatch an action on a current state.
         /// </summary>
         /// <param name="action">The action to apply.</param>
-        internal void Dispatch(IAction<TRootState, IActionBehavior> action)
+        private void Dispatch(IAction<TRootState, IActionBehavior> action)
         {
             var actionBase = (AActionBase<TRootState>)action;
             if (actionBase.State != ActionState.None)
@@ -147,29 +170,6 @@ namespace SoloX.ActionDispatch.Core.Impl
             {
                 this.Dispatch(postDispatchRequest);
             }
-        }
-
-        /// <summary>
-        /// Dispose method.
-        /// </summary>
-        /// <param name="isDispose">Tells if the method is called by Dispose method (finalizer otherwise).</param>
-        protected virtual void Dispose(bool isDispose)
-        {
-            if (isDispose && !this.isDisposed)
-            {
-                this.isDisposed = true;
-                this.state.Dispose();
-                this.action.Dispose();
-                this.listenerActions.Dispose();
-
-                this.listenerActionSubscriptions.ForEach(subscription => subscription.Dispose());
-                this.listenerActionSubscriptions.Clear();
-            }
-        }
-
-        private static IAction<TRootState, IActionBehavior> CreateUnhandledExceptionAction(Exception exception)
-        {
-            return new ActionBase<TRootState, TRootState>(new UnhandledExceptionBehavior<TRootState>(exception), s => s);
         }
 
         private void PostDispatch(IAction<TRootState, IActionBehavior> action)
