@@ -3,4 +3,8 @@
 bin
 obj
 
+src/examples/SoloX.ActionDispatch.Examples/SoloX.ActionDispatch.Examples.xml
 src/libs/SoloX.ActionDispatch.Core/SoloX.ActionDispatch.Core.xml
+src/tests/SoloX.ActionDispatch.Core.UTest/SoloX.ActionDispatch.Core.UTest.xml
+src/tools/SoloX.ActionDispatch.Tools/dotnet-SoloX.ActionDispatch.Tools.xml
+src/tools/SoloX.ActionDispatch.State.Generator/SoloX.ActionDispatch.State.Generator.xml

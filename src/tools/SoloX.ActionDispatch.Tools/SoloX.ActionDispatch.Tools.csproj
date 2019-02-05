@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <Authors>Xavier Solau</Authors>
     <Company>Xavier Solau</Company>
     <Version>0.1.0-alpha-1</Version>
@@ -11,6 +12,7 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/xaviersolau/ActionDispatch.git</RepositoryUrl>
     <LangVersion>latest</LangVersion>
+    <AssemblyName>dotnet-SoloX.ActionDispatch.Tools</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -28,7 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="..\.stylecop.json" Link="stylecop.json" />
+    <AdditionalFiles Include="..\..\libs\.stylecop.json" Link="stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,7 +43,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
-    <PackageReference Include="System.Reactive" Version="4.1.2" />
   </ItemGroup>
 
 </Project>
