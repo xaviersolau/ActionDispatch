@@ -3,6 +3,8 @@
 bin
 obj
 
+launchSettings.json
+
 src/examples/SoloX.ActionDispatch.Examples/SoloX.ActionDispatch.Examples.xml
 src/libs/SoloX.ActionDispatch.Core/SoloX.ActionDispatch.Core.xml
 src/tests/SoloX.ActionDispatch.Core.UTest/SoloX.ActionDispatch.Core.UTest.xml

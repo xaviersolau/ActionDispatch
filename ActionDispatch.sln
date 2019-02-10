@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.Core.U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.Tools", "src\tools\SoloX.ActionDispatch.Tools\SoloX.ActionDispatch.Tools.csproj", "{88744C69-32B0-4A1C-964A-12341497780D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoloX.ActionDispatch.State.Generator", "src\tools\SoloX.ActionDispatch.State.Generator\SoloX.ActionDispatch.State.Generator.csproj", "{768579B8-EA11-47A1-8A9D-8B8E3B3F445B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.State.Generator", "src\tools\SoloX.ActionDispatch.State.Generator\SoloX.ActionDispatch.State.Generator.csproj", "{768579B8-EA11-47A1-8A9D-8B8E3B3F445B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
