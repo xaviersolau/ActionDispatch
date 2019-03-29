@@ -130,6 +130,7 @@ namespace SoloX.ActionDispatch.Core.Impl
 
                 this.listenerActionSubscriptions.ForEach(subscription => subscription.Dispose());
                 this.listenerActionSubscriptions.Clear();
+                this.actionSubscription.Dispose();
             }
         }
 
@@ -190,6 +191,7 @@ namespace SoloX.ActionDispatch.Core.Impl
                     this.state.OnNext(newState);
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
                 actionBase.State = ActionState.Failed;
@@ -199,6 +201,7 @@ namespace SoloX.ActionDispatch.Core.Impl
                 // terminate the current one inside the _syncObject lock monitor.
                 this.PostDispatch(CreateUnhandledExceptionAction(e));
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
     }
 }
