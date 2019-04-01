@@ -13,6 +13,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.Tools"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.State.Generator", "src\tools\SoloX.ActionDispatch.State.Generator\SoloX.ActionDispatch.State.Generator.csproj", "{768579B8-EA11-47A1-8A9D-8B8E3B3F445B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{8A1BF072-D6FD-4D7D-BAD2-304D6260BD4A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9CC5872A-041F-4058-A338-803653E3141B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{BEE0C98F-8C65-4EED-B56D-E5307A495005}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{C3FDC762-1837-4392-9F5A-D4164284879B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +50,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F730E09C-3DD9-4625-90C1-3816A8C8E81E} = {8A1BF072-D6FD-4D7D-BAD2-304D6260BD4A}
+		{0F4E6B37-D526-4CCD-9F31-EBA4532B5D64} = {C3FDC762-1837-4392-9F5A-D4164284879B}
+		{065EB350-7C46-4CA5-BBD0-8E2F6A4475EE} = {9CC5872A-041F-4058-A338-803653E3141B}
+		{88744C69-32B0-4A1C-964A-12341497780D} = {BEE0C98F-8C65-4EED-B56D-E5307A495005}
+		{768579B8-EA11-47A1-8A9D-8B8E3B3F445B} = {BEE0C98F-8C65-4EED-B56D-E5307A495005}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C234AD4E-8AE5-4C97-91A7-CE66AE5EFF32}
