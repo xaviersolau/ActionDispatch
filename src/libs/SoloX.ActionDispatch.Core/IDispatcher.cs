@@ -17,6 +17,7 @@ namespace SoloX.ActionDispatch.Core
     /// </summary>
     /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
     public interface IDispatcher<TRootState>
+        where TRootState : IState<TRootState>
     {
         /// <summary>
         /// Gets current state.
@@ -29,7 +30,8 @@ namespace SoloX.ActionDispatch.Core
         /// <typeparam name="TState">The target state type.</typeparam>
         /// <param name="actionBehavior">The action behavior to apply.</param>
         /// <param name="selector">The target state selector expression.</param>
-        void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector);
+        void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
+            where TState : IState<TState>;
 
         /// <summary>
         /// Dispatch an action on a current state.
@@ -37,7 +39,8 @@ namespace SoloX.ActionDispatch.Core
         /// <typeparam name="TState">The target state type.</typeparam>
         /// <param name="actionBehavior">The asynchronous action behavior to apply.</param>
         /// <param name="selector">The target state selector expression.</param>
-        void Dispatch<TState>(IActionBehaviorAsync<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector);
+        void Dispatch<TState>(IActionBehaviorAsync<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
+            where TState : IState<TState>;
 
         /// <summary>
         /// Add an action observer.

@@ -14,6 +14,7 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
     /// </summary>
     /// <typeparam name="TRootState">The state root type.</typeparam>
     public class UnhandledExceptionBehavior<TRootState> : IActionBehavior<TRootState, TRootState>
+        where TRootState : IState
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="UnhandledExceptionBehavior{TRootState}"/> class.

@@ -12,6 +12,7 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
 {
     /// <inheritdoc/>
     internal abstract class AActionBase<TRootState> : IAction<TRootState>
+        where TRootState : IState<TRootState>
     {
         /// <summary>
         /// Gets or sets action state.
@@ -19,12 +20,14 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
         public ActionState State { get; set; }
 
         /// <inheritdoc/>
-        public abstract TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState state);
+        public abstract TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState rootState);
     }
 
 #pragma warning disable SA1402 // File may only contain a single type
     /// <inheritdoc/>
     internal abstract class AActionBase<TRootState, TState> : AActionBase<TRootState>
+        where TRootState : IState<TRootState>
+        where TState : IState<TState>
 #pragma warning restore SA1402 // File may only contain a single type
     {
         private Func<TRootState, TState> selectorFunc;
@@ -43,17 +46,25 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
         /// <summary>
         /// Gets action state selector expression.
         /// </summary>
-        internal LambdaExpression Selector { get; }
+        private LambdaExpression Selector { get; }
 
         /// <summary>
-        /// Gets and clones the target state.
+        /// Select the target state.
         /// </summary>
-        /// <param name="state">The root state.</param>
-        /// <returns>The cloned target state.</returns>
-        protected TState GetAndCloneTargetState(TRootState state)
+        /// <param name="rootState">The root state.</param>
+        protected TState SelectState(TRootState rootState)
         {
-            var oldTargetState = this.selectorFunc(state);
-            return oldTargetState;
+            return this.selectorFunc(rootState);
+        }
+
+        /// <summary>
+        /// Select the target state within a transaction.
+        /// </summary>
+        /// <param name="rootState">The root state.</param>
+        protected ITransactionalState<TState> SelectStateTransaction(TRootState rootState)
+        {
+            var targetState = this.selectorFunc(rootState);
+            return targetState.CreateTransactionalState();
         }
     }
 }

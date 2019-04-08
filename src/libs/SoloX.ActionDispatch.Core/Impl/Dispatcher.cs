@@ -24,6 +24,7 @@ namespace SoloX.ActionDispatch.Core.Impl
     /// </summary>
     /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
     public class Dispatcher<TRootState> : IDispatcher<TRootState>, IDisposable
+        where TRootState : IState<TRootState>
     {
         private readonly object syncObject = new object();
 
@@ -67,12 +68,14 @@ namespace SoloX.ActionDispatch.Core.Impl
 
         /// <inheritdoc />
         public void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
+            where TState : IState<TState>
         {
             this.Dispatch(new ActionBase<TRootState, TState>(actionBehavior, selector));
         }
 
         /// <inheritdoc />
         public void Dispatch<TState>(IActionBehaviorAsync<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
+            where TState : IState<TState>
         {
             this.Dispatch(new ActionBaseAsync<TRootState, TState>(actionBehavior, selector));
         }
@@ -184,9 +187,10 @@ namespace SoloX.ActionDispatch.Core.Impl
             try
             {
                 var oldState = this.state.Value;
+                var oldVersion = oldState.Version;
                 var newState = action.Apply(this, oldState);
                 actionBase.State = ActionState.Success;
-                if (newState != null && !ReferenceEquals(oldState, newState))
+                if (newState != null && newState.Version != oldVersion)
                 {
                     this.state.OnNext(newState);
                 }

@@ -16,6 +16,8 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
 {
     /// <inheritdoc/>
     internal sealed class ActionBaseAsync<TRootState, TState> : AActionBase<TRootState, TState>, IAction<TRootState, IActionBehaviorAsync<TRootState, TState>>
+        where TRootState : IState<TRootState>
+        where TState : IState<TState>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionBaseAsync{TRootState, TState}"/> class.
@@ -36,13 +38,14 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
         /// <inheritdoc/>
         public override TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState state)
         {
-            var oldActionState = this.GetAndCloneTargetState(state);
+            // Get the target state object. It is locked so we won't be able to write it.
+            var targetState = this.SelectState(state);
 
             Task.Run(
                 async () =>
                 {
-                    // This will run outside of the lock monitor
-                    await this.Behavior.Apply(dispatcher, oldActionState).ConfigureAwait(false);
+                    // This will run outside of the lock dispatcher monitor.
+                    await this.Behavior.Apply(dispatcher, targetState).ConfigureAwait(false);
                 },
                 CancellationToken.None)
                 .ContinueWith(

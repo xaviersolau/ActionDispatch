@@ -18,6 +18,8 @@ namespace SoloX.ActionDispatch.Core
     /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
     /// <typeparam name="TState">The state type the action apply on.</typeparam>
     public interface IActionBehaviorAsync<TRootState, TState> : IActionBehavior
+        where TRootState : IState<TRootState>
+        where TState : IState
     {
         /// <summary>
         /// Apply action behavior on the given state.

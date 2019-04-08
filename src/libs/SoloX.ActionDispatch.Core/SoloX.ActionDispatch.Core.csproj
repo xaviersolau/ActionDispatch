@@ -14,6 +14,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Impl\Action\StateTransaction.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Impl\TransactionalState.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="SoloX.CodeQuality.Prod" Version="1.0.0-rc.4" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="System.Reactive" Version="4.1.3" />

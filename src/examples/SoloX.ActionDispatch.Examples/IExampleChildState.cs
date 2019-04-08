@@ -1,24 +1,26 @@
 ﻿// ----------------------------------------------------------------------
-// <copyright file="ExampleState.cs" company="SoloX Software">
+// <copyright file="IExampleChildState.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // ----------------------------------------------------------------------
 
 using System;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
+using System.Text;
+using SoloX.ActionDispatch.Core;
 
 namespace SoloX.ActionDispatch.Examples
 {
     /// <summary>
-    /// Root state object.
+    /// Child example state interface.
     /// </summary>
-    public class ExampleState
+    public interface IExampleChildState : IState<IExampleChildState>
     {
         /// <summary>
-        /// Gets or sets state count.
+        /// Gets or sets child state count.
         /// </summary>
-        public int Count
+        int ChildCount
         { get; set; }
     }
 }

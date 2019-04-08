@@ -28,11 +28,16 @@ namespace SoloX.ActionDispatch.Examples
             IServiceCollection sc = new ServiceCollection();
 
             sc.AddLogging(b => b.AddConsole());
+            sc.AddSingleton<IDispatcher<IExampleAppState>>(
+                r =>
+                {
+                    var state = new ExampleAppState() { ChildState = new ExampleChildState() };
+                    state.Lock();
 
-            sc.AddSingleton<IDispatcher<ExampleState>>(
-                r => new Dispatcher<ExampleState>(
-                    new ExampleState(),
-                    r.GetService<ILogger<Dispatcher<ExampleState>>>()));
+                    return new Dispatcher<IExampleAppState>(
+                        state,
+                        r.GetService<ILogger<Dispatcher<IExampleAppState>>>());
+                });
 
             this.Service = sc.BuildServiceProvider();
 
@@ -58,11 +63,11 @@ namespace SoloX.ActionDispatch.Examples
 
         private void Run()
         {
-            var dispatcher = this.Service.GetService<IDispatcher<ExampleState>>();
+            var dispatcher = this.Service.GetService<IDispatcher<IExampleAppState>>();
 
             dispatcher.AddObserver(obs => obs.Do(a => this.logger.LogWarning($"Processing action with behavior: {a.Behavior}")));
 
-            dispatcher.Dispatch(new ExampleActionBehavior(), s => s);
+            dispatcher.Dispatch(new ExampleActionBehavior(), s => s.ChildState);
         }
     }
 }

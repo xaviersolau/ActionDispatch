@@ -14,6 +14,8 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
 {
     /// <inheritdoc/>
     internal sealed class ActionBase<TRootState, TState> : AActionBase<TRootState, TState>, IAction<TRootState, IActionBehavior<TRootState, TState>>
+        where TRootState : IState<TRootState>
+        where TState : IState<TState>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionBase{TRootState, TState}"/> class.
@@ -32,14 +34,17 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
         public IActionBehavior<TRootState, TState> Behavior { get; }
 
         /// <inheritdoc/>
-        public override TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState state)
+        public override TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState rootState)
         {
-            var oldActionState = this.GetAndCloneTargetState(state);
+            using (var stateTransaction = this.SelectStateTransaction(rootState))
+            {
+                this.Behavior.Apply(stateTransaction.State);
 
-            // TODO implement clone and patch state.
-            this.Behavior.Apply(oldActionState);
+                var patched = stateTransaction.Patch(rootState);
+                patched.Lock();
 
-            return default;
+                return patched;
+            }
         }
     }
 }

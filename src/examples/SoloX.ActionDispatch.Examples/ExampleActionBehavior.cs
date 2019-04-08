@@ -13,12 +13,13 @@ namespace SoloX.ActionDispatch.Examples
     /// <summary>
     /// Example action.
     /// </summary>
-    public class ExampleActionBehavior : IActionBehavior<ExampleState, ExampleState>
+    public class ExampleActionBehavior : IActionBehavior<IExampleAppState, IExampleChildState>
     {
         /// <inheritdoc />
-        public ExampleState Apply(ExampleState state)
+        public IExampleChildState Apply(IExampleChildState state)
         {
-            throw new NotImplementedException();
+            state.ChildCount++;
+            return state;
         }
     }
 }
