@@ -201,9 +201,13 @@ namespace SoloX.ActionDispatch.Core.Impl
                 actionBase.State = ActionState.Failed;
                 this.logger.LogError(e, "ERROR in action subscription");
 
-                // We are already in a dispatch operation so we need to post a dispatch in order to properly
-                // terminate the current one inside the _syncObject lock monitor.
-                this.PostDispatch(CreateUnhandledExceptionAction(e));
+                // Check we are not already in an UnhandledExceptionAction to avoid a recursive exception handling.
+                if (!(action.Behavior is UnhandledExceptionBehavior<TRootState>))
+                {
+                    // We are already in a dispatch operation so we need to post a dispatch in order to properly
+                    // terminate the current one inside the _syncObject lock monitor.
+                    this.PostDispatch(CreateUnhandledExceptionAction(e));
+                }
             }
 #pragma warning restore CA1031 // Do not catch general exception types
         }
