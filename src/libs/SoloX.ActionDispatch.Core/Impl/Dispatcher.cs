@@ -70,14 +70,14 @@ namespace SoloX.ActionDispatch.Core.Impl
         public void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
             where TState : IState<TState>
         {
-            this.Dispatch(new ActionBase<TRootState, TState>(actionBehavior, selector));
+            this.Dispatch(new SyncAction<TRootState, TState>(actionBehavior, selector));
         }
 
         /// <inheritdoc />
         public void Dispatch<TState>(IActionBehaviorAsync<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
             where TState : IState<TState>
         {
-            this.Dispatch(new ActionBaseAsync<TRootState, TState>(actionBehavior, selector));
+            this.Dispatch(new AsyncAction<TRootState, TState>(actionBehavior, selector));
         }
 
         /// <inheritdoc />
@@ -92,7 +92,7 @@ namespace SoloX.ActionDispatch.Core.Impl
                 })
                 .Subscribe(action =>
                 {
-                    var actionBase = (AActionBase<TRootState>)action;
+                    var actionBase = (AAction<TRootState>)action;
                     if (actionBase.State == ActionState.None)
                     {
                         Task.Run(() => this.Dispatch(action), CancellationToken.None)
@@ -139,7 +139,7 @@ namespace SoloX.ActionDispatch.Core.Impl
 
         private static IAction<TRootState, IActionBehavior> CreateUnhandledExceptionAction(Exception exception)
         {
-            return new ActionBase<TRootState, TRootState>(new UnhandledExceptionBehavior<TRootState>(exception), s => s);
+            return new SyncAction<TRootState, TRootState>(new UnhandledExceptionBehavior<TRootState>(exception), s => s);
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace SoloX.ActionDispatch.Core.Impl
         /// <param name="action">The action to apply.</param>
         private void Dispatch(IAction<TRootState, IActionBehavior> action)
         {
-            var actionBase = (AActionBase<TRootState>)action;
+            var actionBase = (AAction<TRootState>)action;
             if (actionBase.State != ActionState.None)
             {
                 throw new ArgumentException("Error: Action state must be None in order to be dispatched.");
@@ -183,7 +183,7 @@ namespace SoloX.ActionDispatch.Core.Impl
 
         private void ActionSubscriber(IAction<TRootState, IActionBehavior> action)
         {
-            var actionBase = (AActionBase<TRootState>)action;
+            var actionBase = (AAction<TRootState>)action;
             try
             {
                 var oldState = this.state.Value;

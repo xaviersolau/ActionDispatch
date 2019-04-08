@@ -1,5 +1,5 @@
 ﻿// ----------------------------------------------------------------------
-// <copyright file="ActionBaseAsync.cs" company="SoloX Software">
+// <copyright file="AsyncAction.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -15,16 +15,16 @@ using System.Threading.Tasks;
 namespace SoloX.ActionDispatch.Core.Impl.Action
 {
     /// <inheritdoc/>
-    internal sealed class ActionBaseAsync<TRootState, TState> : AActionBase<TRootState, TState>, IAction<TRootState, IActionBehaviorAsync<TRootState, TState>>
+    internal sealed class AsyncAction<TRootState, TState> : AAction<TRootState, TState>, IAction<TRootState, IActionBehaviorAsync<TRootState, TState>>
         where TRootState : IState<TRootState>
         where TState : IState<TState>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ActionBaseAsync{TRootState, TState}"/> class.
+        /// Initializes a new instance of the <see cref="AsyncAction{TRootState, TState}"/> class.
         /// </summary>
         /// <param name="behavior">The action behavior.</param>
         /// <param name="stateSelector">The action state selector expression.</param>
-        public ActionBaseAsync(
+        public AsyncAction(
             IActionBehaviorAsync<TRootState, TState> behavior,
             Expression<Func<TRootState, TState>> stateSelector)
             : base(stateSelector)

@@ -1,5 +1,5 @@
 ﻿// ----------------------------------------------------------------------
-// <copyright file="AActionBase.cs" company="SoloX Software">
+// <copyright file="AAction.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 namespace SoloX.ActionDispatch.Core.Impl.Action
 {
     /// <inheritdoc/>
-    internal abstract class AActionBase<TRootState> : IAction<TRootState>
+    internal abstract class AAction<TRootState> : IAction<TRootState>
         where TRootState : IState<TRootState>
     {
         /// <summary>
@@ -25,7 +25,7 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
 
 #pragma warning disable SA1402 // File may only contain a single type
     /// <inheritdoc/>
-    internal abstract class AActionBase<TRootState, TState> : AActionBase<TRootState>
+    internal abstract class AAction<TRootState, TState> : AAction<TRootState>
         where TRootState : IState<TRootState>
         where TState : IState<TState>
 #pragma warning restore SA1402 // File may only contain a single type
@@ -33,10 +33,10 @@ namespace SoloX.ActionDispatch.Core.Impl.Action
         private Func<TRootState, TState> selectorFunc;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AActionBase{TRootState, TState}"/> class.
+        /// Initializes a new instance of the <see cref="AAction{TRootState, TState}"/> class.
         /// </summary>
         /// <param name="stateSelector">The action state selector expression.</param>
-        protected AActionBase(Expression<Func<TRootState, TState>> stateSelector)
+        protected AAction(Expression<Func<TRootState, TState>> stateSelector)
         {
             this.Selector = stateSelector;
 
