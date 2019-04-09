@@ -5,6 +5,8 @@
 // </copyright>
 // ----------------------------------------------------------------------
 
+using SoloX.ActionDispatch.Core.State;
+
 namespace SoloX.ActionDispatch.Core.UTest
 {
     public interface ITestState : IState<ITestState>

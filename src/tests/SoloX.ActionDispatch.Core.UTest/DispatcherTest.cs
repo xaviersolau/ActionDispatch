@@ -8,8 +8,10 @@
 using System;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SoloX.ActionDispatch.Core.Impl;
-using SoloX.ActionDispatch.Core.Impl.Action;
+using SoloX.ActionDispatch.Core;
+using SoloX.ActionDispatch.Core.Action;
+using SoloX.ActionDispatch.Core.Dispatch.Impl;
+using SoloX.ActionDispatch.Core.State;
 using Xunit;
 
 namespace SoloX.ActionDispatch.Core.UTest
@@ -23,23 +25,30 @@ namespace SoloX.ActionDispatch.Core.UTest
 
             var actionBehaviorMock = new Mock<IActionBehavior<ITestState, ITestState>>();
 
-            var stateMock = new Mock<ITestState>();
-
-            var transactionalStateMock = new Mock<ITransactionalState<ITestState>>();
-            stateMock.Setup(s => s.CreateTransactionalState()).Returns(transactionalStateMock.Object);
-
             var stateCloneMock = new Mock<ITestState>();
+            var state = CreateStateMockWithAClone(stateCloneMock.Object);
 
-            transactionalStateMock.Setup(ts => ts.State).Returns(stateCloneMock.Object);
-
-            transactionalStateMock.Setup(ts => ts.Patch(stateMock.Object)).Returns(stateCloneMock.Object);
-
-            var dispatcher = new Dispatcher<ITestState>(stateMock.Object, logger);
+            var dispatcher = new Dispatcher<ITestState>(state, logger);
 
             dispatcher.Dispatch(actionBehaviorMock.Object, s => s);
 
             actionBehaviorMock.Verify(ab => ab.Apply(stateCloneMock.Object));
             stateCloneMock.Verify(s => s.Lock());
+        }
+
+        private static TState CreateStateMockWithAClone<TState>(TState clone)
+            where TState : class, IState<TState>
+        {
+            var stateMock = new Mock<TState>();
+
+            var transactionalStateMock = new Mock<ITransactionalState<TState>>();
+            stateMock.Setup(s => s.CreateTransactionalState()).Returns(transactionalStateMock.Object);
+
+            transactionalStateMock.Setup(ts => ts.State).Returns(clone);
+
+            transactionalStateMock.Setup(ts => ts.Patch(stateMock.Object)).Returns(clone);
+
+            return stateMock.Object;
         }
     }
 }

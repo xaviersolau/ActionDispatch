@@ -8,8 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SoloX.ActionDispatch.Core.State;
 
-namespace SoloX.ActionDispatch.Core
+namespace SoloX.ActionDispatch.Core.Action
 {
     /// <summary>
     /// Action behavior.

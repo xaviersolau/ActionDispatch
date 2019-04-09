@@ -11,8 +11,10 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using SoloX.ActionDispatch.Core.Dispatch;
+using SoloX.ActionDispatch.Core.State;
 
-namespace SoloX.ActionDispatch.Core.Impl.Action
+namespace SoloX.ActionDispatch.Core.Action.Impl
 {
     /// <inheritdoc/>
     internal sealed class AsyncAction<TRootState, TState> : AAction<TRootState, TState>, IAction<TRootState, IActionBehaviorAsync<TRootState, TState>>

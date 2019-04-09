@@ -5,7 +5,7 @@
 // </copyright>
 // ----------------------------------------------------------------------
 
-namespace SoloX.ActionDispatch.Core.Impl.Action
+namespace SoloX.ActionDispatch.Core.Action.Impl
 {
     /// <summary>
     /// Action state.

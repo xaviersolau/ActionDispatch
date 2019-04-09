@@ -11,8 +11,8 @@ using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SoloX.ActionDispatch.Core;
-using SoloX.ActionDispatch.Core.Impl;
-using SoloX.ActionDispatch.Core.Impl.Action;
+using SoloX.ActionDispatch.Core.Dispatch;
+using SoloX.ActionDispatch.Core.Dispatch.Impl;
 
 namespace SoloX.ActionDispatch.Examples
 {

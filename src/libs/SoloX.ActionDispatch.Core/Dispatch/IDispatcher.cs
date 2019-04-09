@@ -9,8 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using SoloX.ActionDispatch.Core.Action;
+using SoloX.ActionDispatch.Core.State;
 
-namespace SoloX.ActionDispatch.Core
+namespace SoloX.ActionDispatch.Core.Dispatch
 {
     /// <summary>
     /// IDispatcher interface. Used to dispatch IAction that will change the root state object hierarchy.

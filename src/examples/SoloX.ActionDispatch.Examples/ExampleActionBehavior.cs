@@ -6,7 +6,7 @@
 // ----------------------------------------------------------------------
 
 using System;
-using SoloX.ActionDispatch.Core;
+using SoloX.ActionDispatch.Core.Action;
 
 namespace SoloX.ActionDispatch.Examples
 {

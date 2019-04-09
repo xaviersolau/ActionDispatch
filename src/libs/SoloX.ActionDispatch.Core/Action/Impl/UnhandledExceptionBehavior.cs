@@ -6,8 +6,9 @@
 // ----------------------------------------------------------------------
 
 using System;
+using SoloX.ActionDispatch.Core.State;
 
-namespace SoloX.ActionDispatch.Core.Impl.Action
+namespace SoloX.ActionDispatch.Core.Action.Impl
 {
     /// <summary>
     /// Action behavior to report an unhandled exception.

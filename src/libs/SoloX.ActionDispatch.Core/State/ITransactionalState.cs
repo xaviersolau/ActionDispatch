@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SoloX.ActionDispatch.Core
+namespace SoloX.ActionDispatch.Core.State
 {
     /// <summary>
     /// Transactional state interface.

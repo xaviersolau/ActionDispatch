@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using SoloX.ActionDispatch.Core;
+using SoloX.ActionDispatch.Core.State;
 
 namespace SoloX.ActionDispatch.Examples
 {

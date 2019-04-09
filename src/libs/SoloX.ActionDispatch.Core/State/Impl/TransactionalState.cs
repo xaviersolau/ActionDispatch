@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SoloX.ActionDispatch.Core.Impl
+namespace SoloX.ActionDispatch.Core.State.Impl
 {
     internal class TransactionalState<TState> : ITransactionalState<TState>
         where TState : IState

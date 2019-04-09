@@ -14,10 +14,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SoloX.ActionDispatch.Core.Impl.Action;
-using SoloX.ActionDispatch.Core.Impl.Utils;
+using SoloX.ActionDispatch.Core.Action;
+using SoloX.ActionDispatch.Core.Action.Impl;
+using SoloX.ActionDispatch.Core.State;
+using SoloX.ActionDispatch.Core.Utils;
 
-namespace SoloX.ActionDispatch.Core.Impl
+namespace SoloX.ActionDispatch.Core.Dispatch.Impl
 {
     /// <summary>
     /// Implementation of the IDispatcher.

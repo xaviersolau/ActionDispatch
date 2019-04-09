@@ -9,8 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using SoloX.ActionDispatch.Core.Dispatch;
+using SoloX.ActionDispatch.Core.State;
 
-namespace SoloX.ActionDispatch.Core
+namespace SoloX.ActionDispatch.Core.Action
 {
     /// <summary>
     /// Asynchronous action behavior.

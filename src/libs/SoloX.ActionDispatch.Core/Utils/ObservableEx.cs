@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Text;
 
-namespace SoloX.ActionDispatch.Core.Impl.Utils
+namespace SoloX.ActionDispatch.Core.Utils
 {
     /// <summary>
     /// IObservable extensions.

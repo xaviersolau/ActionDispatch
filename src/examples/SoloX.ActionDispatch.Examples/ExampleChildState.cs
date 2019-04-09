@@ -8,7 +8,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using SoloX.ActionDispatch.Core;
-using SoloX.ActionDispatch.Core.Impl;
+using SoloX.ActionDispatch.Core.State.Impl;
 
 namespace SoloX.ActionDispatch.Examples
 {
