@@ -12,23 +12,24 @@ using SoloX.ActionDispatch.Core;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
 using SoloX.ActionDispatch.Core.State;
+using SoloX.ActionDispatch.Core.UTest.State.Basic;
 using Xunit;
 
-namespace SoloX.ActionDispatch.Core.UTest
+namespace SoloX.ActionDispatch.Core.UTest.Dispatch
 {
     public class DispatcherTest
     {
         [Fact]
         public void DispatchActionTest()
         {
-            var logger = Mock.Of<ILogger<Dispatcher<ITestState>>>();
+            var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
 
-            var actionBehaviorMock = new Mock<IActionBehavior<ITestState, ITestState>>();
+            var actionBehaviorMock = new Mock<IActionBehavior<IStateA, IStateA>>();
 
-            var stateCloneMock = new Mock<ITestState>();
+            var stateCloneMock = new Mock<IStateA>();
             var state = CreateStateMockWithAClone(stateCloneMock.Object);
 
-            var dispatcher = new Dispatcher<ITestState>(state, logger);
+            var dispatcher = new Dispatcher<IStateA>(state, logger);
 
             dispatcher.Dispatch(actionBehaviorMock.Object, s => s);
 
