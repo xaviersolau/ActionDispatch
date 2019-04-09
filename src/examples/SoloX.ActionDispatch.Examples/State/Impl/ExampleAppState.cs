@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SoloX.ActionDispatch.Core;
 using SoloX.ActionDispatch.Core.State.Impl;
 
-namespace SoloX.ActionDispatch.Examples
+namespace SoloX.ActionDispatch.Examples.State.Impl
 {
     /// <summary>
     /// Root example state object.

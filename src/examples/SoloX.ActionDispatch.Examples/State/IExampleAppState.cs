@@ -11,7 +11,7 @@ using System.Text;
 using SoloX.ActionDispatch.Core;
 using SoloX.ActionDispatch.Core.State;
 
-namespace SoloX.ActionDispatch.Examples
+namespace SoloX.ActionDispatch.Examples.State
 {
     /// <summary>
     /// Root example state interface.

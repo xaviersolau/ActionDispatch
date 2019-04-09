@@ -1,5 +1,5 @@
 ﻿// ----------------------------------------------------------------------
-// <copyright file="IExampleChildState.cs" company="SoloX Software">
+// <copyright file="IStateFactory.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -8,20 +8,20 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using SoloX.ActionDispatch.Core;
-using SoloX.ActionDispatch.Core.State;
 
-namespace SoloX.ActionDispatch.Examples
+namespace SoloX.ActionDispatch.Core.State
 {
     /// <summary>
-    /// Child example state interface.
+    /// The state factory interface.
     /// </summary>
-    public interface IExampleChildState : IState<IExampleChildState>
+    public interface IStateFactory
     {
         /// <summary>
-        /// Gets or sets child state count.
+        /// Create a state instance.
         /// </summary>
-        int ChildCount
-        { get; set; }
+        /// <typeparam name="TState">The state type that will be created.</typeparam>
+        /// <returns>The created instance.</returns>
+        TState Create<TState>()
+            where TState : IState<TState>;
     }
 }

@@ -7,8 +7,9 @@
 
 using System;
 using SoloX.ActionDispatch.Core.Action;
+using SoloX.ActionDispatch.Examples.State;
 
-namespace SoloX.ActionDispatch.Examples
+namespace SoloX.ActionDispatch.Examples.ActionBehavior
 {
     /// <summary>
     /// Example action.

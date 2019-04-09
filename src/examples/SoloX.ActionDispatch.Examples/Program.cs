@@ -13,6 +13,9 @@ using Microsoft.Extensions.Logging;
 using SoloX.ActionDispatch.Core;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
+using SoloX.ActionDispatch.Core.State;
+using SoloX.ActionDispatch.Examples.ActionBehavior;
+using SoloX.ActionDispatch.Examples.State;
 
 namespace SoloX.ActionDispatch.Examples
 {
@@ -28,10 +31,14 @@ namespace SoloX.ActionDispatch.Examples
             IServiceCollection sc = new ServiceCollection();
 
             sc.AddLogging(b => b.AddConsole());
+            sc.AddSingleton<IStateFactory>(new State.Impl.ExampleStateFactory());
             sc.AddSingleton<IDispatcher<IExampleAppState>>(
                 r =>
                 {
-                    var state = new ExampleAppState() { ChildState = new ExampleChildState() };
+                    var factory = r.GetService<IStateFactory>();
+                    var state = factory.Create<IExampleAppState>();
+                    state.ChildState = factory.Create<IExampleChildState>();
+
                     state.Lock();
 
                     return new Dispatcher<IExampleAppState>(
