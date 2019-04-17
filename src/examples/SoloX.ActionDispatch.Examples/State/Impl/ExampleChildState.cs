@@ -40,21 +40,11 @@ namespace SoloX.ActionDispatch.Examples.State.Impl
         }
 
         /// <inheritdoc/>
-        protected override AStateBase<IExampleChildState> CreateAndDeepClone()
+        protected override AStateBase<IExampleChildState> CreateAndClone(bool deep)
         {
             var clone = new ExampleChildState();
 
-            this.CopyToExampleChildState(clone, true);
-
-            return clone;
-        }
-
-        /// <inheritdoc/>
-        protected override AStateBase<IExampleChildState> CreateAndClone()
-        {
-            var clone = new ExampleChildState();
-
-            this.CopyToExampleChildState(clone, false);
+            this.CopyToExampleChildState(clone, deep);
 
             return clone;
         }

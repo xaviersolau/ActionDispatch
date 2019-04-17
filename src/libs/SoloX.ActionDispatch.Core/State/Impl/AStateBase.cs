@@ -44,7 +44,7 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         /// <returns>The cloned object.</returns>
         public AStateBase<TState> DeepClone()
         {
-            return this.CreateAndDeepClone();
+            return this.CreateAndClone(true);
         }
 
         /// <inheritdoc/>
@@ -78,7 +78,7 @@ namespace SoloX.ActionDispatch.Core.State.Impl
 
             if (this.CheckPatch(oldState, newState, out var patcher))
             {
-                var clone = this.CreateAndClone();
+                var clone = this.CreateAndClone(false);
                 patcher(clone.Identity);
 
                 patched = clone;
@@ -123,16 +123,11 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         }
 
         /// <summary>
-        /// Create a cloned instance (deep).
-        /// </summary>
-        /// <returns>The created clone.</returns>
-        protected abstract AStateBase<TState> CreateAndDeepClone();
-
-        /// <summary>
         /// Create a cloned instance.
         /// </summary>
+        /// <param name="deep">Tells if a deep clone must be done.</param>
         /// <returns>The created clone.</returns>
-        protected abstract AStateBase<TState> CreateAndClone();
+        protected abstract AStateBase<TState> CreateAndClone(bool deep);
 
         /// <summary>
         /// Lock children state.
@@ -151,14 +146,6 @@ namespace SoloX.ActionDispatch.Core.State.Impl
 #pragma warning restore CA1801 // Parameter deep of method CopyToAStateBase is never used. Remove the parameter or use it in the method body.
         {
             state.Version = this.Version;
-        }
-
-        /// <summary>
-        /// Propagate lock to child state if any.
-        /// </summary>
-        protected virtual void PropagateLock()
-        {
-            // It must be overridden.
         }
 
         /// <summary>

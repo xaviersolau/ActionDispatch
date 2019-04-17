@@ -16,20 +16,11 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
     {
         public override IStateA Identity => this;
 
-        protected override AStateBase<IStateA> CreateAndClone()
+        protected override AStateBase<IStateA> CreateAndClone(bool deep)
         {
             var clone = new StateA();
 
-            this.CopyToStateA(clone, false);
-
-            return clone;
-        }
-
-        protected override AStateBase<IStateA> CreateAndDeepClone()
-        {
-            var clone = new StateA();
-
-            this.CopyToStateA(clone, true);
+            this.CopyToStateA(clone, deep);
 
             return clone;
         }
