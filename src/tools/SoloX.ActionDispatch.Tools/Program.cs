@@ -62,13 +62,12 @@ namespace SoloX.ActionDispatch.Tools
         /// </summary>
         public void Run()
         {
-            var prjFolder = "../../../../SoloX.ActionDispatch.State.Sample";
-            var prjFile = Path.Combine(prjFolder, "SoloX.ActionDispatch.State.Sample.csproj");
+            var projectFile = this.configuration.GetValue<string>("project");
 
             var projectNameSpace = "SoloX.ActionDispatch.State.Sample";
 
             var generator = this.Service.GetService<IStateGenerator>();
-            generator.Generate(prjFile, projectNameSpace);
+            generator.Generate(projectFile, projectNameSpace);
         }
     }
 }
