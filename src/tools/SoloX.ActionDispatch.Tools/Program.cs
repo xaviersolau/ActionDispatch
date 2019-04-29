@@ -6,9 +6,11 @@
 // ----------------------------------------------------------------------
 
 using System;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SoloX.ActionDispatch.State.Generator;
 
 namespace SoloX.ActionDispatch.Tools
 {
@@ -31,6 +33,7 @@ namespace SoloX.ActionDispatch.Tools
             IServiceCollection sc = new ServiceCollection();
 
             sc.AddLogging(b => b.AddConsole());
+            sc.AddStateGenerator();
 
             this.Service = sc.BuildServiceProvider();
 
@@ -50,6 +53,8 @@ namespace SoloX.ActionDispatch.Tools
             var config = builder.Build();
 
             new Program(config).Run();
+
+            Console.ReadKey();
         }
 
         /// <summary>
@@ -57,7 +62,13 @@ namespace SoloX.ActionDispatch.Tools
         /// </summary>
         public void Run()
         {
-            Console.WriteLine($"Running {this.configuration["test"]}");
+            var prjFolder = "../../../../SoloX.ActionDispatch.State.Sample";
+            var prjFile = Path.Combine(prjFolder, "SoloX.ActionDispatch.State.Sample.csproj");
+
+            var projectNameSpace = "SoloX.ActionDispatch.State.Sample";
+
+            var generator = this.Service.GetService<IStateGenerator>();
+            generator.Generate(prjFile, projectNameSpace);
         }
     }
 }
