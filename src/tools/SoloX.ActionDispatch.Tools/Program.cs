@@ -64,10 +64,8 @@ namespace SoloX.ActionDispatch.Tools
         {
             var projectFile = this.configuration.GetValue<string>("project");
 
-            var projectNameSpace = "SoloX.ActionDispatch.State.Sample";
-
             var generator = this.Service.GetService<IStateGenerator>();
-            generator.Generate(projectFile, projectNameSpace);
+            generator.Generate(projectFile);
         }
     }
 }

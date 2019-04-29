@@ -20,7 +20,6 @@ namespace SoloX.ActionDispatch.State.Generator
         /// Generate the state implementation on the given project.
         /// </summary>
         /// <param name="projectFile">Project file.</param>
-        /// <param name="projectNameSpace">Root name space of the project.</param>
-        void Generate(string projectFile, string projectNameSpace);
+        void Generate(string projectFile);
     }
 }

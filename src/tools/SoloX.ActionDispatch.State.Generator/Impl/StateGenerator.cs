@@ -45,13 +45,13 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
         }
 
         /// <inheritdoc/>
-        public void Generate(string projectFile, string projectNameSpace)
+        public void Generate(string projectFile)
         {
             var projectFolder = Path.GetDirectoryName(projectFile);
 
             this.logger.LogInformation($"Loading {Path.GetFileName(projectFile)}...");
 
-            this.workspace.RegisterProject(projectFile);
+            var project = this.workspace.RegisterProject(projectFile);
 
             this.workspace.RegisterFile("./Patterns/Itf/IParentStatePattern.cs");
             this.workspace.RegisterFile("./Patterns/Itf/IChildStatePattern.cs");
@@ -66,7 +66,7 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             var implPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.ParentStatePattern").Single() as IGenericDeclaration;
 
-            var locator = new RelativeLocator(projectFolder, projectNameSpace, suffix: "Impl");
+            var locator = new RelativeLocator(projectFolder, project.RootNameSpace, suffix: "Impl");
 
             var generator = new ImplementationGenerator(
                 new FileGenerator(),
