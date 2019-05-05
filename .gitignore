@@ -3,6 +3,7 @@
 bin
 obj
 
+*.generated.cs
 launchSettings.json
 
 src/examples/SoloX.ActionDispatch.Examples/SoloX.ActionDispatch.Examples.xml
