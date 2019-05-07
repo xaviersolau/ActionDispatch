@@ -16,10 +16,24 @@ namespace SoloX.ActionDispatch.Examples.ActionBehavior
     /// </summary>
     public class ExampleActionBehavior : IActionBehavior<IExampleAppState, IExampleChildState>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExampleActionBehavior"/> class.
+        /// </summary>
+        /// <param name="increment">The value to increment.</param>
+        public ExampleActionBehavior(int increment)
+        {
+            this.Increment = increment;
+        }
+
+        /// <summary>
+        /// Gets inc value.
+        /// </summary>
+        public int Increment { get; }
+
         /// <inheritdoc />
         public IExampleChildState Apply(IExampleChildState state)
         {
-            state.ChildCount++;
+            state.ChildCount += this.Increment;
             return state;
         }
     }

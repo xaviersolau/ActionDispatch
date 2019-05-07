@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SoloX.ActionDispatch.Core;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
@@ -59,7 +60,6 @@ namespace SoloX.ActionDispatch.Examples
         public static void Main()
         {
             new Program().Run();
-            Console.ReadLine();
         }
 
         /// <inheritdoc/>
@@ -72,9 +72,28 @@ namespace SoloX.ActionDispatch.Examples
         {
             var dispatcher = this.Service.GetService<IDispatcher<IExampleAppState>>();
 
-            dispatcher.AddObserver(obs => obs.Do(a => this.logger.LogWarning($"Processing action with behavior: {a.Behavior}")));
+            dispatcher.AddObserver(obs => obs.Do(a =>
+            {
+                this.logger.LogWarning($"Processing action with behavior: {a.Behavior}");
 
-            dispatcher.Dispatch(new ExampleActionBehavior(), s => s.ChildState);
+                this.logger.LogWarning(JsonConvert.SerializeObject(a));
+            }));
+
+            using (var stateSubscribtion = dispatcher.State.Do(s =>
+            {
+                this.logger.LogWarning($"State: {s.Version}");
+
+                this.logger.LogWarning(JsonConvert.SerializeObject(s));
+            }).Subscribe())
+            {
+                dispatcher.Dispatch(new ExampleAsyncActionBehavior(), s => s.ChildState);
+
+                dispatcher.Dispatch(new ExampleActionBehavior(1), s => s.ChildState);
+
+                dispatcher.Dispatch(new ExampleActionBehavior(3), s => s.ChildState);
+
+                Console.ReadLine();
+            }
         }
     }
 }
