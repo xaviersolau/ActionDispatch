@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace SoloX.ActionDispatch.Core.State.Impl
 {
@@ -24,11 +25,13 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         /// <summary>
         /// Gets the actual typed identity state.
         /// </summary>
+        [JsonIgnore]
         public abstract TState Identity { get; }
 
         /// <summary>
         /// Gets a value indicating whether it is locked or not.
         /// </summary>
+        [JsonIgnore]
         public bool IsLocked
         { get; private set; }
 
