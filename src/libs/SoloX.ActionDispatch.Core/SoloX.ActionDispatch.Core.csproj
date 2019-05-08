@@ -2,15 +2,26 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Authors>Xavier Solau</Authors>
-    <Company>Xavier Solau</Company>
-    <Version>0.1.0-alpha-1</Version>
-    <Copyright>Copyright © 2019 Xavier Solau</Copyright>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <PackageProjectUrl>https://github.com/xaviersolau/ActionDispatch</PackageProjectUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/xaviersolau/ActionDispatch.git</RepositoryUrl>
     <LangVersion>latest</LangVersion>
+
+    <PackageId>SoloX.ActionDispatch.Core</PackageId>
+
+    <Version>1.0.0-alpha.1</Version>
+    <Authors>Xavier Solau</Authors>
+    <Copyright>Copyright © 2019 Xavier Solau</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/xaviersolau/ActionDispatch/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/xaviersolau/ActionDispatch</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/xaviersolau/ActionDispatch.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>action, dispatch, state, generator, tool</PackageTags>
+    <PackageReleaseNotes>
+      - Implement Action dispatcher.
+      - Implement a State generator.
+    </PackageReleaseNotes>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Description>SoloX.ActionDispatch.Core provides a c# dispatcher to process actions on an application state.</Description>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
