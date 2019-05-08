@@ -1,5 +1,5 @@
 ﻿// ----------------------------------------------------------------------
-// <copyright file="StateA.cs" company="SoloX Software">
+// <copyright file="RootState.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -12,15 +12,16 @@ using SoloX.ActionDispatch.Core.State.Impl;
 
 namespace SoloX.ActionDispatch.Core.UTest.State.Basic
 {
-    public class StateA : AStateBase<IStateA>, IStateA
+    public class RootState : AStateBase<IRootState>, IRootState
     {
-        private string value;
+        private int value;
+        private AStateBase<IStateA> child;
 
         /// <inheritdoc/>
-        public override IStateA Identity => this;
+        public override IRootState Identity => this;
 
         /// <inheritdoc/>
-        public string Value
+        public int Value
         {
             get
             {
@@ -35,13 +36,34 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
         }
 
         /// <inheritdoc/>
+        public IStateA Child
+        {
+            get
+            {
+                return this.child.Identity;
+            }
+
+            set
+            {
+                this.CheckUnlock();
+                this.child = value.ToStateBase();
+            }
+        }
+
+        /// <inheritdoc/>
         protected override bool CheckPatch<TPatchState>(
             AStateBase<TPatchState> oldState,
             AStateBase<TPatchState> newState,
-            out Action<IStateA> patcher)
+            out Action<IRootState> patcher)
         {
             if (base.CheckPatch(oldState, newState, out patcher))
             {
+                return true;
+            }
+
+            if (this.child.Patch(oldState, newState, out var childPatched))
+            {
+                patcher = (s) => { s.Child = childPatched.Identity; };
                 return true;
             }
 
@@ -53,14 +75,15 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
         protected override void LockChildren()
         {
             base.LockChildren();
+            this.child.Lock();
         }
 
         /// <inheritdoc/>
-        protected override AStateBase<IStateA> CreateAndClone(bool deep)
+        protected override AStateBase<IRootState> CreateAndClone(bool deep)
         {
-            var clone = new StateA();
+            var clone = new RootState();
 
-            this.CopyToStateA(clone, deep);
+            this.CopyToRootState(clone, deep);
 
             return clone;
         }
@@ -70,7 +93,7 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
         /// </summary>
         /// <param name="state">Target state where to copy current object data.</param>
         /// <param name="deep">Tells if we need to make a deep copy.</param>
-        protected void CopyToStateA(StateA state, bool deep)
+        protected void CopyToRootState(RootState state, bool deep)
         {
             this.CopyToAStateBase(state, deep);
 
@@ -78,9 +101,11 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
 
             if (deep)
             {
+                state.child = this.child.DeepClone();
             }
             else
             {
+                state.child = this.child;
             }
         }
     }
