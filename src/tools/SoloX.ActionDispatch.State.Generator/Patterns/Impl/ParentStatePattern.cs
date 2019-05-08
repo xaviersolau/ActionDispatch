@@ -89,7 +89,7 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
         {
             var clone = new ParentStatePattern();
 
-            this.CopyToStatePattern(clone, deep);
+            this.CopyToParentStatePattern(clone, deep);
 
             return clone;
         }
@@ -99,7 +99,7 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
         /// </summary>
         /// <param name="state">Target state where to copy current object data.</param>
         /// <param name="deep">Tells if we need to make a deep copy.</param>
-        protected void CopyToStatePattern(ParentStatePattern state, bool deep)
+        protected void CopyToParentStatePattern(ParentStatePattern state, bool deep)
         {
             this.CopyToAStateBase(state, deep);
 
