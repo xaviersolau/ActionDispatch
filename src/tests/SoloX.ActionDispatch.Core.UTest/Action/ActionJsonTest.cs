@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,48 +20,92 @@ namespace SoloX.ActionDispatch.Core.UTest.Action
 {
     public class ActionJsonTest
     {
-        [Fact]
-        public void SimpleActionSerializationTest()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void SimpleActionSerializationTest(bool async)
         {
             var someText = "Test";
-            var action = new SyncAction<IStateA, IStateA>(new SyncBehavior(someText), s => s);
-            var jsonAction = JsonConvert.SerializeObject(action);
+
+            string jsonAction = GetJsonAction(async, someText);
 
             var valueMap = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonAction);
 
-            Assert.False((bool)valueMap["isAsynchronous"]);
+            Assert.Equal(async, (bool)valueMap[JsonActionConverter.IsAsynchronous]);
 
-            var behaviorTypeName = (string)valueMap["behaviorType"];
+            var behaviorTypeName = (string)valueMap[JsonActionConverter.BehaviorType];
             var behaviorType = Type.GetType(behaviorTypeName);
-            Assert.Equal(typeof(SyncBehavior), behaviorType);
 
-            Assert.Equal("s => s", valueMap["selector"]);
+            Assert.Equal("s => s", valueMap[JsonActionConverter.Selector]);
 
-            var jobj = (JObject)valueMap["behavior"];
-            var behavior = (SyncBehavior)jobj.ToObject(behaviorType);
+            var jobj = (JObject)valueMap[JsonActionConverter.Behavior];
 
-            Assert.Equal(someText, behavior.SomeValue);
+            if (async)
+            {
+                Assert.Equal(typeof(AsyncBehavior), behaviorType);
+                var behavior = (AsyncBehavior)jobj.ToObject(behaviorType);
+                Assert.Equal(someText, behavior.SomeValue);
+            }
+            else
+            {
+                Assert.Equal(typeof(SyncBehavior), behaviorType);
+                var behavior = (SyncBehavior)jobj.ToObject(behaviorType);
+                Assert.Equal(someText, behavior.SomeValue);
+            }
         }
 
-        [Fact]
-        public void SimpleActionDeserializationTest()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void SimpleActionDeserializationTest(bool async)
         {
             var someText = "Test";
-            var action = new SyncAction<IStateA, IStateA>(new SyncBehavior(someText), s => s);
-            var jsonAction = JsonConvert.SerializeObject(action);
 
-            var deserializedAction = JsonConvert.DeserializeObject<SyncAction<IStateA, IStateA>>(jsonAction);
+            string jsonAction = GetJsonAction(async, someText);
 
-            Assert.NotNull(deserializedAction);
+            AAction<IStateA, IStateA> deserializedAction;
+            string behaviorSomeValue;
+            if (async)
+            {
+                var action = JsonConvert.DeserializeObject<AsyncAction<IStateA, IStateA>>(jsonAction);
+                Assert.NotNull(action);
 
-            var behavior = Assert.IsType<SyncBehavior>(deserializedAction.Behavior);
+                var behavior = Assert.IsType<AsyncBehavior>(action.Behavior);
+                behaviorSomeValue = behavior.SomeValue;
+                deserializedAction = action;
+            }
+            else
+            {
+                var action = JsonConvert.DeserializeObject<SyncAction<IStateA, IStateA>>(jsonAction);
+                Assert.NotNull(action);
 
-            Assert.Equal(someText, behavior.SomeValue);
-            Assert.NotNull(deserializedAction.Selector);
-            Func<IStateA, IStateA> exp = Assert.IsType<Func<IStateA, IStateA>>(deserializedAction.Selector.Compile());
+                var behavior = Assert.IsType<SyncBehavior>(action.Behavior);
+                behaviorSomeValue = behavior.SomeValue;
+                deserializedAction = action;
+            }
+
+            Assert.Equal(someText, behaviorSomeValue);
+            var selector = deserializedAction.Selector;
+
+            Assert.NotNull(selector);
+            Func<IStateA, IStateA> exp = Assert.IsType<Func<IStateA, IStateA>>(selector.Compile());
 
             var state = new StateA();
             Assert.Same(state, exp(state));
+        }
+
+        private static string GetJsonAction(bool async, string someText)
+        {
+            if (async)
+            {
+                var action = new AsyncAction<IStateA, IStateA>(new AsyncBehavior(someText), s => s);
+                return JsonConvert.SerializeObject(action);
+            }
+            else
+            {
+                var action = new SyncAction<IStateA, IStateA>(new SyncBehavior(someText), s => s);
+                return JsonConvert.SerializeObject(action);
+            }
         }
     }
 }

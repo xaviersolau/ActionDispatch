@@ -21,10 +21,10 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
     /// </summary>
     public class JsonActionConverter : JsonConverter
     {
-        private const string IsAsynchronous = "isAsynchronous";
-        private const string BehaviorType = "behaviorType";
-        private const string Behavior = "behavior";
-        private const string Selector = "selector";
+        internal const string IsAsynchronous = "isAsynchronous";
+        internal const string BehaviorType = "behaviorType";
+        internal const string Behavior = "behavior";
+        internal const string Selector = "selector";
 
         private static readonly Type GenericAsyncActionType = typeof(AsyncAction<,>);
         private static readonly Type GenericSyncActionType = typeof(SyncAction<,>);
