@@ -36,20 +36,25 @@ namespace SoloX.ActionDispatch.Core.UTest.State
         {
             var state = new RootState()
             {
-                Child = new StateA(),
+                Child1 = new StateA(),
+                Child2 = new StateA(),
             };
 
             Assert.False(state.IsLocked);
-            Assert.False(state.Child.IsLocked);
+            Assert.False(state.Child1.IsLocked);
+            Assert.False(state.Child2.IsLocked);
 
-            state.Child.Value = "some value 1";
+            state.Child1.Value = "some value 11";
+            state.Child1.Value = "some value 12";
 
             state.Lock();
 
             Assert.True(state.IsLocked);
-            Assert.True(state.Child.IsLocked);
+            Assert.True(state.Child1.IsLocked);
+            Assert.True(state.Child2.IsLocked);
 
-            Assert.Throws<AccessViolationException>(() => state.Child.Value = "some value 2");
+            Assert.Throws<AccessViolationException>(() => state.Child1.Value = "some value 21");
+            Assert.Throws<AccessViolationException>(() => state.Child2.Value = "some value 22");
         }
 
         [Fact]
@@ -76,7 +81,7 @@ namespace SoloX.ActionDispatch.Core.UTest.State
             var childValue = "Test";
             var state = new RootState()
             {
-                Child = new StateA()
+                Child1 = new StateA()
                 {
                     Value = childValue,
                 },
@@ -90,9 +95,9 @@ namespace SoloX.ActionDispatch.Core.UTest.State
 
             Assert.NotSame(state, clone);
             var clonedState = Assert.IsType<RootState>(clone);
-            Assert.NotSame(state.Child, clonedState.Child);
+            Assert.NotSame(state.Child1, clonedState.Child1);
 
-            Assert.Equal(childValue, clonedState.Child.Value);
+            Assert.Equal(childValue, clonedState.Child1.Value);
         }
 
         [Fact]
@@ -100,27 +105,32 @@ namespace SoloX.ActionDispatch.Core.UTest.State
         {
             var value = 123;
             var childValue = "Test";
+            var child2Value = "Test2";
             var childNewValue = "NewTest";
 
-            var oldChild = new StateA()
+            var child2 = new StateA()
+            {
+                Value = child2Value,
+            };
+
+            var oldChild1 = new StateA()
             {
                 Value = childValue,
             };
 
-            var newChild = new StateA()
-            {
-                Value = childNewValue,
-            };
-
             var state = new RootState()
             {
-                Child = oldChild,
+                Child1 = oldChild1,
+                Child2 = child2,
                 Value = value,
             };
 
             state.Lock();
 
-            var patch = state.Patch(oldChild, newChild);
+            var newChild1 = (StateA)oldChild1.DeepClone();
+            newChild1.Value = childNewValue;
+
+            var patch = state.Patch(oldChild1, newChild1);
 
             patch.Lock();
 
@@ -128,9 +138,11 @@ namespace SoloX.ActionDispatch.Core.UTest.State
 
             Assert.NotSame(state, patch);
             var patchedState = Assert.IsType<RootState>(patch);
-            Assert.NotSame(state.Child, patchedState.Child);
+            Assert.NotSame(state.Child1, patchedState.Child1);
+            Assert.Equal(state.Child1.Version + 1, patchedState.Child1.Version);
+            Assert.Equal(childNewValue, patchedState.Child1.Value);
 
-            Assert.Equal(childNewValue, patchedState.Child.Value);
+            Assert.Same(state.Child2, patchedState.Child2);
         }
     }
 }

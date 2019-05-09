@@ -15,7 +15,8 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
     public class RootState : AStateBase<IRootState>, IRootState
     {
         private int value;
-        private AStateBase<IStateA> child;
+        private AStateBase<IStateA> child1;
+        private AStateBase<IStateA> child2;
 
         /// <inheritdoc/>
         public override IRootState Identity => this;
@@ -36,17 +37,32 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
         }
 
         /// <inheritdoc/>
-        public IStateA Child
+        public IStateA Child1
         {
             get
             {
-                return this.child.Identity;
+                return this.child1?.Identity;
             }
 
             set
             {
                 this.CheckUnlock();
-                this.child = value.ToStateBase();
+                this.child1 = value?.ToStateBase();
+            }
+        }
+
+        /// <inheritdoc/>
+        public IStateA Child2
+        {
+            get
+            {
+                return this.child2?.Identity;
+            }
+
+            set
+            {
+                this.CheckUnlock();
+                this.child2 = value?.ToStateBase();
             }
         }
 
@@ -61,9 +77,15 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
                 return true;
             }
 
-            if (this.child.Patch(oldState, newState, out var childPatched))
+            if (this.child1 != null && this.child1.Patch(oldState, newState, out var child1Patched))
             {
-                patcher = (s) => { s.Child = childPatched.Identity; };
+                patcher = (s) => { s.Child1 = child1Patched.Identity; };
+                return true;
+            }
+
+            if (this.child2 != null && this.child2.Patch(oldState, newState, out var child2Patched))
+            {
+                patcher = (s) => { s.Child2 = child2Patched.Identity; };
                 return true;
             }
 
@@ -75,7 +97,8 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
         protected override void LockChildren()
         {
             base.LockChildren();
-            this.child.Lock();
+            this.child1?.Lock();
+            this.child2?.Lock();
         }
 
         /// <inheritdoc/>
@@ -101,11 +124,13 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
 
             if (deep)
             {
-                state.child = this.child.DeepClone();
+                state.child1 = this.child1?.DeepClone();
+                state.child2 = this.child2?.DeepClone();
             }
             else
             {
-                state.child = this.child;
+                state.child1 = this.child1;
+                state.child2 = this.child2;
             }
         }
     }
