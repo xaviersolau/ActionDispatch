@@ -29,12 +29,13 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
             var stateCloneMock = new Mock<IStateA>();
             var state = CreateStateMockWithAClone(stateCloneMock.Object);
 
-            var dispatcher = new Dispatcher<IStateA>(state, logger);
+            using (var dispatcher = new Dispatcher<IStateA>(state, logger))
+            {
+                dispatcher.Dispatch(actionBehaviorMock.Object, s => s);
 
-            dispatcher.Dispatch(actionBehaviorMock.Object, s => s);
-
-            actionBehaviorMock.Verify(ab => ab.Apply(stateCloneMock.Object));
-            stateCloneMock.Verify(s => s.Lock());
+                actionBehaviorMock.Verify(ab => ab.Apply(stateCloneMock.Object));
+                stateCloneMock.Verify(s => s.Lock());
+            }
         }
 
         private static TState CreateStateMockWithAClone<TState>(TState clone)
@@ -42,12 +43,15 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
         {
             var stateMock = new Mock<TState>();
 
-            var transactionalStateMock = new Mock<ITransactionalState<TState>>();
-            stateMock.Setup(s => s.CreateTransactionalState()).Returns(transactionalStateMock.Object);
+            var transactionalStateMock = new Mock<ITransactionalState<TState, TState>>();
+
+            stateMock.Setup(s => s.CreateTransactionalState(It.IsAny<TState>())).Returns(transactionalStateMock.Object);
 
             transactionalStateMock.Setup(ts => ts.State).Returns(clone);
 
-            transactionalStateMock.Setup(ts => ts.Patch(stateMock.Object)).Returns(clone);
+            transactionalStateMock.Setup(ts => ts.Close()).Returns(clone);
+
+            transactionalStateMock.Setup(ts => ts.Dispose()).Callback(clone.Lock);
 
             return stateMock.Object;
         }

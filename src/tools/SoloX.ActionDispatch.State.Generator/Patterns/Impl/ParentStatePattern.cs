@@ -45,13 +45,13 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
         {
             get
             {
-                return this.childPattern.Identity;
+                return this.childPattern?.Identity;
             }
 
             set
             {
                 this.CheckUnlock();
-                this.childPattern = value.ToStateBase();
+                this.childPattern = value?.ToStateBase();
             }
         }
 
@@ -67,7 +67,7 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
                 return true;
             }
 
-            if (this.childPattern.Patch(oldState, newState, out var childPatternPatched))
+            if (this.childPattern != null && this.childPattern.Patch(oldState, newState, out var childPatternPatched))
             {
                 patcher = (s) => { s.ChildPattern = childPatternPatched.Identity; };
                 return true;
@@ -81,7 +81,7 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
         protected override void LockChildren()
         {
             base.LockChildren();
-            this.childPattern.Lock();
+            this.childPattern?.Lock();
         }
 
         /// <inheritdoc/>
@@ -107,7 +107,7 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
 
             if (deep)
             {
-                state.childPattern = this.childPattern.DeepClone();
+                state.childPattern = this.childPattern?.DeepClone();
             }
             else
             {

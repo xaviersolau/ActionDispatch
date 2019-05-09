@@ -11,30 +11,48 @@ using System.Text;
 
 namespace SoloX.ActionDispatch.Core.State.Impl
 {
-    internal class TransactionalState<TState> : ITransactionalState<TState>
+    internal class TransactionalState<TState, TRootState> : ITransactionalState<TState, TRootState>
         where TState : IState
+        where TRootState : IState<TRootState>
     {
         private readonly AStateBase<TState> stateBase;
         private readonly AStateBase<TState> newState;
+        private TRootState rootState;
+        private TRootState patchedRootState;
 
-        public TransactionalState(AStateBase<TState> state)
+        public TransactionalState(AStateBase<TState> state, TRootState rootState)
         {
             this.stateBase = state;
             this.newState = state.DeepClone();
             this.State = this.newState.Identity;
+            this.rootState = rootState;
         }
 
         public TState State { get; }
 
-        public TRootState Patch<TRootState>(TRootState rootState)
-            where TRootState : IState<TRootState>
+        public TRootState Close()
         {
-            return rootState.ToStateBase().Patch(this.stateBase, this.newState).Identity;
+            if (this.patchedRootState != null)
+            {
+                throw new AccessViolationException("The root state is already patched.");
+            }
+
+            this.patchedRootState = this.Patch();
+            return this.patchedRootState;
         }
 
         /// <inheritdoc/>
         public void Dispose()
         {
+            if (this.patchedRootState != null)
+            {
+                this.patchedRootState.Lock();
+            }
+        }
+
+        private TRootState Patch()
+        {
+            return this.rootState.ToStateBase().Patch(this.stateBase, this.newState).Identity;
         }
     }
 }

@@ -16,6 +16,8 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
     {
         int Value { get; set; }
 
-        IStateA Child { get; set; }
+        IStateA Child1 { get; set; }
+
+        IStateA Child2 { get; set; }
     }
 }
