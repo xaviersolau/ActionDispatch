@@ -42,8 +42,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
             {
                 this.Behavior.Apply(stateTransaction.State);
 
-                var patched = stateTransaction.Patch(rootState);
-                patched.Lock();
+                var patched = stateTransaction.Close();
 
                 return patched;
             }

@@ -36,9 +36,10 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         { get; private set; }
 
         /// <inheritdoc/>
-        public ITransactionalState<TState> CreateTransactionalState()
+        public ITransactionalState<TState, TRootState> CreateTransactionalState<TRootState>(TRootState rootState)
+            where TRootState : IState<TRootState>
         {
-            return new TransactionalState<TState>(this);
+            return new TransactionalState<TState, TRootState>(this, rootState);
         }
 
         /// <summary>
