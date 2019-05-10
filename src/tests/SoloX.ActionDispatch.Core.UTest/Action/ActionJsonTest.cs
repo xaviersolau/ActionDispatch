@@ -12,8 +12,8 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SoloX.ActionDispatch.Core.Action.Impl;
+using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.UTest.Action.Basic;
-using SoloX.ActionDispatch.Core.UTest.State.Basic;
 using Xunit;
 
 namespace SoloX.ActionDispatch.Core.UTest.Action

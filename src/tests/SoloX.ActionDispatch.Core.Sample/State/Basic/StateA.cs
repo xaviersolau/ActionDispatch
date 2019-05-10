@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Text;
 using SoloX.ActionDispatch.Core.State.Impl;
 
-namespace SoloX.ActionDispatch.Core.UTest.State.Basic
+namespace SoloX.ActionDispatch.Core.Sample.State.Basic
 {
     public class StateA : AStateBase<IStateA>, IStateA
     {

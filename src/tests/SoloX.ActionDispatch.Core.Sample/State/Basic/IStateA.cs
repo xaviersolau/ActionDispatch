@@ -7,7 +7,7 @@
 
 using SoloX.ActionDispatch.Core.State;
 
-namespace SoloX.ActionDispatch.Core.UTest.State.Basic
+namespace SoloX.ActionDispatch.Core.Sample.State.Basic
 {
     public interface IStateA : IState<IStateA>
     {

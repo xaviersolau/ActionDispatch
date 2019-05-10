@@ -13,7 +13,7 @@ namespace SoloX.ActionDispatch.Core.ITest.Dipatch
     public class DispatcherTest
     {
         [Fact]
-        public void Test1()
+        public void ActionObserverTest()
         {
         }
     }

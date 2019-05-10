@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using SoloX.ActionDispatch.Core.Action;
-using SoloX.ActionDispatch.Core.UTest.State.Basic;
+using SoloX.ActionDispatch.Core.Sample.State.Basic;
 
 namespace SoloX.ActionDispatch.Core.UTest.Action.Basic
 {

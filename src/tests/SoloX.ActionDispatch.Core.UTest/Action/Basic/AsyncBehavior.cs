@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
-using SoloX.ActionDispatch.Core.UTest.State.Basic;
+using SoloX.ActionDispatch.Core.Sample.State.Basic;
 
 namespace SoloX.ActionDispatch.Core.UTest.Action.Basic
 {
