@@ -6,10 +6,12 @@
 // ----------------------------------------------------------------------
 
 using System;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SoloX.ActionDispatch.Core;
 using SoloX.ActionDispatch.Core.Action;
+using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
 using SoloX.ActionDispatch.Core.State;
 using SoloX.ActionDispatch.Core.UTest.State.Basic;
@@ -36,6 +38,39 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
                 actionBehaviorMock.Verify(ab => ab.Apply(stateCloneMock.Object));
                 stateCloneMock.Verify(s => s.Lock());
             }
+        }
+
+        [Fact]
+        public void DispatchAsyncActionTest()
+        {
+            var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
+
+            var actionBehaviorMock = new Mock<IActionBehaviorAsync<IStateA, IStateA>>();
+
+            var stateMock = new Mock<IStateA>();
+
+            var isThreadPoolThread = false;
+            var waitHandler = new AutoResetEvent(false);
+
+            actionBehaviorMock
+                .Setup(ab => ab.Apply(It.IsAny<IDispatcher<IStateA>>(), stateMock.Object))
+                .Callback(() =>
+                {
+                    isThreadPoolThread = Thread.CurrentThread.IsThreadPoolThread;
+                    waitHandler.Set();
+                });
+
+            using (var dispatcher = new Dispatcher<IStateA>(stateMock.Object, logger))
+            {
+                dispatcher.Dispatch(actionBehaviorMock.Object, s => s);
+
+                actionBehaviorMock.Verify(ab => ab.Apply(dispatcher, stateMock.Object));
+            }
+
+            waitHandler.WaitOne(2000);
+
+            Assert.True(isThreadPoolThread);
+            Assert.False(Thread.CurrentThread.IsThreadPoolThread);
         }
 
         private static TState CreateStateMockWithAClone<TState>(TState clone)
