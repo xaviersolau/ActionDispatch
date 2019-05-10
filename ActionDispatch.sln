@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoloX.ActionDispatch.Core.ITest", "src\tests\SoloX.ActionDispatch.Core.ITest\SoloX.ActionDispatch.Core.ITest.csproj", "{0E49D5F4-5CBE-41B0-99F9-8051EB4EAF91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{F427AC47-A485-46AA-9D8C-97A077BD0F65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F427AC47-A485-46AA-9D8C-97A077BD0F65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F427AC47-A485-46AA-9D8C-97A077BD0F65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E49D5F4-5CBE-41B0-99F9-8051EB4EAF91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E49D5F4-5CBE-41B0-99F9-8051EB4EAF91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E49D5F4-5CBE-41B0-99F9-8051EB4EAF91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E49D5F4-5CBE-41B0-99F9-8051EB4EAF91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,6 +76,7 @@ Global
 		{88744C69-32B0-4A1C-964A-12341497780D} = {BEE0C98F-8C65-4EED-B56D-E5307A495005}
 		{768579B8-EA11-47A1-8A9D-8B8E3B3F445B} = {BEE0C98F-8C65-4EED-B56D-E5307A495005}
 		{F427AC47-A485-46AA-9D8C-97A077BD0F65} = {BEE0C98F-8C65-4EED-B56D-E5307A495005}
+		{0E49D5F4-5CBE-41B0-99F9-8051EB4EAF91} = {9CC5872A-041F-4058-A338-803653E3141B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C234AD4E-8AE5-4C97-91A7-CE66AE5EFF32}
