@@ -9,6 +9,7 @@ using System;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
 using SoloX.ActionDispatch.Core.ITest.Dipatch.Behavior;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
@@ -20,6 +21,35 @@ namespace SoloX.ActionDispatch.Core.ITest.Dipatch
     {
         [Fact]
         public void ActionObserverTest()
+        {
+            var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
+
+            var state = new StateA();
+
+            var myText1 = "Some text 1.";
+            var myText2 = "Some text 2.";
+            var actionBehavior1 = new SetTextActionBehavior(myText1);
+            var actionBehavior2 = new SetTextActionBehavior(myText2);
+
+            IActionBehavior observedBehavior = null;
+
+            state.Lock();
+            using (var dispatcher = new Dispatcher<IStateA>(state, logger))
+            {
+                dispatcher.AddObserver(o => o.Do(a => observedBehavior = a.Behavior));
+
+                dispatcher.Dispatch(actionBehavior1, s => s);
+
+                Assert.Same(actionBehavior1, observedBehavior);
+
+                dispatcher.Dispatch(actionBehavior2, s => s);
+
+                Assert.Same(actionBehavior2, observedBehavior);
+            }
+        }
+
+        [Fact]
+        public void StateObserverTest()
         {
             var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
 
