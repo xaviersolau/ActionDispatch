@@ -37,7 +37,7 @@ namespace SoloX.ActionDispatch.Core.State.Impl
                 throw new AccessViolationException("The root state is already patched.");
             }
 
-            this.patchedRootState = this.Patch();
+            this.patchedRootState = this.rootState.ToStateBase().Patch(this.stateBase, this.newState).Identity;
             return this.patchedRootState;
         }
 
@@ -48,11 +48,6 @@ namespace SoloX.ActionDispatch.Core.State.Impl
             {
                 this.patchedRootState.Lock();
             }
-        }
-
-        private TRootState Patch()
-        {
-            return this.rootState.ToStateBase().Patch(this.stateBase, this.newState).Identity;
         }
     }
 }

@@ -34,8 +34,12 @@ namespace SoloX.ActionDispatch.Examples.State.Impl
 
             set
             {
-                this.CheckUnlock();
-                this.childCount = value;
+                if (this.childCount != value)
+                {
+                    this.CheckUnlock();
+                    this.MakeDirty();
+                    this.childCount = value;
+                }
             }
         }
 

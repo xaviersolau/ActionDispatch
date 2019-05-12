@@ -29,8 +29,12 @@ namespace SoloX.ActionDispatch.Core.Sample.State.Basic
 
             set
             {
-                this.CheckUnlock();
-                this.value = value;
+                if (this.value != value)
+                {
+                    this.CheckUnlock();
+                    this.MakeDirty();
+                    this.value = value;
+                }
             }
         }
 
@@ -50,9 +54,9 @@ namespace SoloX.ActionDispatch.Core.Sample.State.Basic
         }
 
         /// <inheritdoc/>
-        protected override void LockChildren()
+        protected override bool LockChildrenAndCheckDirty()
         {
-            base.LockChildren();
+            return base.LockChildrenAndCheckDirty();
         }
 
         /// <inheritdoc/>

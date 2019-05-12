@@ -144,5 +144,26 @@ namespace SoloX.ActionDispatch.Core.UTest.State
 
             Assert.Same(state.Child2, patchedState.Child2);
         }
+
+        [Theory]
+        [InlineData("a", "b", 1)]
+        [InlineData("a", "a", 0)]
+        [InlineData(null, "a", 1)]
+        [InlineData(null, null, 0)]
+        public void VersionIncTest(string initValue, string newValue, int expectedVersion)
+        {
+            // We need to deep clone in order to get a clean state object with a version set to 0.
+            // Otherwise the version number would be incremented on lock because of the dirty flag set on Value initialization.
+            var state = new StateA()
+            {
+                Value = initValue,
+            }.DeepClone().Identity;
+
+            state.Value = newValue;
+
+            state.Lock();
+
+            Assert.Equal(expectedVersion, state.Version);
+        }
     }
 }

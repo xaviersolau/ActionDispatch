@@ -33,8 +33,12 @@ namespace SoloX.ActionDispatch.Examples.State.Impl
 
             set
             {
-                this.CheckUnlock();
-                this.appCount = value;
+                if (this.appCount != value)
+                {
+                    this.CheckUnlock();
+                    this.MakeDirty();
+                    this.appCount = value;
+                }
             }
         }
 
@@ -48,8 +52,12 @@ namespace SoloX.ActionDispatch.Examples.State.Impl
 
             set
             {
-                this.CheckUnlock();
-                this.childState = value.ToStateBase();
+                if (this.childState != value)
+                {
+                    this.CheckUnlock();
+                    this.MakeDirty();
+                    this.childState = value.ToStateBase();
+                }
             }
         }
 
@@ -75,10 +83,18 @@ namespace SoloX.ActionDispatch.Examples.State.Impl
         }
 
         /// <inheritdoc/>
-        protected override void LockChildren()
+        protected override bool LockChildrenAndCheckDirty()
         {
-            base.LockChildren();
-            this.childState.Lock();
+            var dirty = base.LockChildrenAndCheckDirty();
+
+            if (this.childState != null)
+            {
+                var oldVersion = this.childState.Version;
+                this.childState.Lock();
+                dirty |= oldVersion != this.childState.Version;
+            }
+
+            return dirty;
         }
 
         /// <inheritdoc/>
