@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libs\SoloX.ActionDispatch.Core\SoloX.ActionDispatch.Core.csproj" />
+    <ProjectReference Include="..\SoloX.ActionDispatch.Core.Sample\SoloX.ActionDispatch.Core.Sample.csproj" />
   </ItemGroup>
 
 </Project>

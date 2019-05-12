@@ -19,6 +19,8 @@ namespace SoloX.ActionDispatch.Core.State.Impl
     public abstract class AStateBase<TState> : IState<TState>
         where TState : IState
     {
+        private bool isDirty;
+
         /// <inheritdoc/>
         public int Version { get; private set; }
 
@@ -56,9 +58,14 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         {
             if (!this.IsLocked)
             {
-                this.LockChildren();
                 this.IsLocked = true;
-                this.Version++;
+
+                if (this.LockChildrenAndCheckDirty())
+                {
+                    this.Version++;
+                }
+
+                this.isDirty = false;
             }
         }
 
@@ -134,10 +141,12 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         protected abstract AStateBase<TState> CreateAndClone(bool deep);
 
         /// <summary>
-        /// Lock children state.
+        /// Lock children state and check if it is dirty.
         /// </summary>
-        protected virtual void LockChildren()
+        /// <returns>True if the state or one of the children state was actually dirty.</returns>
+        protected virtual bool LockChildrenAndCheckDirty()
         {
+            return this.isDirty;
         }
 
         /// <summary>
@@ -161,6 +170,14 @@ namespace SoloX.ActionDispatch.Core.State.Impl
             {
                 throw new AccessViolationException("The state is locked.");
             }
+        }
+
+        /// <summary>
+        /// Make this instance as dirty.
+        /// </summary>
+        protected void MakeDirty()
+        {
+            this.isDirty = true;
         }
     }
 }

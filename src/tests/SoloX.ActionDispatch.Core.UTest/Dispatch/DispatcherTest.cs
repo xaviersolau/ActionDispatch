@@ -13,8 +13,8 @@ using SoloX.ActionDispatch.Core;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
+using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.State;
-using SoloX.ActionDispatch.Core.UTest.State.Basic;
 using Xunit;
 
 namespace SoloX.ActionDispatch.Core.UTest.Dispatch

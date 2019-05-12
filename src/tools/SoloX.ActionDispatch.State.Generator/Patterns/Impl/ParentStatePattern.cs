@@ -35,8 +35,12 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
 
             set
             {
-                this.CheckUnlock();
-                this.propertyPattern = value;
+                if (this.propertyPattern != value)
+                {
+                    this.CheckUnlock();
+                    this.MakeDirty();
+                    this.propertyPattern = value;
+                }
             }
         }
 
@@ -50,8 +54,12 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
 
             set
             {
-                this.CheckUnlock();
-                this.childPattern = value?.ToStateBase();
+                if (this.childPattern != value)
+                {
+                    this.CheckUnlock();
+                    this.MakeDirty();
+                    this.childPattern = value?.ToStateBase();
+                }
             }
         }
 
@@ -78,10 +86,19 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
         }
 
         /// <inheritdoc/>
-        protected override void LockChildren()
+        [PackStatements]
+        protected override bool LockChildrenAndCheckDirty()
         {
-            base.LockChildren();
-            this.childPattern?.Lock();
+            var dirty = base.LockChildrenAndCheckDirty();
+
+            if (this.childPattern != null)
+            {
+                var oldVersion = this.childPattern.Version;
+                this.childPattern.Lock();
+                dirty |= oldVersion != this.childPattern.Version;
+            }
+
+            return dirty;
         }
 
         /// <inheritdoc/>

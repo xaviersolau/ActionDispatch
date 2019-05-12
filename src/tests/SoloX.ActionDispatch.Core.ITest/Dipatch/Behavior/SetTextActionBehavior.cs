@@ -1,5 +1,5 @@
 ﻿// ----------------------------------------------------------------------
-// <copyright file="SyncBehavior.cs" company="SoloX Software">
+// <copyright file="SetTextActionBehavior.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -11,20 +11,20 @@ using System.Text;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 
-namespace SoloX.ActionDispatch.Core.UTest.Action.Basic
+namespace SoloX.ActionDispatch.Core.ITest.Dipatch.Behavior
 {
-    public class SyncBehavior : IActionBehavior<IStateA, IStateA>
+    public class SetTextActionBehavior : IActionBehavior<IStateA, IStateA>
     {
-        public SyncBehavior(string someValue)
+        public SetTextActionBehavior(string text)
         {
-            this.SomeValue = someValue;
+            this.Text = text;
         }
 
-        public string SomeValue { get; }
+        public string Text { get; }
 
         public IStateA Apply(IStateA state)
         {
-            // Nothing to do for now.
+            state.Value = this.Text;
             return state;
         }
     }

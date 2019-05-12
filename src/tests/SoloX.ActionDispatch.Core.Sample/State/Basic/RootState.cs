@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Text;
 using SoloX.ActionDispatch.Core.State.Impl;
 
-namespace SoloX.ActionDispatch.Core.UTest.State.Basic
+namespace SoloX.ActionDispatch.Core.Sample.State.Basic
 {
     public class RootState : AStateBase<IRootState>, IRootState
     {
@@ -31,8 +31,12 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
 
             set
             {
-                this.CheckUnlock();
-                this.value = value;
+                if (this.value != value)
+                {
+                    this.CheckUnlock();
+                    this.MakeDirty();
+                    this.value = value;
+                }
             }
         }
 
@@ -46,8 +50,12 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
 
             set
             {
-                this.CheckUnlock();
-                this.child1 = value?.ToStateBase();
+                if (this.child1 != value)
+                {
+                    this.CheckUnlock();
+                    this.MakeDirty();
+                    this.child1 = value?.ToStateBase();
+                }
             }
         }
 
@@ -61,8 +69,12 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
 
             set
             {
-                this.CheckUnlock();
-                this.child2 = value?.ToStateBase();
+                if (this.child2 != value)
+                {
+                    this.CheckUnlock();
+                    this.MakeDirty();
+                    this.child2 = value?.ToStateBase();
+                }
             }
         }
 
@@ -94,11 +106,25 @@ namespace SoloX.ActionDispatch.Core.UTest.State.Basic
         }
 
         /// <inheritdoc/>
-        protected override void LockChildren()
+        protected override bool LockChildrenAndCheckDirty()
         {
-            base.LockChildren();
-            this.child1?.Lock();
-            this.child2?.Lock();
+            var dirty = base.LockChildrenAndCheckDirty();
+
+            if (this.child1 != null)
+            {
+                var oldVersion = this.child1.Version;
+                this.child1.Lock();
+                dirty |= oldVersion != this.child1.Version;
+            }
+
+            if (this.child2 != null)
+            {
+                var oldVersion = this.child2.Version;
+                this.child2.Lock();
+                dirty |= oldVersion != this.child2.Version;
+            }
+
+            return dirty;
         }
 
         /// <inheritdoc/>
