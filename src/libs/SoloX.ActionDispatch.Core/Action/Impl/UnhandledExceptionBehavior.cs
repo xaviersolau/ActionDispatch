@@ -14,7 +14,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
     /// Action behavior to report an unhandled exception.
     /// </summary>
     /// <typeparam name="TRootState">The state root type.</typeparam>
-    public class UnhandledExceptionBehavior<TRootState> : IActionBehavior<TRootState, TRootState>
+    public class UnhandledExceptionBehavior<TRootState> : IUnhandledExceptionBehavior<TRootState>
         where TRootState : IState
     {
         /// <summary>

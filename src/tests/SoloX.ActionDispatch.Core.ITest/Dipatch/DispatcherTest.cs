@@ -7,12 +7,15 @@
 
 using System;
 using System.Reactive.Linq;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SoloX.ActionDispatch.Core.Action;
+using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
 using SoloX.ActionDispatch.Core.ITest.Dipatch.Behavior;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
+using SoloX.ActionDispatch.Core.State;
 using Xunit;
 
 namespace SoloX.ActionDispatch.Core.ITest.Dipatch
@@ -22,71 +25,139 @@ namespace SoloX.ActionDispatch.Core.ITest.Dipatch
         [Fact]
         public void ActionObserverTest()
         {
-            var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
+            SetupAndTestDispatcher<IStateA>(
+                new StateA(),
+                dispatcher =>
+                {
+                    var myText1 = "Some text 1.";
+                    var myText2 = "Some text 2.";
+                    var actionBehavior1 = new SetTextActionBehavior(myText1);
+                    var actionBehavior2 = new SetTextActionBehavior(myText2);
+                    IActionBehavior observedBehavior = null;
 
-            var state = new StateA();
+                    dispatcher.AddObserver(o => o.Do(a => observedBehavior = a.Behavior));
 
-            var myText1 = "Some text 1.";
-            var myText2 = "Some text 2.";
-            var actionBehavior1 = new SetTextActionBehavior(myText1);
-            var actionBehavior2 = new SetTextActionBehavior(myText2);
+                    dispatcher.Dispatch(actionBehavior1, s => s);
 
-            IActionBehavior observedBehavior = null;
+                    Assert.Same(actionBehavior1, observedBehavior);
 
-            state.Lock();
-            using (var dispatcher = new Dispatcher<IStateA>(state, logger))
-            {
-                dispatcher.AddObserver(o => o.Do(a => observedBehavior = a.Behavior));
+                    dispatcher.Dispatch(actionBehavior2, s => s);
 
-                dispatcher.Dispatch(actionBehavior1, s => s);
-
-                Assert.Same(actionBehavior1, observedBehavior);
-
-                dispatcher.Dispatch(actionBehavior2, s => s);
-
-                Assert.Same(actionBehavior2, observedBehavior);
-            }
+                    Assert.Same(actionBehavior2, observedBehavior);
+                });
         }
 
         [Fact]
         public void StateObserverTest()
         {
-            var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
-
-            var state = new StateA();
-
-            state.Lock();
-
-            string myText = "myText";
-
-            var actionBehavior = new SetTextActionBehavior(myText);
-
-            var lastText = string.Empty;
-            var lastVersion = -1;
-            using (var dispatcher = new Dispatcher<IStateA>(state, logger))
-            using (var subscription = dispatcher.State
-                .Do(s =>
+            SetupAndTestDispatcher<IStateA>(
+                new StateA(),
+                dispatcher =>
                 {
-                    lastVersion = s.Version;
-                    lastText = s.Value;
-                }).Subscribe())
+                    string myText = "myText";
+
+                    var actionBehavior = new SetTextActionBehavior(myText);
+
+                    var lastText = string.Empty;
+                    var lastVersion = -1;
+                    using (var subscription = dispatcher.State
+                        .Do(s =>
+                        {
+                            lastVersion = s.Version;
+                            lastText = s.Value;
+                        }).Subscribe())
+                    {
+                        // The initial state value is null.
+                        Assert.Null(lastText);
+                        Assert.Equal(0, lastVersion);
+
+                        dispatcher.Dispatch(actionBehavior, s => s);
+
+                        // Once the action is done the state will be set to myText.
+                        Assert.Equal(myText, lastText);
+                        Assert.Equal(1, lastVersion);
+
+                        dispatcher.Dispatch(actionBehavior, s => s);
+
+                        // Since the action won't change the state (set to the same instance value),
+                        // the version should remain the same.
+                        Assert.Equal(myText, lastText);
+                        Assert.Equal(1, lastVersion);
+                    }
+                });
+        }
+
+        [Fact]
+        public void ThrowActionTest()
+        {
+            SetupAndTestDispatcher<IStateA>(
+                new StateA(),
+                dispatcher =>
+                {
+                    IActionBehavior observedBehavior = null;
+
+                    dispatcher.AddObserver(o => o.Do(a => observedBehavior = a.Behavior));
+
+                    var throwBehavior = new ThrowActionBehavior();
+                    dispatcher.Dispatch(throwBehavior, s => s);
+
+                    var ueb = Assert.IsAssignableFrom<IUnhandledExceptionBehavior<IStateA>>(observedBehavior);
+                    Assert.Same(throwBehavior.Exception, ueb.Exception);
+                });
+        }
+
+        [Fact]
+        public void AsyncActionTest()
+        {
+            SetupAndTestDispatcher<IStateA>(
+                new StateA(),
+                dispatcher =>
+                {
+                    var someText = "Some text.";
+                    var waitHandle = new ManualResetEvent(false);
+                    var behaviorToDelay = new SetTextActionBehavior(someText);
+                    var delayBehavior = new DelayActionBehavior(300, behaviorToDelay);
+
+                    dispatcher.AddObserver(o => o.Do(
+                        a =>
+                        {
+                            // Unlock the wait handle as soon as we observed the expected SetTextAction.
+                            if (ReferenceEquals(a.Behavior, behaviorToDelay))
+                            {
+                                waitHandle.Set();
+                            }
+                        }));
+
+                    IStateA lastState = null;
+                    using (var subscription = dispatcher.State
+                        .Do(s =>
+                        {
+                            lastState = s;
+                        }).Subscribe())
+                    {
+                        dispatcher.Dispatch(delayBehavior, s => s);
+
+                        // Wait for the end of the delayed action.
+                        Assert.True(waitHandle.WaitOne(500));
+
+                        // Make sure the state has been set.
+                        Assert.NotNull(lastState);
+                        Assert.Equal(1, lastState.Version);
+                        Assert.Equal(someText, lastState.Value);
+                    }
+                });
+        }
+
+        private static void SetupAndTestDispatcher<TRootState>(TRootState initialState, Action<IDispatcher<TRootState>> testHandler)
+            where TRootState : IState<TRootState>
+        {
+            var logger = Mock.Of<ILogger<Dispatcher<TRootState>>>();
+
+            initialState.Lock();
+
+            using (var dispatcher = new Dispatcher<TRootState>(initialState, logger))
             {
-                // The initial state value is null.
-                Assert.Null(lastText);
-                Assert.Equal(0, lastVersion);
-
-                dispatcher.Dispatch(actionBehavior, s => s);
-
-                // Once the action is done the state will be set to myText.
-                Assert.Equal(myText, lastText);
-                Assert.Equal(1, lastVersion);
-
-                dispatcher.Dispatch(actionBehavior, s => s);
-
-                // Since the action won't change the state (set to the same instance value),
-                // the version should remain the same.
-                Assert.Equal(myText, lastText);
-                Assert.Equal(1, lastVersion);
+                testHandler(dispatcher);
             }
         }
     }
