@@ -24,7 +24,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Action.Basic
 
         public string SomeValue { get; }
 
-        public async Task Apply(IDispatcher<IStateA> dispatcher, IStateA state)
+        public async Task Apply(IRelativeDispatcher<IStateA, IStateA> dispatcher, IStateA state)
         {
             await Task.Delay(1000).ConfigureAwait(false);
             return;

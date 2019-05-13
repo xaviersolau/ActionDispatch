@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SoloX.ActionDispatch.Core.Dispatch;
+using SoloX.ActionDispatch.Core.Dispatch.Impl;
 using SoloX.ActionDispatch.Core.State;
 
 namespace SoloX.ActionDispatch.Core.Action.Impl
@@ -46,8 +47,10 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
             Task.Run(
                 async () =>
                 {
+                    var relativeDispatcher = new RelativeDispatcher<TRootState, TState>(dispatcher, this.Selector);
+
                     // This will run outside of the lock dispatcher monitor.
-                    await this.Behavior.Apply(dispatcher, targetState).ConfigureAwait(false);
+                    await this.Behavior.Apply(relativeDispatcher, targetState).ConfigureAwait(false);
                 },
                 CancellationToken.None)
                 .ContinueWith(

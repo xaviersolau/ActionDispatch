@@ -138,7 +138,7 @@ namespace SoloX.ActionDispatch.Core.ITest.Dipatch
                         dispatcher.Dispatch(delayBehavior, s => s);
 
                         // Wait for the end of the delayed action.
-                        Assert.True(waitHandle.WaitOne(500));
+                        Assert.True(waitHandle.WaitOne(1000));
 
                         // Make sure the state has been set.
                         Assert.NotNull(lastState);
