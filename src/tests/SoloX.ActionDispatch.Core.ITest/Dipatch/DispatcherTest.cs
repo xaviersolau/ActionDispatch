@@ -7,6 +7,7 @@
 
 using System;
 using System.Reactive.Linq;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SoloX.ActionDispatch.Core.Action;
@@ -102,6 +103,48 @@ namespace SoloX.ActionDispatch.Core.ITest.Dipatch
 
                     var ueb = Assert.IsAssignableFrom<IUnhandledExceptionBehavior<IStateA>>(observedBehavior);
                     Assert.Same(throwBehavior.Exception, ueb.Exception);
+                });
+        }
+
+        [Fact]
+        public void AsyncActionTest()
+        {
+            SetupAndTestDispatcher<IStateA>(
+                new StateA(),
+                dispatcher =>
+                {
+                    var someText = "Some text.";
+                    var waitHandle = new ManualResetEvent(false);
+                    var behaviorToDelay = new SetTextActionBehavior(someText);
+                    var delayBehavior = new DelayActionBehavior(300, behaviorToDelay);
+
+                    dispatcher.AddObserver(o => o.Do(
+                        a =>
+                        {
+                            // Unlock the wait handle as soon as we observed the expected SetTextAction.
+                            if (ReferenceEquals(a.Behavior, behaviorToDelay))
+                            {
+                                waitHandle.Set();
+                            }
+                        }));
+
+                    IStateA lastState = null;
+                    using (var subscription = dispatcher.State
+                        .Do(s =>
+                        {
+                            lastState = s;
+                        }).Subscribe())
+                    {
+                        dispatcher.Dispatch(delayBehavior, s => s);
+
+                        // Wait for the end of the delayed action.
+                        Assert.True(waitHandle.WaitOne(500));
+
+                        // Make sure the state has been set.
+                        Assert.NotNull(lastState);
+                        Assert.Equal(1, lastState.Version);
+                        Assert.Equal(someText, lastState.Value);
+                    }
                 });
         }
 
