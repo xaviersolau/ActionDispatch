@@ -35,6 +35,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="System.Reactive" Version="4.1.5" />
     <PackageReference Include="SoloX.ExpressionTools.Parser" Version="1.0.0-alpha.1" />
+    <PackageReference Include="SoloX.ExpressionTools.Transform" Version="1.0.0-alpha.1" />
   </ItemGroup>
 
 </Project>

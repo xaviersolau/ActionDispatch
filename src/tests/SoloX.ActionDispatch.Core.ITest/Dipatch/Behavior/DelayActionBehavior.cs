@@ -27,7 +27,7 @@ namespace SoloX.ActionDispatch.Core.ITest.Dipatch.Behavior
 
         public IActionBehavior<IStateA, IStateA> Behavior { get; }
 
-        public async Task Apply(IDispatcher<IStateA> dispatcher, IStateA state)
+        public async Task Apply(IRelativeDispatcher<IStateA, IStateA> dispatcher, IStateA state)
         {
             await Task.Delay(this.Delay).ConfigureAwait(false);
 

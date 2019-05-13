@@ -21,11 +21,11 @@ namespace SoloX.ActionDispatch.Examples.ActionBehavior
     public class ExampleAsyncActionBehavior : IActionBehaviorAsync<IExampleAppState, IExampleChildState>
     {
         /// <inheritdoc/>
-        public async Task Apply(IDispatcher<IExampleAppState> dispatcher, IExampleChildState state)
+        public async Task Apply(IRelativeDispatcher<IExampleAppState, IExampleChildState> dispatcher, IExampleChildState state)
         {
             await Task.Delay(2000).ConfigureAwait(false);
 
-            dispatcher.Dispatch(new ExampleActionBehavior(2), s => s.ChildState);
+            dispatcher.Dispatch(new ExampleActionBehavior(2), s => s);
         }
     }
 }

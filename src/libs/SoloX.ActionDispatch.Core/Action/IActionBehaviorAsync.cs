@@ -29,6 +29,6 @@ namespace SoloX.ActionDispatch.Core.Action
         /// <param name="dispatcher">The dispatcher object.</param>
         /// <param name="state">The state the action apply on.</param>
         /// <returns>The resulting state.</returns>
-        Task Apply(IDispatcher<TRootState> dispatcher, TState state);
+        Task Apply(IRelativeDispatcher<TRootState, TState> dispatcher, TState state);
     }
 }
