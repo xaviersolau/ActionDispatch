@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
+using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
 using Xunit;
 
 namespace SoloX.ActionDispatch.Core.UTest.State

@@ -62,6 +62,8 @@ namespace SoloX.ActionDispatch.Tools
         /// </summary>
         public void Run()
         {
+            // var projectFile = @"../../../../SoloX.ActionDispatch.State.Sample\SoloX.ActionDispatch.State.Sample.csproj";
+            // var projectFile = @"../../../../../tests/SoloX.ActionDispatch.Core.Sample\SoloX.ActionDispatch.Core.Sample.csproj";
             var projectFile = this.configuration.GetValue<string>("project");
 
             var generator = this.Service.GetService<IStateGenerator>();

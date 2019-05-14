@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="StateA.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
@@ -8,10 +8,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.State.Impl;
 
-namespace SoloX.ActionDispatch.Core.Sample.State.Basic
+namespace SoloX.ActionDispatch.Core.Sample.State.Basic.Impl
 {
+    /// <summary>
+    /// State implementation pattern.
+    /// </summary>
     public class StateA : AStateBase<IStateA>, IStateA
     {
         private string value;
@@ -56,7 +60,9 @@ namespace SoloX.ActionDispatch.Core.Sample.State.Basic
         /// <inheritdoc/>
         protected override bool LockChildrenAndCheckDirty()
         {
-            return base.LockChildrenAndCheckDirty();
+            var dirty = base.LockChildrenAndCheckDirty();
+
+            return dirty;
         }
 
         /// <inheritdoc/>

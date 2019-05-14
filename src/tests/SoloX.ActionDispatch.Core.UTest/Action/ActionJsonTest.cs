@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SoloX.ActionDispatch.Core.Action.Impl;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
+using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
 using SoloX.ActionDispatch.Core.UTest.Action.Basic;
 using Xunit;
 

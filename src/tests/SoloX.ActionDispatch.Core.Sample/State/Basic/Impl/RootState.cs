@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="RootState.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
@@ -8,15 +8,20 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.State.Impl;
 
-namespace SoloX.ActionDispatch.Core.Sample.State.Basic
+namespace SoloX.ActionDispatch.Core.Sample.State.Basic.Impl
 {
+    /// <summary>
+    /// State implementation pattern.
+    /// </summary>
     public class RootState : AStateBase<IRootState>, IRootState
     {
         private int value;
         private AStateBase<IStateA> child1;
         private AStateBase<IStateA> child2;
+        private AStateBase<IStateB> child3;
 
         /// <inheritdoc/>
         public override IRootState Identity => this;
@@ -79,6 +84,25 @@ namespace SoloX.ActionDispatch.Core.Sample.State.Basic
         }
 
         /// <inheritdoc/>
+        public IStateB Child3
+        {
+            get
+            {
+                return this.child3?.Identity;
+            }
+
+            set
+            {
+                if (this.child3 != value)
+                {
+                    this.CheckUnlock();
+                    this.MakeDirty();
+                    this.child3 = value?.ToStateBase();
+                }
+            }
+        }
+
+        /// <inheritdoc/>
         protected override bool CheckPatch<TPatchState>(
             AStateBase<TPatchState> oldState,
             AStateBase<TPatchState> newState,
@@ -98,6 +122,12 @@ namespace SoloX.ActionDispatch.Core.Sample.State.Basic
             if (this.child2 != null && this.child2.Patch(oldState, newState, out var child2Patched))
             {
                 patcher = (s) => { s.Child2 = child2Patched.Identity; };
+                return true;
+            }
+
+            if (this.child3 != null && this.child3.Patch(oldState, newState, out var child3Patched))
+            {
+                patcher = (s) => { s.Child3 = child3Patched.Identity; };
                 return true;
             }
 
@@ -122,6 +152,13 @@ namespace SoloX.ActionDispatch.Core.Sample.State.Basic
                 var oldVersion = this.child2.Version;
                 this.child2.Lock();
                 dirty |= oldVersion != this.child2.Version;
+            }
+
+            if (this.child3 != null)
+            {
+                var oldVersion = this.child3.Version;
+                this.child3.Lock();
+                dirty |= oldVersion != this.child3.Version;
             }
 
             return dirty;
@@ -152,11 +189,13 @@ namespace SoloX.ActionDispatch.Core.Sample.State.Basic
             {
                 state.child1 = this.child1?.DeepClone();
                 state.child2 = this.child2?.DeepClone();
+                state.child3 = this.child3?.DeepClone();
             }
             else
             {
                 state.child1 = this.child1;
                 state.child2 = this.child2;
+                state.child3 = this.child3;
             }
         }
     }
