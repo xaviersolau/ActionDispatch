@@ -45,7 +45,7 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
         }
 
         /// <inheritdoc/>
-        public void Generate(string projectFile)
+        public void Generate(string projectFile, string inputsFile, string outputsFile)
         {
             var projectFolder = Path.GetDirectoryName(projectFile);
 
@@ -53,10 +53,10 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             var project = this.workspace.RegisterProject(projectFile);
 
-            this.workspace.RegisterFile("./Patterns/Itf/IParentStatePattern.cs");
-            this.workspace.RegisterFile("./Patterns/Itf/IChildStatePattern.cs");
-            this.workspace.RegisterFile("./Patterns/Impl/ParentStatePattern.cs");
-            this.workspace.RegisterFile("./Patterns/Impl/StateFactoryPattern.cs");
+            this.workspace.RegisterFile(GetContentFile("./Patterns/Itf/IParentStatePattern.cs"));
+            this.workspace.RegisterFile(GetContentFile("./Patterns/Itf/IChildStatePattern.cs"));
+            this.workspace.RegisterFile(GetContentFile("./Patterns/Impl/ParentStatePattern.cs"));
+            this.workspace.RegisterFile(GetContentFile("./Patterns/Impl/StateFactoryPattern.cs"));
 
             var resolver = this.workspace.DeepLoad();
 
@@ -75,12 +75,15 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
                 implPatternDeclaration);
 
             var generatedClasses = new List<(string, string)>();
+            var interfaceNameSpaceList = new HashSet<string>();
 
             foreach (var extendedByItem in declaration.ExtendedBy.Where(d => d is IInterfaceDeclaration && d != itfParentPatternDeclaration && d != itfChildPatternDeclaration))
             {
                 this.logger.LogInformation(extendedByItem.FullName);
 
                 var itfDeclaration = (IInterfaceDeclaration)extendedByItem;
+
+                interfaceNameSpaceList.Add(itfDeclaration.DeclarationNameSpace);
 
                 var implName = GeneratorHelper.ComputeClassName(itfDeclaration.Name);
 
@@ -90,10 +93,19 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
                 generatedClasses.Add(className);
             }
 
-            this.GenerateFactory(resolver, locator, generatedClasses);
+            this.GenerateFactory(resolver, locator, generatedClasses, interfaceNameSpaceList);
         }
 
-        private void GenerateFactory(IDeclarationResolver resolver, RelativeLocator locator, List<(string nameSpace, string name)> generatedClasses)
+        private static string GetContentFile(string contentFile)
+        {
+            return Path.Combine(Path.GetDirectoryName(typeof(StateGenerator).Assembly.Location), contentFile);
+        }
+
+        private void GenerateFactory(
+            IDeclarationResolver resolver,
+            RelativeLocator locator,
+            List<(string nameSpace, string name)> generatedClasses,
+            HashSet<string> interfaceNameSpaceList)
         {
             var stateFactoryItfDecl = resolver.Find("SoloX.ActionDispatch.Core.State.IStateFactory").Single() as IInterfaceDeclaration;
             var factoryPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.StateFactoryPattern").Single() as IGenericDeclaration;
@@ -108,11 +120,12 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             var nsList = new HashSet<string>(generatedClasses.Select(n => n.nameSpace));
 
-            var nsWriter = new StringReplaceWriter("SoloX.ActionDispatch.State.Generator.Patterns.Itf", nsList.ToArray());
+            var nsWriter = new StringReplaceWriter("SoloX.ActionDispatch.State.Generator.Patterns.Impl", nsList.ToArray());
+            var nsItfWriter = new StringReplaceWriter("SoloX.ActionDispatch.State.Generator.Patterns.Itf", interfaceNameSpaceList.ToArray());
             var ctorWriter = new StringReplaceWriter("ParentStatePattern", generatedClasses.Select(n => n.name).ToArray());
             var implNameWriter = new StringReplaceWriter(factoryPatternDeclaration.Name, implName);
 
-            var writerSelector = new WriterSelector(ctorWriter, nsWriter, implNameWriter);
+            var writerSelector = new WriterSelector(ctorWriter, nsWriter, nsItfWriter, implNameWriter);
 
             generator.Generate(writerSelector, stateFactoryItfDecl, implName);
         }

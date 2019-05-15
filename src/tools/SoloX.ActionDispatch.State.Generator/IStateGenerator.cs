@@ -20,6 +20,8 @@ namespace SoloX.ActionDispatch.State.Generator
         /// Generate the state implementation on the given project.
         /// </summary>
         /// <param name="projectFile">Project file.</param>
-        void Generate(string projectFile);
+        /// <param name="inputsFile">Location where the input files must be generated.</param>
+        /// <param name="outputsFile">Location where the output files must be generated.</param>
+        void Generate(string projectFile, string inputsFile, string outputsFile);
     }
 }

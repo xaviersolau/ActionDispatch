@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using SoloX.ActionDispatch.Core.State;
+using SoloX.ActionDispatch.State.Generator.Patterns.Impl;
 using SoloX.ActionDispatch.State.Generator.Patterns.Itf;
 
 namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl

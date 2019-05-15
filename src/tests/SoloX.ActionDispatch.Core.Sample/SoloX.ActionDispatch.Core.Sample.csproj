@@ -12,4 +12,25 @@
     <ProjectReference Include="..\..\libs\SoloX.ActionDispatch.Core\SoloX.ActionDispatch.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Impl\" />
+    <Folder Include="State\Basic\Impl\" />
+  </ItemGroup>
+
+  <Target Name="StateGenerator" BeforeTargets="BeforeBuild;BeforeRebuild"
+    Inputs="State/Basic/IRootState.cs;State/Basic/IStateA.cs;State/Basic/IStateB.cs;State/Basic/IStateBa.cs"
+    Outputs="Impl/StateFactory.generated.cs; State/Basic/Impl/RootState.generated.cs; State/Basic/Impl/StateA.generated.cs; State/Basic/Impl/StateB.generated.cs; State/Basic/Impl/StateBa.generated.cs">
+    <Exec 
+      Command="dotnet build -c Release"
+      WorkingDirectory="../../tools/SoloX.ActionDispatch.Tools" />
+    <Exec
+      Command="dotnet run -c Release -- --project ../../tests/SoloX.ActionDispatch.Core.Sample/SoloX.ActionDispatch.Core.Sample.csproj"
+      WorkingDirectory="../../tools/SoloX.ActionDispatch.Tools" />
+    <ItemGroup>
+      <Compile Remove="**/*.generated.cs" />
+      <Compile Include="**/*.generated.cs" />
+      <FileWrites Include="**/*.generated.cs" />
+    </ItemGroup>
+  </Target>
+
 </Project>

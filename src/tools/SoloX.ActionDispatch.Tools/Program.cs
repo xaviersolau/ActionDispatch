@@ -33,6 +33,7 @@ namespace SoloX.ActionDispatch.Tools
             IServiceCollection sc = new ServiceCollection();
 
             sc.AddLogging(b => b.AddConsole());
+            sc.AddSingleton(configuration);
             sc.AddStateGenerator();
 
             this.Service = sc.BuildServiceProvider();
@@ -46,26 +47,47 @@ namespace SoloX.ActionDispatch.Tools
         /// Main program entry point.
         /// </summary>
         /// <param name="args">Tools arguments.</param>
-        public static void Main(string[] args)
+        /// <returns>Error code.</returns>
+        public static int Main(string[] args)
         {
             var builder = new ConfigurationBuilder();
             builder.AddCommandLine(args);
             var config = builder.Build();
 
-            new Program(config).Run();
-
-            Console.ReadKey();
+            return new Program(config).Run();
         }
 
         /// <summary>
         /// Run the tools command.
         /// </summary>
-        public void Run()
+        /// <returns>Error code.</returns>
+        public int Run()
         {
+            // var projectFile = @"../../../../SoloX.ActionDispatch.State.Sample\SoloX.ActionDispatch.State.Sample.csproj";
             var projectFile = this.configuration.GetValue<string>("project");
+            var inputsFile = this.configuration.GetValue<string>("inputs");
+            var outputsFile = this.configuration.GetValue<string>("outputs");
+
+            this.logger.LogInformation($"Generating state class in {projectFile}");
+
+            if (string.IsNullOrEmpty(projectFile))
+            {
+                this.logger.LogError($"Missing project file parameter.");
+                return -1;
+            }
+
+            if (!File.Exists(projectFile))
+            {
+                this.logger.LogError($"Could not find project file {projectFile}");
+                return -1;
+            }
 
             var generator = this.Service.GetService<IStateGenerator>();
-            generator.Generate(projectFile);
+            generator.Generate(projectFile, inputsFile, outputsFile);
+
+            this.logger.LogInformation($"State classes are generated.");
+
+            return 0;
         }
     }
 }
