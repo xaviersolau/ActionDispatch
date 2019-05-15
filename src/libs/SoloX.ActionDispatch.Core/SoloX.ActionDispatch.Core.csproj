@@ -6,10 +6,12 @@
 
     <PackageId>SoloX.ActionDispatch.Core</PackageId>
 
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+
     <Version>1.0.0-alpha.1</Version>
     <Authors>Xavier Solau</Authors>
     <Copyright>Copyright © 2019 Xavier Solau</Copyright>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/xaviersolau/ActionDispatch/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/xaviersolau/ActionDispatch</PackageProjectUrl>
     <RepositoryUrl>https://github.com/xaviersolau/ActionDispatch.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
