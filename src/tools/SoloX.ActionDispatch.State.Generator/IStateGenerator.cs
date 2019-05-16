@@ -22,6 +22,7 @@ namespace SoloX.ActionDispatch.State.Generator
         /// <param name="projectFile">Project file.</param>
         /// <param name="inputsFile">Location where the input files must be generated.</param>
         /// <param name="outputsFile">Location where the output files must be generated.</param>
-        void Generate(string projectFile, string inputsFile, string outputsFile);
+        /// <param name="generate">Tells if we must generate the output files.</param>
+        void Generate(string projectFile, string inputsFile, string outputsFile, bool generate);
     }
 }

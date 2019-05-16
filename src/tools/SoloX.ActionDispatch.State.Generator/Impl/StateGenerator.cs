@@ -45,7 +45,7 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
         }
 
         /// <inheritdoc/>
-        public void Generate(string projectFile, string inputsFile, string outputsFile)
+        public void Generate(string projectFile, string inputsFile, string outputsFile, bool generate)
         {
             var projectFolder = Path.GetDirectoryName(projectFile);
 
@@ -68,8 +68,12 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             var locator = new RelativeLocator(projectFolder, project.RootNameSpace, suffix: "Impl");
 
+            var inputs = new HashSet<string>();
+            var outputs = new HashSet<string>();
+
+            var fileGenerator = new FileGenerator(".generated.cs", f => outputs.Add(Path.GetFullPath(f)));
             var generator = new ImplementationGenerator(
-                new FileGenerator(),
+                fileGenerator,
                 locator,
                 itfParentPatternDeclaration,
                 implPatternDeclaration);
@@ -79,21 +83,40 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             foreach (var extendedByItem in declaration.ExtendedBy.Where(d => d is IInterfaceDeclaration && d != itfParentPatternDeclaration && d != itfChildPatternDeclaration))
             {
-                this.logger.LogInformation(extendedByItem.FullName);
-
                 var itfDeclaration = (IInterfaceDeclaration)extendedByItem;
 
-                interfaceNameSpaceList.Add(itfDeclaration.DeclarationNameSpace);
+                if (generate)
+                {
+                    this.logger.LogInformation(extendedByItem.FullName);
 
-                var implName = GeneratorHelper.ComputeClassName(itfDeclaration.Name);
+                    interfaceNameSpaceList.Add(itfDeclaration.DeclarationNameSpace);
 
-                var writerSelector = this.CreateWriterSelector(itfParentPatternDeclaration, itfChildPatternDeclaration, implPatternDeclaration, itfDeclaration, implName);
+                    var implName = GeneratorHelper.ComputeClassName(itfDeclaration.Name);
 
-                var className = generator.Generate(writerSelector, itfDeclaration, implName);
-                generatedClasses.Add(className);
+                    var writerSelector = this.CreateWriterSelector(itfParentPatternDeclaration, itfChildPatternDeclaration, implPatternDeclaration, itfDeclaration, implName);
+
+                    var className = generator.Generate(writerSelector, itfDeclaration, implName);
+                    generatedClasses.Add(className);
+                }
+
+                inputs.Add(itfDeclaration.Location);
             }
 
-            this.GenerateFactory(resolver, locator, generatedClasses, interfaceNameSpaceList);
+            if (generate)
+            {
+                this.GenerateFactory(resolver, locator, fileGenerator, generatedClasses, interfaceNameSpaceList);
+                WriteFileList(outputs, outputsFile, Path.GetFullPath(Path.GetDirectoryName(projectFile)));
+            }
+
+            WriteFileList(inputs, inputsFile, Path.GetFullPath(Path.GetDirectoryName(projectFile)));
+        }
+
+        private static void WriteFileList(HashSet<string> list, string file, string projectFolder)
+        {
+            if (!string.IsNullOrEmpty(file))
+            {
+                File.WriteAllLines(file, list.Select(f => f.Replace(projectFolder, string.Empty).Substring(1)));
+            }
         }
 
         private static string GetContentFile(string contentFile)
@@ -104,6 +127,7 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
         private void GenerateFactory(
             IDeclarationResolver resolver,
             RelativeLocator locator,
+            FileGenerator fileGenerator,
             List<(string nameSpace, string name)> generatedClasses,
             HashSet<string> interfaceNameSpaceList)
         {
@@ -111,7 +135,7 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             var factoryPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.StateFactoryPattern").Single() as IGenericDeclaration;
 
             var generator = new ImplementationGenerator(
-                new FileGenerator(),
+                fileGenerator,
                 locator,
                 stateFactoryItfDecl,
                 factoryPatternDeclaration);
