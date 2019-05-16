@@ -17,19 +17,53 @@
     <Folder Include="State\Basic\Impl\" />
   </ItemGroup>
 
-  <Target Name="StateGenerator" BeforeTargets="BeforeBuild;BeforeRebuild"
-    Inputs="State/Basic/IRootState.cs;State/Basic/IStateA.cs;State/Basic/IStateB.cs;State/Basic/IStateBa.cs"
-    Outputs="Impl/StateFactory.generated.cs; State/Basic/Impl/RootState.generated.cs; State/Basic/Impl/StateA.generated.cs; State/Basic/Impl/StateB.generated.cs; State/Basic/Impl/StateBa.generated.cs">
-    <Exec 
-      Command="dotnet build -c Release"
-      WorkingDirectory="../../tools/SoloX.ActionDispatch.Tools" />
+  <Target Name="BeforeStateGenerator" BeforeTargets="StateGenerator">
+    <ReadLinesFromFile
+            File="obj/state.generator.inputs" >
+      <Output
+          TaskParameter="Lines"
+          ItemName="OldStateGeneratorInputs"/>
+    </ReadLinesFromFile>
     <Exec
-      Command="dotnet run -c Release -- --project ../../tests/SoloX.ActionDispatch.Core.Sample/SoloX.ActionDispatch.Core.Sample.csproj"
+      Command="dotnet run -c Release -- --generate false --project ../../tests/SoloX.ActionDispatch.Core.Sample/SoloX.ActionDispatch.Core.Sample.csproj --inputs ../../tests/SoloX.ActionDispatch.Core.Sample/obj/state.generator.inputs"
       WorkingDirectory="../../tools/SoloX.ActionDispatch.Tools" />
+    <ReadLinesFromFile
+            File="obj/state.generator.inputs" >
+      <Output
+          TaskParameter="Lines"
+          ItemName="StateGeneratorInputs"/>
+    </ReadLinesFromFile>
+    <ReadLinesFromFile
+            File="obj/state.generator.outputs" >
+      <Output
+          TaskParameter="Lines"
+          ItemName="StateGeneratorOutputs"/>
+    </ReadLinesFromFile>
+    
+    <ItemGroup Condition="@(StateGeneratorInputs) != @(OldStateGeneratorInputs)">
+      <StateGeneratorOutputs Include="dummy" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="StateGenerator" BeforeTargets="BeforeBuild;BeforeRebuild"
+    Inputs="@(StateGeneratorInputs)"
+    Outputs="@(StateGeneratorOutputs)">
+    <Delete Files="@(StateGeneratorOutputs)" />
     <ItemGroup>
-      <Compile Remove="**/*.generated.cs" />
-      <Compile Include="**/*.generated.cs" />
-      <FileWrites Include="**/*.generated.cs" />
+      <Compile Remove="@(StateGeneratorOutputs)" />
+    </ItemGroup>
+    <Exec
+      Command="dotnet run -c Release -- --project ../../tests/SoloX.ActionDispatch.Core.Sample/SoloX.ActionDispatch.Core.Sample.csproj --outputs ../../tests/SoloX.ActionDispatch.Core.Sample/obj/state.generator.outputs  --inputs ../../tests/SoloX.ActionDispatch.Core.Sample/obj/state.generator.inputs"
+      WorkingDirectory="../../tools/SoloX.ActionDispatch.Tools" />
+    <ReadLinesFromFile
+            File="obj/state.generator.outputs" >
+      <Output
+          TaskParameter="Lines"
+          ItemName="NewStateGeneratorOutputs"/>
+    </ReadLinesFromFile>
+    <ItemGroup>
+      <Compile Include="@(NewStateGeneratorOutputs)" />
+      <FileWrites Include="@(NewStateGeneratorOutputs)" />
     </ItemGroup>
   </Target>
 
