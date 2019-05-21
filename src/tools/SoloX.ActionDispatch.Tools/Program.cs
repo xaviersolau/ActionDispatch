@@ -72,7 +72,10 @@ namespace SoloX.ActionDispatch.Tools
                 generate = true;
             }
 
-            if (generate) this.logger.LogInformation($"Generating state class in {projectFile}");
+            if (generate)
+            {
+                this.logger.LogInformation($"Generating state class in {projectFile}");
+            }
 
             if (string.IsNullOrEmpty(projectFile))
             {
@@ -89,7 +92,10 @@ namespace SoloX.ActionDispatch.Tools
             var generator = this.Service.GetService<IStateGenerator>();
             generator.Generate(projectFile, inputsFile, outputsFile, generate);
 
-            if (generate) this.logger.LogInformation($"State classes are generated.");
+            if (generate)
+            {
+                this.logger.LogInformation($"State classes are generated.");
+            }
 
             return 0;
         }

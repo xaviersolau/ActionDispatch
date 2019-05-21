@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -11,5 +11,13 @@
   <ItemGroup>
     <Folder Include="Impl\" />
   </ItemGroup>
+
+  <Import Project="..\SoloX.ActionDispatch.State.Build\build\SoloX.ActionDispatch.State.Build.props" />
+  <Import Project="..\SoloX.ActionDispatch.State.Build\build\SoloX.ActionDispatch.State.Build.targets" />
+
+  <PropertyGroup>
+    <ActionDispatchToolsWorkingDirectory>../SoloX.ActionDispatch.Tools</ActionDispatchToolsWorkingDirectory>
+    <ActionDispatchToolsCommand>dotnet run -c Release --no-build --</ActionDispatchToolsCommand>
+  </PropertyGroup>
 
 </Project>

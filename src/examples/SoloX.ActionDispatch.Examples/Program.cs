@@ -32,7 +32,7 @@ namespace SoloX.ActionDispatch.Examples
             IServiceCollection sc = new ServiceCollection();
 
             sc.AddLogging(b => b.AddConsole());
-            sc.AddSingleton<IStateFactory>(new State.Impl.ExampleStateFactory());
+            sc.AddSingleton<IStateFactory>(new Impl.StateFactory());
             sc.AddSingleton<IDispatcher<IExampleAppState>>(
                 r =>
                 {

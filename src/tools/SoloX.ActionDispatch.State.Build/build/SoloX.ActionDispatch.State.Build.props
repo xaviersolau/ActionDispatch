@@ -1,0 +1,11 @@
+<Project>
+
+  <PropertyGroup>
+    <StateGeneratorInputsFile>obj/state.generator.inputs</StateGeneratorInputsFile>
+    <StateGeneratorOutputsFile>obj/state.generator.outputs</StateGeneratorOutputsFile>
+    
+    <ActionDispatchToolsWorkingDirectory>.</ActionDispatchToolsWorkingDirectory>
+    <ActionDispatchToolsCommand>dotnet SoloX.ActionDispatch.Tools</ActionDispatchToolsCommand>
+  </PropertyGroup>
+
+</Project>
