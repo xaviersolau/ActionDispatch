@@ -1,0 +1,57 @@
+<Project>
+
+  <Target Name="StateGeneratorMain"
+      BeforeTargets="BeforeBuild;BeforeRebuild"
+      DependsOnTargets="BeforeStateGenerator;StateGenerator">
+
+    <ReadLinesFromFile File="$(StateGeneratorOutputsFile)">
+      <Output TaskParameter="Lines" ItemName="NewStateGeneratorOutputs" />
+    </ReadLinesFromFile>
+
+    <ItemGroup>
+      <Compile Remove="@(StateGeneratorOutputs)" />
+      <Compile Include="@(NewStateGeneratorOutputs)" />
+      <FileWrites Include="@(NewStateGeneratorOutputs)" />
+    </ItemGroup>
+
+  </Target>
+
+  <Target Name="BeforeStateGenerator">
+
+    <ReadLinesFromFile File="$(StateGeneratorInputsFile)" >
+      <Output TaskParameter="Lines" ItemName="OldStateGeneratorInputs"/>
+    </ReadLinesFromFile>
+    
+    <Exec
+      Command="$(ActionDispatchToolsCommand) --generate false --project $(MSBuildProjectDirectory)/$(MSBuildProjectFile) --inputs $(MSBuildProjectDirectory)/$(StateGeneratorInputsFile)"
+      WorkingDirectory="$(ActionDispatchToolsWorkingDirectory)" />
+
+    <ReadLinesFromFile File="$(StateGeneratorInputsFile)" >
+      <Output TaskParameter="Lines" ItemName="StateGeneratorInputs"/>
+    </ReadLinesFromFile>
+    
+    <ReadLinesFromFile File="$(StateGeneratorOutputsFile)" >
+      <Output TaskParameter="Lines" ItemName="StateGeneratorOutputs"/>
+    </ReadLinesFromFile>
+    
+    <Delete Condition="@(StateGeneratorInputs) != @(OldStateGeneratorInputs)"
+            Files="@(StateGeneratorOutputs)" />
+
+    <ItemGroup Condition="@(StateGeneratorOutputs)==''">
+      <StateGeneratorOutputs Include="dummy" />
+    </ItemGroup>
+
+  </Target>
+
+  <Target Name="StateGenerator"
+          AfterTargets="BeforeStateGenerator"
+          Inputs="@(StateGeneratorInputs)"
+          Outputs="@(StateGeneratorOutputs)">
+
+    <Exec
+      Command="$(ActionDispatchToolsCommand) --project $(MSBuildProjectDirectory)/$(MSBuildProjectFile) --outputs $(MSBuildProjectDirectory)/$(StateGeneratorOutputsFile) --inputs $(MSBuildProjectDirectory)/$(StateGeneratorInputsFile)"
+      WorkingDirectory="$(ActionDispatchToolsWorkingDirectory)" />
+
+  </Target>
+
+</Project>

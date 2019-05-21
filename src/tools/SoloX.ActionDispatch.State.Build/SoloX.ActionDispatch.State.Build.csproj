@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <PackageId>SoloX.ActionDispatch.State.Build</PackageId>
+
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+
+    <Version>1.0.0-alpha.1</Version>
+    <Authors>Xavier Solau</Authors>
+    <Copyright>Copyright © 2019 Xavier Solau</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/xaviersolau/ActionDispatch</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/xaviersolau/ActionDispatch.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>action, dispatch, state, generator, tool</PackageTags>
+    <PackageReleaseNotes>
+      - Generate Action dispatcher State.
+    </PackageReleaseNotes>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Description>SoloX.ActionDispatch.State.Build provides the build tooling to generate the state classes automatically at build time.</Description>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="build\" />
+    <Folder Include="buildMultiTargeting\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="buildMultiTargeting\SoloX.ActionDispatch.State.Build.props" PackagePath="buildMultiTargeting\" />
+    <Content Include="buildMultiTargeting\SoloX.ActionDispatch.State.Build.targets" PackagePath="buildMultiTargeting\" />
+    <Content Include="build\SoloX.ActionDispatch.State.Build.props" PackagePath="build\" />
+    <Content Include="build\SoloX.ActionDispatch.State.Build.targets" PackagePath="build\" />
+  </ItemGroup>
+
+</Project>
