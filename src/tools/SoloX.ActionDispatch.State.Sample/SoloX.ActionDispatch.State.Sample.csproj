@@ -12,12 +12,13 @@
     <Folder Include="Impl\" />
   </ItemGroup>
 
-  <Import Project="..\SoloX.ActionDispatch.State.Build\build\SoloX.ActionDispatch.State.Build.props" />
-  <Import Project="..\SoloX.ActionDispatch.State.Build\build\SoloX.ActionDispatch.State.Build.targets" />
-
   <PropertyGroup>
     <ActionDispatchToolsWorkingDirectory>../SoloX.ActionDispatch.Tools</ActionDispatchToolsWorkingDirectory>
     <ActionDispatchToolsCommand>dotnet run -c Release --no-build --</ActionDispatchToolsCommand>
+    <PreventPackageReference>true</PreventPackageReference>
   </PropertyGroup>
+
+  <Import Project="..\SoloX.ActionDispatch.State.Build\build\SoloX.ActionDispatch.State.Build.props" />
+  <Import Project="..\SoloX.ActionDispatch.State.Build\build\SoloX.ActionDispatch.State.Build.targets" />
 
 </Project>
