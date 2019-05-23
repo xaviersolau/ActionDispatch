@@ -17,7 +17,7 @@ namespace SoloX.ActionDispatch.Core.UTest.State
     public class TransactionalStateTest
     {
         [Fact]
-        public void StateTransactionTest()
+        public void StateTransactionGetStateTest()
         {
             var value = "Test";
             var state = new StateA();
@@ -27,10 +27,42 @@ namespace SoloX.ActionDispatch.Core.UTest.State
             IStateA patchedState;
             using (var transactionalState = state.CreateTransactionalState<IStateA>(state))
             {
-                var newState = transactionalState.State;
+                var newState = transactionalState.GetState();
                 Assert.NotSame(state, newState);
                 Assert.False(newState.IsLocked);
                 Assert.Equal(state.Value, newState.Value);
+                patchedState = transactionalState.Close();
+                Assert.Same(newState, patchedState);
+            }
+
+            Assert.True(patchedState.IsLocked);
+        }
+
+        [Fact]
+        public void StateTransactionSetStateTest()
+        {
+            var value = "Test";
+            var state = new StateA();
+            state.Value = value;
+            state.Lock();
+
+            var value2 = "Test2";
+            var state2 = new StateA()
+            {
+                Value = value2,
+            };
+
+            IStateA patchedState;
+            using (var transactionalState = state.CreateTransactionalState<IStateA>(state))
+            {
+                var newState = new StateA()
+                {
+                    Value = value2,
+                };
+
+                transactionalState.SetState(newState);
+
+                Assert.False(newState.IsLocked);
                 patchedState = transactionalState.Close();
                 Assert.Same(newState, patchedState);
             }

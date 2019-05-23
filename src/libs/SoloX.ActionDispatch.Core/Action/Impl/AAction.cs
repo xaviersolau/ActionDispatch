@@ -65,7 +65,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         /// Select the target state within a transaction.
         /// </summary>
         /// <param name="rootState">The root state.</param>
-        protected ITransactionalState<TState, TRootState> SelectStateTransaction(TRootState rootState)
+        protected ITransactionalState<TRootState, TState> SelectStateTransaction(TRootState rootState)
         {
             var targetState = this.selectorFunc(rootState);
             return targetState.CreateTransactionalState(rootState);

@@ -7,6 +7,7 @@
 
 using System;
 using SoloX.ActionDispatch.Core.Action;
+using SoloX.ActionDispatch.Core.State;
 using SoloX.ActionDispatch.Examples.State;
 
 namespace SoloX.ActionDispatch.Examples.ActionBehavior
@@ -31,10 +32,11 @@ namespace SoloX.ActionDispatch.Examples.ActionBehavior
         public int Increment { get; }
 
         /// <inheritdoc />
-        public IExampleChildState Apply(IExampleChildState state)
+        public void Apply(ITransactionalState<IExampleAppState, IExampleChildState> transactionalState)
         {
+            var state = transactionalState.GetState();
+
             state.ChildCount += this.Increment;
-            return state;
         }
     }
 }

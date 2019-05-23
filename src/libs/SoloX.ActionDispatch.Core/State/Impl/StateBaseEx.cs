@@ -22,7 +22,7 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         /// <typeparam name="TState">The type or interface of the state.</typeparam>
         /// <param name="state">The state instance to convert.</param>
         /// <returns>The AStateBase converted state.</returns>
-        public static AStateBase<TState> ToStateBase<TState>(this IState<TState> state)
+        public static AStateBase<TState> ToStateBase<TState>(this TState state)
             where TState : IState
         {
             if (state is AStateBase<TState> stateBase)

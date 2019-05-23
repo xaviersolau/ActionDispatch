@@ -32,10 +32,9 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         public Exception Exception { get; }
 
         /// <inheritdoc/>
-        public TRootState Apply(TRootState state)
+        public void Apply(ITransactionalState<TRootState, TRootState> transactionalState)
         {
             // Nothing to do.
-            return default;
         }
     }
 }

@@ -40,7 +40,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         {
             using (var stateTransaction = this.SelectStateTransaction(rootState))
             {
-                this.Behavior.Apply(stateTransaction.State);
+                this.Behavior.Apply(stateTransaction);
 
                 var patched = stateTransaction.Close();
 

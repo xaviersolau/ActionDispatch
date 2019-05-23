@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Text;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
+using SoloX.ActionDispatch.Core.State;
 
 namespace SoloX.ActionDispatch.Core.UTest.Action.Basic
 {
@@ -22,10 +23,9 @@ namespace SoloX.ActionDispatch.Core.UTest.Action.Basic
 
         public string SomeValue { get; }
 
-        public IStateA Apply(IStateA state)
+        public void Apply(ITransactionalState<IStateA, IStateA> transactionalState)
         {
             // Nothing to do for now.
-            return state;
         }
     }
 }
