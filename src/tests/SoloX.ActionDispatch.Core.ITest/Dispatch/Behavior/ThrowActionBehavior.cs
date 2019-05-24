@@ -10,14 +10,15 @@ using System.Collections.Generic;
 using System.Text;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
+using SoloX.ActionDispatch.Core.State;
 
-namespace SoloX.ActionDispatch.Core.ITest.Dipatch.Behavior
+namespace SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior
 {
     public class ThrowActionBehavior : IActionBehavior<IStateA, IStateA>
     {
         public ApplicationException Exception { get; } = new ApplicationException("What if we throw an exception here?");
 
-        public IStateA Apply(IStateA state)
+        public void Apply(ITransactionalState<IStateA, IStateA> transactionalState)
         {
             throw this.Exception;
         }

@@ -1,7 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\SharedProperties.props" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>SoloX.ActionDispatch.State.Generator</PackageId>
+
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+
+    <PackageTags>action, dispatch, state, generator, tool</PackageTags>
+    <PackageReleaseNotes>
+      - Implement a State generator.
+    </PackageReleaseNotes>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Description>SoloX.ActionDispatch.State.Generator provides the tools to generate state implementation classes.</Description>
+
+    <LangVersion>latest</LangVersion>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

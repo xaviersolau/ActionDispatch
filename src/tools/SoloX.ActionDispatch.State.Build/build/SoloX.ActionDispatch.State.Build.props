@@ -4,8 +4,16 @@
     <StateGeneratorInputsFile>obj/state.generator.inputs</StateGeneratorInputsFile>
     <StateGeneratorOutputsFile>obj/state.generator.outputs</StateGeneratorOutputsFile>
     
-    <ActionDispatchToolsWorkingDirectory>.</ActionDispatchToolsWorkingDirectory>
-    <ActionDispatchToolsCommand>dotnet SoloX.ActionDispatch.Tools</ActionDispatchToolsCommand>
+    <ActionDispatchToolsWorkingDirectory Condition="$(ActionDispatchToolsWorkingDirectory)==''">.</ActionDispatchToolsWorkingDirectory>
+    <ActionDispatchToolsCommand Condition="$(ActionDispatchToolsCommand) == ''">dotnet SoloX.ActionDispatch.Tools</ActionDispatchToolsCommand>
   </PropertyGroup>
+
+  <ItemGroup Condition="$(PreventPackageReference)==''">
+    <PackageReference Include="SoloX.ActionDispatch.Core" Version="1.0.0-alpha-1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(PreventPackageReference)==''">
+    <DotNetCliToolReference Include="SoloX.ActionDispatch.Tools" Version="1.0.0-alpha-1" />
+  </ItemGroup>
 
 </Project>

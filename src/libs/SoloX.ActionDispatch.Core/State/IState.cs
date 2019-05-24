@@ -46,7 +46,7 @@ namespace SoloX.ActionDispatch.Core.State
         /// <typeparam name="TRootState">The type of the root application state.</typeparam>
         /// <param name="rootState">The root application state instance.</param>
         /// <returns>The transactional state instance.</returns>
-        ITransactionalState<TState, TRootState> CreateTransactionalState<TRootState>(TRootState rootState)
+        ITransactionalState<TRootState, TState> CreateTransactionalState<TRootState>(TRootState rootState)
             where TRootState : IState<TRootState>;
     }
 }

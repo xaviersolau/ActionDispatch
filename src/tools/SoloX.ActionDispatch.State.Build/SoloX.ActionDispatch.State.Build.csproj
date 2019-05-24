@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\SharedProperties.props" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
 
@@ -7,13 +9,6 @@
 
     <NoPackageAnalysis>true</NoPackageAnalysis>
 
-    <Version>1.0.0-alpha.1</Version>
-    <Authors>Xavier Solau</Authors>
-    <Copyright>Copyright © 2019 Xavier Solau</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/xaviersolau/ActionDispatch</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/xaviersolau/ActionDispatch.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <PackageTags>action, dispatch, state, generator, tool</PackageTags>
     <PackageReleaseNotes>
       - Generate Action dispatcher State.

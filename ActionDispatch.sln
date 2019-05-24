@@ -27,13 +27,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{
 	ProjectSection(SolutionItems) = preProject
 		LICENSE = LICENSE
 		README.md = README.md
+		src\SharedProperties.props = src\SharedProperties.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.Core.ITest", "src\tests\SoloX.ActionDispatch.Core.ITest\SoloX.ActionDispatch.Core.ITest.csproj", "{0E49D5F4-5CBE-41B0-99F9-8051EB4EAF91}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.Core.Sample", "src\tests\SoloX.ActionDispatch.Core.Sample\SoloX.ActionDispatch.Core.Sample.csproj", "{CD1BCA06-4D6B-4FAE-B6C8-141FAEB21DFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoloX.ActionDispatch.State.Build", "src\tools\SoloX.ActionDispatch.State.Build\SoloX.ActionDispatch.State.Build.csproj", "{5ABBDCA7-271D-43FC-82F7-79F055C691B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.State.Build", "src\tools\SoloX.ActionDispatch.State.Build\SoloX.ActionDispatch.State.Build.csproj", "{5ABBDCA7-271D-43FC-82F7-79F055C691B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

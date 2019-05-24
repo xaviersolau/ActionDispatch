@@ -13,7 +13,7 @@ using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 
-namespace SoloX.ActionDispatch.Core.ITest.Dipatch.Behavior
+namespace SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior
 {
     public class DelayActionBehavior : IActionBehaviorAsync<IStateA, IStateA>
     {

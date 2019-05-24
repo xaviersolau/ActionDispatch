@@ -13,13 +13,13 @@ using Moq;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
-using SoloX.ActionDispatch.Core.ITest.Dipatch.Behavior;
+using SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
 using SoloX.ActionDispatch.Core.State;
 using Xunit;
 
-namespace SoloX.ActionDispatch.Core.ITest.Dipatch
+namespace SoloX.ActionDispatch.Core.ITest.Dispatch
 {
     public class DispatcherTest
     {

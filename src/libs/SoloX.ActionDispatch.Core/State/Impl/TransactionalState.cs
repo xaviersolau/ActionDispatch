@@ -11,27 +11,48 @@ using System.Text;
 
 namespace SoloX.ActionDispatch.Core.State.Impl
 {
-    internal class TransactionalState<TState, TRootState> : ITransactionalState<TState, TRootState>
-        where TState : IState
+    internal class TransactionalState<TRootState, TState> : ITransactionalState<TRootState, TState>
         where TRootState : IState<TRootState>
+        where TState : IState
     {
         private readonly AStateBase<TState> stateBase;
-        private readonly AStateBase<TState> newState;
+        private AStateBase<TState> newState;
         private TRootState rootState;
         private TRootState patchedRootState;
 
         public TransactionalState(AStateBase<TState> state, TRootState rootState)
         {
             this.stateBase = state;
-            this.newState = state.DeepClone();
-            this.State = this.newState.Identity;
             this.rootState = rootState;
         }
 
-        public TState State { get; }
+        public TState GetState()
+        {
+            this.CheckOpen();
+
+            this.newState = this.stateBase.DeepClone();
+            return this.newState.Identity;
+        }
+
+        public void SetState(TState state)
+        {
+            this.CheckOpen();
+
+            if (state.IsLocked)
+            {
+                throw new AccessViolationException("The new state must not be locked.");
+            }
+
+            this.newState = state.ToStateBase();
+        }
 
         public TRootState Close()
         {
+            if (this.newState == null)
+            {
+                return default;
+            }
+
             if (this.patchedRootState != null)
             {
                 throw new AccessViolationException("The root state is already patched.");
@@ -47,6 +68,14 @@ namespace SoloX.ActionDispatch.Core.State.Impl
             if (this.patchedRootState != null)
             {
                 this.patchedRootState.Lock();
+            }
+        }
+
+        private void CheckOpen()
+        {
+            if (this.newState != null)
+            {
+                throw new AccessViolationException("The state transaction is already opened.");
             }
         }
     }

@@ -33,8 +33,7 @@ namespace SoloX.ActionDispatch.Core.Action
         /// <summary>
         /// Apply action behavior on the given state.
         /// </summary>
-        /// <param name="state">The state the action apply on.</param>
-        /// <returns>The resulting state.</returns>
-        TState Apply(TState state);
+        /// <param name="transactionalState">The state transaction the action apply on.</param>
+        void Apply(ITransactionalState<TRootState, TState> transactionalState);
     }
 }

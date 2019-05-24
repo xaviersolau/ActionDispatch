@@ -10,8 +10,9 @@ using System.Collections.Generic;
 using System.Text;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
+using SoloX.ActionDispatch.Core.State;
 
-namespace SoloX.ActionDispatch.Core.ITest.Dipatch.Behavior
+namespace SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior
 {
     public class SetTextActionBehavior : IActionBehavior<IStateA, IStateA>
     {
@@ -22,10 +23,10 @@ namespace SoloX.ActionDispatch.Core.ITest.Dipatch.Behavior
 
         public string Text { get; }
 
-        public IStateA Apply(IStateA state)
+        public void Apply(ITransactionalState<IStateA, IStateA> transactionalState)
         {
+            var state = transactionalState.GetState();
             state.Value = this.Text;
-            return state;
         }
     }
 }

@@ -5,6 +5,7 @@ jobs:
       - image: microsoft/dotnet:sdk
     steps:
       - checkout
+
       - run:
           name: Build the projects
           command: |
@@ -13,6 +14,7 @@ jobs:
             cd ../../..
 
             dotnet build -c Release
+
       - run:
           name: Run Unit Tests
           command: |
@@ -23,6 +25,7 @@ jobs:
             cd src/tests/SoloX.ActionDispatch.Core.ITest
             dotnet test -c Release --no-build
             cd ../../..
+
       - run:
           name: Run Code coverage
           command: |
@@ -39,15 +42,34 @@ jobs:
             mkdir coverage
             cp result.opencover.xml coverage/result.opencover.xml
             coveralls/csmacnz.Coveralls --opencover -i coverage/result.opencover.xml --repoToken $COVERALLS_REPO_TOKEN --useRelativePaths --commitId $CIRCLE_SHA1 --commitBranch $CIRCLE_BRANCH --commitAuthor $CIRCLE_USERNAME --jobId $CIRCLE_BUILD_NUM --serviceName circleci
+
       - store_artifacts:
           path: coverage
+
       - run:
           name: Generate packages
           command: |
             mkdir packages
+
             cd src/libs/SoloX.ActionDispatch.Core
             dotnet pack -c Release --no-build
             cd ../../..
             mv src/libs/SoloX.ActionDispatch.Core/bin/Release/*.nupkg packages/
+
+            cd src/tools/SoloX.ActionDispatch.Tools
+            dotnet pack -c Release --no-build
+            cd ../../..
+            mv src/tools/SoloX.ActionDispatch.Tools/bin/Release/*.nupkg packages/
+
+            cd src/tools/SoloX.ActionDispatch.State.Generator
+            dotnet pack -c Release --no-build
+            cd ../../..
+            mv src/tools/SoloX.ActionDispatch.State.Generator/bin/Release/*.nupkg packages/
+
+            cd src/tools/SoloX.ActionDispatch.State.Build
+            dotnet pack -c Release --no-build
+            cd ../../..
+            mv src/tools/SoloX.ActionDispatch.State.Build/bin/Release/*.nupkg packages/
+
       - store_artifacts:
           path: packages
