@@ -69,5 +69,31 @@ namespace SoloX.ActionDispatch.Core.UTest.State
 
             Assert.True(patchedState.IsLocked);
         }
+
+        [Fact]
+        public void MultipleCallToGetSetState()
+        {
+            var value = "Test";
+            var state = new StateA();
+            state.Value = value;
+            state.Lock();
+
+            IStateA patchedState;
+            using (var transactionalState = state.CreateTransactionalState<IStateA>(state))
+            {
+                var newState = transactionalState.GetState();
+
+                Assert.Throws<AccessViolationException>(() => transactionalState.GetState());
+
+                Assert.Throws<AccessViolationException>(() => transactionalState.SetState(new StateA()));
+
+                Assert.False(newState.IsLocked);
+
+                patchedState = transactionalState.Close();
+                Assert.Same(newState, patchedState);
+            }
+
+            Assert.True(patchedState.IsLocked);
+        }
     }
 }
