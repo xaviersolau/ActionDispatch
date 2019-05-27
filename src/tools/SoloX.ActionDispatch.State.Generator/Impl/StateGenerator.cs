@@ -53,6 +53,12 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             var project = this.workspace.RegisterProject(projectFile);
 
+            if (!File.Exists(Path.Combine(GetContentFile("."), "../../../../../libs/SoloX.ActionDispatch.Core/State/IState.cs")))
+            {
+                this.workspace.RegisterFile(GetContentFile("./Resources/IState.cs"));
+                this.workspace.RegisterFile(GetContentFile("./Resources/IStateFactory.cs"));
+            }
+
             this.workspace.RegisterFile(GetContentFile("./Patterns/Itf/IParentStatePattern.cs"));
             this.workspace.RegisterFile(GetContentFile("./Patterns/Itf/IChildStatePattern.cs"));
             this.workspace.RegisterFile(GetContentFile("./Patterns/Impl/ParentStatePattern.cs"));
