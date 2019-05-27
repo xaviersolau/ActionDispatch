@@ -32,18 +32,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Patterns\Impl\ParentStatePattern.cs">
+    <Content Include="Patterns\Impl\ParentStatePattern.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Patterns\Impl\StateFactoryPattern.cs">
+    </Content>
+    <Content Include="Patterns\Impl\StateFactoryPattern.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Patterns\Itf\IChildStatePattern.cs">
+    </Content>
+    <Content Include="Patterns\Itf\IChildStatePattern.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Patterns\Itf\IParentStatePattern.cs">
+    </Content>
+    <Content Include="Patterns\Itf\IParentStatePattern.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
+    </Content>
+    <Compile Update="Patterns\Impl\ParentStatePattern.cs" />
+    <Compile Update="Patterns\Impl\StateFactoryPattern.cs" />
+    <Compile Update="Patterns\Itf\IChildStatePattern.cs" />
+    <Compile Update="Patterns\Itf\IParentStatePattern.cs" />
   </ItemGroup>
 
 </Project>
