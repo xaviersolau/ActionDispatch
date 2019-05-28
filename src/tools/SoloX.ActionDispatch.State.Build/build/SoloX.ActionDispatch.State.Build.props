@@ -9,11 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup Condition="$(PreventPackageReference)==''">
-    <PackageReference Include="SoloX.ActionDispatch.Core" Version="1.0.0-alpha.2" />
+    <PackageReference Include="SoloX.ActionDispatch.Core" Version="1.0.0-alpha.3" />
   </ItemGroup>
 
   <ItemGroup Condition="$(PreventPackageReference)==''">
-    <DotNetCliToolReference Include="SoloX.ActionDispatch.Tools" Version="1.0.0-alpha.2" />
+    <DotNetCliToolReference Include="SoloX.ActionDispatch.Tools" Version="1.0.0-alpha.3" />
   </ItemGroup>
 
 </Project>
