@@ -23,7 +23,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Action.Basic
 
         public string SomeValue { get; }
 
-        public void Apply(ITransactionalState<IStateA, IStateA> transactionalState)
+        public void Apply(IStateContainer<IStateA> stateContainer)
         {
             // Nothing to do for now.
         }

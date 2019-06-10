@@ -8,9 +8,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Moq;
 using SoloX.ActionDispatch.Core.Action.Impl;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
+using SoloX.ActionDispatch.Core.State;
 using Xunit;
 
 namespace SoloX.ActionDispatch.Core.UTest.Action
@@ -27,12 +29,9 @@ namespace SoloX.ActionDispatch.Core.UTest.Action
             IStateA newState = new StateA();
             var ib = new InitializeBehavior<IStateA, IStateA>(newState);
 
-            using (var ts = current.CreateTransactionalState(current))
-            {
-                ib.Apply(ts);
+            var action = new SyncAction<IStateA, IStateA>(ib, s => s);
 
-                current = ts.Close();
-            }
+            current = action.Apply(null, current);
 
             Assert.True(current.IsLocked);
             Assert.NotSame(previous, current);
@@ -54,12 +53,9 @@ namespace SoloX.ActionDispatch.Core.UTest.Action
             IStateBa newState = new StateBa();
             var ib = new InitializeBehavior<IStateB, IStateBa>(newState);
 
-            using (var ts = child.CreateTransactionalState(current))
-            {
-                ib.Apply(ts);
+            var action = new SyncAction<IStateB, IStateBa>(ib, s => s.Child);
 
-                current = ts.Close();
-            }
+            current = action.Apply(null, current);
 
             Assert.True(current.IsLocked);
 

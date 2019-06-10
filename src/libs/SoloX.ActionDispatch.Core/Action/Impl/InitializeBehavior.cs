@@ -36,9 +36,9 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         public TState State { get; }
 
         /// <inheritdoc/>
-        public void Apply(ITransactionalState<TRootState, TState> transactionalState)
+        public void Apply(IStateContainer<TState> stateContainer)
         {
-            transactionalState.SetState(this.State);
+            stateContainer.State = this.State;
         }
     }
 }

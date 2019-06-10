@@ -18,7 +18,7 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior
     {
         public ApplicationException Exception { get; } = new ApplicationException("What if we throw an exception here?");
 
-        public void Apply(ITransactionalState<IStateA, IStateA> transactionalState)
+        public void Apply(IStateContainer<IStateA> stateContainer)
         {
             throw this.Exception;
         }

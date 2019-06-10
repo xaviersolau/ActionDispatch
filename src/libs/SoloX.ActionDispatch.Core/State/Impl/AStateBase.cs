@@ -37,13 +37,6 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         public bool IsLocked
         { get; private set; }
 
-        /// <inheritdoc/>
-        public ITransactionalState<TRootState, TState> CreateTransactionalState<TRootState>(TRootState rootState)
-            where TRootState : IState<TRootState>
-        {
-            return new TransactionalState<TRootState, TState>(this, rootState);
-        }
-
         /// <summary>
         /// Deep clone the state object.
         /// </summary>
