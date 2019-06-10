@@ -16,7 +16,7 @@ namespace SoloX.ActionDispatch.Examples.State
     /// <summary>
     /// Root example state interface.
     /// </summary>
-    public interface IExampleAppState : IState<IExampleAppState>
+    public interface IExampleAppState : IState
     {
         /// <summary>
         /// Gets or sets app state count.

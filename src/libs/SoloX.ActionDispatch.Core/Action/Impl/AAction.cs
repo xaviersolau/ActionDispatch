@@ -16,7 +16,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
     /// <inheritdoc/>
     [JsonConverter(typeof(JsonActionConverter))]
     internal abstract class AAction<TRootState> : IAction<TRootState>
-        where TRootState : IState<TRootState>
+        where TRootState : IState
     {
         /// <summary>
         /// Gets or sets action state.
@@ -30,8 +30,8 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
 #pragma warning disable SA1402 // File may only contain a single type
     /// <inheritdoc/>
     internal abstract class AAction<TRootState, TState> : AAction<TRootState>
-        where TRootState : IState<TRootState>
-        where TState : IState<TState>
+        where TRootState : IState
+        where TState : IState
 #pragma warning restore SA1402 // File may only contain a single type
     {
         private Func<TRootState, TState> selectorFunc;

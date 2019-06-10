@@ -21,7 +21,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch
     /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
     /// <typeparam name="TIntermediatState">Type of the intermediate state object on witch actions will apply.</typeparam>
     public interface IRelativeDispatcher<TRootState, TIntermediatState>
-        where TRootState : IState<TRootState>
+        where TRootState : IState
         where TIntermediatState : IState
     {
         /// <summary>
@@ -36,7 +36,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch
         /// <param name="actionBehavior">The action behavior to apply.</param>
         /// <param name="selector">The target state selector expression.</param>
         void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
-            where TState : IState<TState>;
+            where TState : IState;
 
         /// <summary>
         /// Dispatch an action on a current state.
@@ -45,6 +45,6 @@ namespace SoloX.ActionDispatch.Core.Dispatch
         /// <param name="actionBehavior">The asynchronous action behavior to apply.</param>
         /// <param name="selector">The target state selector expression.</param>
         void Dispatch<TState>(IActionBehaviorAsync<TRootState, TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
-            where TState : IState<TState>;
+            where TState : IState;
     }
 }

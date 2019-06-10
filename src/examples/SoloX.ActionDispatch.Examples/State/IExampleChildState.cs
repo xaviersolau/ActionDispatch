@@ -16,7 +16,7 @@ namespace SoloX.ActionDispatch.Examples.State
     /// <summary>
     /// Child example state interface.
     /// </summary>
-    public interface IExampleChildState : IState<IExampleChildState>
+    public interface IExampleChildState : IState
     {
         /// <summary>
         /// Gets or sets child state count.

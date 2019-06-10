@@ -22,8 +22,8 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
     /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
     /// <typeparam name="TIntermediatState">Type of the intermediate state object on witch actions will apply.</typeparam>
     public class RelativeDispatcher<TRootState, TIntermediatState> : IRelativeDispatcher<TRootState, TIntermediatState>
-        where TRootState : IState<TRootState>
-        where TIntermediatState : IState<TIntermediatState>
+        where TRootState : IState
+        where TIntermediatState : IState
     {
         private LambdaExpression baseSelector;
 
@@ -43,7 +43,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
 
         /// <inheritdoc/>
         public void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
-            where TState : IState<TState>
+            where TState : IState
         {
             var absolutSelector = this.ComputeAbsolutSelector(selector);
 
@@ -52,7 +52,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
 
         /// <inheritdoc/>
         public void Dispatch<TState>(IActionBehaviorAsync<TRootState, TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
-            where TState : IState<TState>
+            where TState : IState
         {
             var absolutSelector = this.ComputeAbsolutSelector(selector);
 
@@ -60,7 +60,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         }
 
         private Expression<Func<TRootState, TState>> ComputeAbsolutSelector<TState>(Expression<Func<TIntermediatState, TState>> selector)
-            where TState : IState<TState>
+            where TState : IState
         {
             var resolver = new ParameterResolver(this.baseSelector);
             var inliner = new ExpressionInliner(resolver);

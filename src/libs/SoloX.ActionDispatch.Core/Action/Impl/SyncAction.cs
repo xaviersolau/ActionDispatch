@@ -17,8 +17,8 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
 {
     /// <inheritdoc/>
     internal sealed class SyncAction<TRootState, TState> : AAction<TRootState, TState>, IAction<TRootState, IActionBehavior<TRootState, TState>>
-        where TRootState : IState<TRootState>
-        where TState : IState<TState>
+        where TRootState : IState
+        where TState : IState
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncAction{TRootState, TState}"/> class.

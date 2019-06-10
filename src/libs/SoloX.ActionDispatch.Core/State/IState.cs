@@ -32,13 +32,4 @@ namespace SoloX.ActionDispatch.Core.State
         /// </summary>
         void Lock();
     }
-
-    /// <summary>
-    /// State base interface.
-    /// </summary>
-    /// <typeparam name="TState">The actual type of the state.</typeparam>
-    public interface IState<TState> : IState
-        where TState : IState
-    {
-    }
 }

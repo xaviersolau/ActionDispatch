@@ -16,7 +16,7 @@ namespace SoloX.ActionDispatch.Core.State.Impl
     /// State base implementation.
     /// </summary>
     /// <typeparam name="TState">The actual type of the state.</typeparam>
-    public abstract class AStateBase<TState> : IState<TState>
+    public abstract class AStateBase<TState> : IState
         where TState : IState
     {
         private bool isDirty;
