@@ -66,7 +66,7 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             var resolver = this.workspace.DeepLoad();
 
-            var declaration = resolver.Find("SoloX.ActionDispatch.Core.State.IState").Cast<IGenericDeclaration>().Single(d => d.GenericParameters.Any());
+            var declaration = resolver.Find("SoloX.ActionDispatch.Core.State.IState").Cast<IGenericDeclaration>().Single();
             var itfParentPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Itf.IParentStatePattern").Single() as IInterfaceDeclaration;
             var itfChildPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Itf.IChildStatePattern").Single() as IInterfaceDeclaration;
 

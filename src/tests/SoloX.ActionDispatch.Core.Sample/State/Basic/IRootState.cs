@@ -12,7 +12,7 @@ using SoloX.ActionDispatch.Core.State;
 
 namespace SoloX.ActionDispatch.Core.Sample.State.Basic
 {
-    public interface IRootState : IState<IRootState>
+    public interface IRootState : IState
     {
         int Value { get; set; }
 

@@ -22,6 +22,6 @@ namespace SoloX.ActionDispatch.Core.State
         /// <typeparam name="TState">The state type that will be created.</typeparam>
         /// <returns>The created instance.</returns>
         TState Create<TState>()
-            where TState : IState<TState>;
+            where TState : IState;
     }
 }

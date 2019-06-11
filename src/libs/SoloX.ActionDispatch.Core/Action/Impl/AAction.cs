@@ -16,7 +16,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
     /// <inheritdoc/>
     [JsonConverter(typeof(JsonActionConverter))]
     internal abstract class AAction<TRootState> : IAction<TRootState>
-        where TRootState : IState<TRootState>
+        where TRootState : IState
     {
         /// <summary>
         /// Gets or sets action state.
@@ -30,8 +30,8 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
 #pragma warning disable SA1402 // File may only contain a single type
     /// <inheritdoc/>
     internal abstract class AAction<TRootState, TState> : AAction<TRootState>
-        where TRootState : IState<TRootState>
-        where TState : IState<TState>
+        where TRootState : IState
+        where TState : IState
 #pragma warning restore SA1402 // File may only contain a single type
     {
         private Func<TRootState, TState> selectorFunc;
@@ -47,6 +47,13 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
             this.selectorFunc = stateSelector.Compile();
         }
 
+#pragma warning disable CA1822 // Member RootStateType does not access instance data and can be marked as static
+        /// <summary>
+        /// Gets the action Root state type.
+        /// </summary>
+        internal Type RootStateType => typeof(TRootState);
+#pragma warning restore CA1822 // Member RootStateType does not access instance data and can be marked as static
+
         /// <summary>
         /// Gets action state selector expression.
         /// </summary>
@@ -59,16 +66,6 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         protected TState SelectState(TRootState rootState)
         {
             return this.selectorFunc(rootState);
-        }
-
-        /// <summary>
-        /// Select the target state within a transaction.
-        /// </summary>
-        /// <param name="rootState">The root state.</param>
-        protected ITransactionalState<TRootState, TState> SelectStateTransaction(TRootState rootState)
-        {
-            var targetState = this.selectorFunc(rootState);
-            return targetState.CreateTransactionalState(rootState);
         }
     }
 }

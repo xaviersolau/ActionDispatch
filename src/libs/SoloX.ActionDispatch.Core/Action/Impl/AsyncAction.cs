@@ -18,9 +18,9 @@ using SoloX.ActionDispatch.Core.State;
 namespace SoloX.ActionDispatch.Core.Action.Impl
 {
     /// <inheritdoc/>
-    internal sealed class AsyncAction<TRootState, TState> : AAction<TRootState, TState>, IAction<TRootState, IActionBehaviorAsync<TRootState, TState>>
-        where TRootState : IState<TRootState>
-        where TState : IState<TState>
+    internal sealed class AsyncAction<TRootState, TState> : AAction<TRootState, TState>, IAction<TRootState, IActionBehaviorAsync<TState>>
+        where TRootState : IState
+        where TState : IState
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AsyncAction{TRootState, TState}"/> class.
@@ -28,7 +28,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         /// <param name="behavior">The action behavior.</param>
         /// <param name="stateSelector">The action state selector expression.</param>
         public AsyncAction(
-            IActionBehaviorAsync<TRootState, TState> behavior,
+            IActionBehaviorAsync<TState> behavior,
             Expression<Func<TRootState, TState>> stateSelector)
             : base(stateSelector)
         {
@@ -36,7 +36,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         }
 
         /// <inheritdoc/>
-        public IActionBehaviorAsync<TRootState, TState> Behavior { get; }
+        public IActionBehaviorAsync<TState> Behavior { get; }
 
         /// <inheritdoc/>
         public override TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState state)

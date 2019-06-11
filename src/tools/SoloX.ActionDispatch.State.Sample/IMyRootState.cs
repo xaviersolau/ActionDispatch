@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SoloX.ActionDispatch.State.Sample
 {
-    public interface IMyRootState : IState<IMyRootState>
+    public interface IMyRootState : IState
     {
         string Value1 { get; set; }
 

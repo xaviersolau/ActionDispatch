@@ -26,7 +26,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
     /// </summary>
     /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
     public class Dispatcher<TRootState> : IDispatcher<TRootState>, IDisposable
-        where TRootState : IState<TRootState>
+        where TRootState : IState
     {
         private readonly object syncObject = new object();
 
@@ -69,15 +69,15 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         public IObservable<TRootState> State => this.state.AsObservable();
 
         /// <inheritdoc />
-        public void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
-            where TState : IState<TState>
+        public void Dispatch<TState>(IActionBehavior<TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
+            where TState : IState
         {
             this.Dispatch(new SyncAction<TRootState, TState>(actionBehavior, selector));
         }
 
         /// <inheritdoc />
-        public void Dispatch<TState>(IActionBehaviorAsync<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
-            where TState : IState<TState>
+        public void Dispatch<TState>(IActionBehaviorAsync<TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
+            where TState : IState
         {
             this.Dispatch(new AsyncAction<TRootState, TState>(actionBehavior, selector));
         }

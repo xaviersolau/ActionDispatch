@@ -14,6 +14,7 @@ using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
+using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
 using SoloX.ActionDispatch.Core.State;
 using Xunit;
 
@@ -26,17 +27,26 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
         {
             var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
 
-            var actionBehaviorMock = new Mock<IActionBehavior<IStateA, IStateA>>();
+            var actionBehaviorMock = new Mock<IActionBehavior<IStateA>>();
 
-            var stateCloneMock = new Mock<IStateA>();
-            var state = CreateStateMockWithAClone(stateCloneMock.Object, out var transactionalState);
+            var state = new StateA();
+
+            IStateA clone = null;
+
+            actionBehaviorMock.Setup(ab => ab.Apply(It.IsAny<IStateContainer<IStateA>>()))
+                .Callback<IStateContainer<IStateA>>(sc =>
+                {
+                    sc.LoadState();
+                    clone = sc.State;
+                });
 
             using (var dispatcher = new Dispatcher<IStateA>(state, logger))
             {
                 dispatcher.Dispatch(actionBehaviorMock.Object, s => s);
 
-                actionBehaviorMock.Verify(ab => ab.Apply(transactionalState));
-                stateCloneMock.Verify(s => s.Lock());
+                actionBehaviorMock.Verify(ab => ab.Apply(It.IsAny<IStateContainer<IStateA>>()));
+
+                Assert.True(clone.IsLocked);
             }
         }
 
@@ -45,7 +55,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
         {
             var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
 
-            var actionBehaviorMock = new Mock<IActionBehaviorAsync<IStateA, IStateA>>();
+            var actionBehaviorMock = new Mock<IActionBehaviorAsync<IStateA>>();
 
             var stateMock = new Mock<IStateA>();
 
@@ -53,7 +63,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
             var waitHandler = new ManualResetEvent(false);
 
             actionBehaviorMock
-                .Setup(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA, IStateA>>(), stateMock.Object))
+                .Setup(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA>>(), stateMock.Object))
                 .Callback(() =>
                 {
                     isThreadPoolThread = Thread.CurrentThread.IsThreadPoolThread;
@@ -67,28 +77,9 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
                 waitHandler.WaitOne(2000);
             }
 
-            actionBehaviorMock.Verify(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA, IStateA>>(), stateMock.Object));
+            actionBehaviorMock.Verify(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA>>(), stateMock.Object));
             Assert.True(isThreadPoolThread);
             Assert.False(Thread.CurrentThread.IsThreadPoolThread);
-        }
-
-        private static TState CreateStateMockWithAClone<TState>(TState clone, out ITransactionalState<TState, TState> transactionalState)
-            where TState : class, IState<TState>
-        {
-            var stateMock = new Mock<TState>();
-
-            var transactionalStateMock = new Mock<ITransactionalState<TState, TState>>();
-
-            stateMock.Setup(s => s.CreateTransactionalState(It.IsAny<TState>())).Returns(transactionalStateMock.Object);
-
-            transactionalStateMock.Setup(ts => ts.GetState()).Returns(clone);
-
-            transactionalStateMock.Setup(ts => ts.Close()).Returns(clone);
-
-            transactionalStateMock.Setup(ts => ts.Dispose()).Callback(clone.Lock);
-
-            transactionalState = transactionalStateMock.Object;
-            return stateMock.Object;
         }
     }
 }

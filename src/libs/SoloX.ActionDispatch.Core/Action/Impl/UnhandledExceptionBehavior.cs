@@ -32,7 +32,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         public Exception Exception { get; }
 
         /// <inheritdoc/>
-        public void Apply(ITransactionalState<TRootState, TRootState> transactionalState)
+        public void Apply(IStateContainer<TRootState> stateContainer)
         {
             // Nothing to do.
         }

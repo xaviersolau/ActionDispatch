@@ -9,7 +9,7 @@ using SoloX.ActionDispatch.Core.State;
 
 namespace SoloX.ActionDispatch.Core.Sample.State.Basic
 {
-    public interface IStateBa : IState<IStateBa>
+    public interface IStateBa : IState
     {
         string Value { get; set; }
     }

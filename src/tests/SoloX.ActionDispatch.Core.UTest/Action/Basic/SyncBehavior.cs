@@ -14,7 +14,7 @@ using SoloX.ActionDispatch.Core.State;
 
 namespace SoloX.ActionDispatch.Core.UTest.Action.Basic
 {
-    public class SyncBehavior : IActionBehavior<IStateA, IStateA>
+    public class SyncBehavior : IActionBehavior<IStateA>
     {
         public SyncBehavior(string someValue)
         {
@@ -23,7 +23,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Action.Basic
 
         public string SomeValue { get; }
 
-        public void Apply(ITransactionalState<IStateA, IStateA> transactionalState)
+        public void Apply(IStateContainer<IStateA> stateContainer)
         {
             // Nothing to do for now.
         }

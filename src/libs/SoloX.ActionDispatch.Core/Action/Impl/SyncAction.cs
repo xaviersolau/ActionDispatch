@@ -11,13 +11,14 @@ using System.Linq.Expressions;
 using System.Text;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.State;
+using SoloX.ActionDispatch.Core.State.Impl;
 
 namespace SoloX.ActionDispatch.Core.Action.Impl
 {
     /// <inheritdoc/>
-    internal sealed class SyncAction<TRootState, TState> : AAction<TRootState, TState>, IAction<TRootState, IActionBehavior<TRootState, TState>>
-        where TRootState : IState<TRootState>
-        where TState : IState<TState>
+    internal sealed class SyncAction<TRootState, TState> : AAction<TRootState, TState>, IAction<TRootState, IActionBehavior<TState>>
+        where TRootState : IState
+        where TState : IState
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncAction{TRootState, TState}"/> class.
@@ -25,7 +26,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         /// <param name="behavior">The action behavior.</param>
         /// <param name="stateSelector">The action state selector expression.</param>
         public SyncAction(
-            IActionBehavior<TRootState, TState> behavior,
+            IActionBehavior<TState> behavior,
             Expression<Func<TRootState, TState>> stateSelector)
             : base(stateSelector)
         {
@@ -33,18 +34,29 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         }
 
         /// <inheritdoc/>
-        public IActionBehavior<TRootState, TState> Behavior { get; }
+        public IActionBehavior<TState> Behavior { get; }
 
         /// <inheritdoc/>
         public override TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState rootState)
         {
-            using (var stateTransaction = this.SelectStateTransaction(rootState))
-            {
-                this.Behavior.Apply(stateTransaction);
+            // Get the target state object. It is locked so we won't be able to write it.
+            var targetState = this.SelectState(rootState).ToStateBase();
 
-                var patched = stateTransaction.Close();
+            var stateContainer = new StateContainer<TState>(targetState);
+
+            this.Behavior.Apply(stateContainer);
+
+            if (!stateContainer.IsEmpty)
+            {
+                var patched = rootState.ToStateBase().Patch(targetState, stateContainer.State?.ToStateBase()).Identity;
+
+                patched.Lock();
 
                 return patched;
+            }
+            else
+            {
+                return default;
             }
         }
     }

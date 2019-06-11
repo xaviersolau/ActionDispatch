@@ -16,7 +16,7 @@ namespace SoloX.ActionDispatch.Core.Action
     /// Unhandled exception behavior that will be used if an exception is thrown while dispatching an action.
     /// </summary>
     /// <typeparam name="TRootState">The state root type.</typeparam>
-    public interface IUnhandledExceptionBehavior<TRootState> : IActionBehavior<TRootState, TRootState>
+    public interface IUnhandledExceptionBehavior<TRootState> : IActionBehavior<TRootState>
         where TRootState : IState
     {
         /// <summary>

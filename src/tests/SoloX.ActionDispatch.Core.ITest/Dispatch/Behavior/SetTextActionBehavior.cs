@@ -14,7 +14,7 @@ using SoloX.ActionDispatch.Core.State;
 
 namespace SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior
 {
-    public class SetTextActionBehavior : IActionBehavior<IStateA, IStateA>
+    public class SetTextActionBehavior : IActionBehavior<IStateA>
     {
         public SetTextActionBehavior(string text)
         {
@@ -23,9 +23,10 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior
 
         public string Text { get; }
 
-        public void Apply(ITransactionalState<IStateA, IStateA> transactionalState)
+        public void Apply(IStateContainer<IStateA> stateContainer)
         {
-            var state = transactionalState.GetState();
+            stateContainer.LoadState();
+            var state = stateContainer.State;
             state.Value = this.Text;
         }
     }

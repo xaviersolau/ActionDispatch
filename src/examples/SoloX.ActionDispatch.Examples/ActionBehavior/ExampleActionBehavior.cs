@@ -15,7 +15,7 @@ namespace SoloX.ActionDispatch.Examples.ActionBehavior
     /// <summary>
     /// Example action.
     /// </summary>
-    public class ExampleActionBehavior : IActionBehavior<IExampleAppState, IExampleChildState>
+    public class ExampleActionBehavior : IActionBehavior<IExampleChildState>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ExampleActionBehavior"/> class.
@@ -32,9 +32,11 @@ namespace SoloX.ActionDispatch.Examples.ActionBehavior
         public int Increment { get; }
 
         /// <inheritdoc />
-        public void Apply(ITransactionalState<IExampleAppState, IExampleChildState> transactionalState)
+        public void Apply(IStateContainer<IExampleChildState> stateContainer)
         {
-            var state = transactionalState.GetState();
+            stateContainer.LoadState();
+
+            var state = stateContainer.State;
 
             state.ChildCount += this.Increment;
         }

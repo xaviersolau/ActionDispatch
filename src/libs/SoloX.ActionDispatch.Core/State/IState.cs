@@ -32,21 +32,4 @@ namespace SoloX.ActionDispatch.Core.State
         /// </summary>
         void Lock();
     }
-
-    /// <summary>
-    /// State base interface.
-    /// </summary>
-    /// <typeparam name="TState">The actual type of the state.</typeparam>
-    public interface IState<TState> : IState
-        where TState : IState
-    {
-        /// <summary>
-        /// Create a transactional state in order to update the state.
-        /// </summary>
-        /// <typeparam name="TRootState">The type of the root application state.</typeparam>
-        /// <param name="rootState">The root application state instance.</param>
-        /// <returns>The transactional state instance.</returns>
-        ITransactionalState<TRootState, TState> CreateTransactionalState<TRootState>(TRootState rootState)
-            where TRootState : IState<TRootState>;
-    }
 }

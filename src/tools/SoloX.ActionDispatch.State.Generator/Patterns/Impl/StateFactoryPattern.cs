@@ -26,7 +26,7 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
 
         /// <inheritdoc/>
         public TState Create<TState>()
-            where TState : IState<TState>
+            where TState : IState
         {
             var create = Key<TState>.Create;
             if (create == null)
@@ -38,7 +38,7 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
         }
 
         private static class Key<T>
-            where T : IState<T>
+            where T : IState
         {
             internal static Func<T> Create { get; set; }
         }

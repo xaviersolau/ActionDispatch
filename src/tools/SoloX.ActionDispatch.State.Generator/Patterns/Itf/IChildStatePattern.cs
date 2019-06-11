@@ -15,7 +15,7 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Itf
     /// <summary>
     /// Child State interface pattern declaration.
     /// </summary>
-    public interface IChildStatePattern : IState<IChildStatePattern>
+    public interface IChildStatePattern : IState
     {
     }
 }

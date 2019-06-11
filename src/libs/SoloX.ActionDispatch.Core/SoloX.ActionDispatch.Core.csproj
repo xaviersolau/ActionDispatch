@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="State\Impl\TransactionalState.cs" />
+    <None Include="State\Impl\StateContainer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -15,7 +15,7 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Itf
     /// <summary>
     /// State interface pattern declaration.
     /// </summary>
-    public interface IParentStatePattern : IState<IParentStatePattern>
+    public interface IParentStatePattern : IState
     {
         /// <summary>
         /// Gets or sets PropertyPattern.

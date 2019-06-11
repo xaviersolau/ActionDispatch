@@ -14,11 +14,11 @@ using SoloX.ActionDispatch.Core.State;
 
 namespace SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior
 {
-    public class ThrowActionBehavior : IActionBehavior<IStateA, IStateA>
+    public class ThrowActionBehavior : IActionBehavior<IStateA>
     {
         public ApplicationException Exception { get; } = new ApplicationException("What if we throw an exception here?");
 
-        public void Apply(ITransactionalState<IStateA, IStateA> transactionalState)
+        public void Apply(IStateContainer<IStateA> stateContainer)
         {
             throw this.Exception;
         }
