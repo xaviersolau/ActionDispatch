@@ -18,17 +18,10 @@ namespace SoloX.ActionDispatch.Core.Dispatch
     /// IRelativeDispatcher interface. Used to dispatch IAction from an asynchronous action that will change
     /// the root state object hierarchy.
     /// </summary>
-    /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
     /// <typeparam name="TIntermediatState">Type of the intermediate state object on witch actions will apply.</typeparam>
-    public interface IRelativeDispatcher<TRootState, TIntermediatState>
-        where TRootState : IState
+    public interface IRelativeDispatcher<TIntermediatState>
         where TIntermediatState : IState
     {
-        /// <summary>
-        /// Gets the base dispatcher.
-        /// </summary>
-        IDispatcher<TRootState> Dispatcher { get; }
-
         /// <summary>
         /// Dispatch an action on a current state.
         /// </summary>
@@ -44,7 +37,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch
         /// <typeparam name="TState">The target state type.</typeparam>
         /// <param name="actionBehavior">The asynchronous action behavior to apply.</param>
         /// <param name="selector">The target state selector expression.</param>
-        void Dispatch<TState>(IActionBehaviorAsync<TRootState, TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
+        void Dispatch<TState>(IActionBehaviorAsync<TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
             where TState : IState;
     }
 }

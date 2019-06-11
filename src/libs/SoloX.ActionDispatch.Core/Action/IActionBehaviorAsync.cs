@@ -17,10 +17,8 @@ namespace SoloX.ActionDispatch.Core.Action
     /// <summary>
     /// Asynchronous action behavior.
     /// </summary>
-    /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
     /// <typeparam name="TState">The state type the action apply on.</typeparam>
-    public interface IActionBehaviorAsync<TRootState, TState> : IActionBehavior
-        where TRootState : IState
+    public interface IActionBehaviorAsync<TState> : IActionBehavior
         where TState : IState
     {
         /// <summary>
@@ -29,6 +27,6 @@ namespace SoloX.ActionDispatch.Core.Action
         /// <param name="dispatcher">The dispatcher object.</param>
         /// <param name="state">The state the action apply on.</param>
         /// <returns>The resulting state.</returns>
-        Task Apply(IRelativeDispatcher<TRootState, TState> dispatcher, TState state);
+        Task Apply(IRelativeDispatcher<TState> dispatcher, TState state);
     }
 }

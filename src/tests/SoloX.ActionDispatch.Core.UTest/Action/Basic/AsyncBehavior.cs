@@ -15,7 +15,7 @@ using SoloX.ActionDispatch.Core.Sample.State.Basic;
 
 namespace SoloX.ActionDispatch.Core.UTest.Action.Basic
 {
-    public class AsyncBehavior : IActionBehaviorAsync<IStateA, IStateA>
+    public class AsyncBehavior : IActionBehaviorAsync<IStateA>
     {
         public AsyncBehavior(string someValue)
         {
@@ -24,7 +24,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Action.Basic
 
         public string SomeValue { get; }
 
-        public async Task Apply(IRelativeDispatcher<IStateA, IStateA> dispatcher, IStateA state)
+        public async Task Apply(IRelativeDispatcher<IStateA> dispatcher, IStateA state)
         {
             await Task.Delay(1000).ConfigureAwait(false);
             return;

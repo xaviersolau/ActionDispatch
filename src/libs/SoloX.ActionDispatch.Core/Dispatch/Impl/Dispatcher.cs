@@ -76,7 +76,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         }
 
         /// <inheritdoc />
-        public void Dispatch<TState>(IActionBehaviorAsync<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
+        public void Dispatch<TState>(IActionBehaviorAsync<TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
             where TState : IState
         {
             this.Dispatch(new AsyncAction<TRootState, TState>(actionBehavior, selector));

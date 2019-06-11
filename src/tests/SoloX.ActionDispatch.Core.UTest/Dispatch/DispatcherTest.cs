@@ -55,7 +55,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
         {
             var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
 
-            var actionBehaviorMock = new Mock<IActionBehaviorAsync<IStateA, IStateA>>();
+            var actionBehaviorMock = new Mock<IActionBehaviorAsync<IStateA>>();
 
             var stateMock = new Mock<IStateA>();
 
@@ -63,7 +63,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
             var waitHandler = new ManualResetEvent(false);
 
             actionBehaviorMock
-                .Setup(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA, IStateA>>(), stateMock.Object))
+                .Setup(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA>>(), stateMock.Object))
                 .Callback(() =>
                 {
                     isThreadPoolThread = Thread.CurrentThread.IsThreadPoolThread;
@@ -77,7 +77,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
                 waitHandler.WaitOne(2000);
             }
 
-            actionBehaviorMock.Verify(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA, IStateA>>(), stateMock.Object));
+            actionBehaviorMock.Verify(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA>>(), stateMock.Object));
             Assert.True(isThreadPoolThread);
             Assert.False(Thread.CurrentThread.IsThreadPoolThread);
         }

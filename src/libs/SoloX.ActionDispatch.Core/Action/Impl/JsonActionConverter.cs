@@ -29,7 +29,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
 
         private static readonly Type GenericAsyncActionType = typeof(AsyncAction<,>);
         private static readonly Type GenericSyncActionType = typeof(SyncAction<,>);
-        private static readonly Type GenericActionBehaviorAsyncType = typeof(IActionBehaviorAsync<,>);
+        private static readonly Type GenericActionBehaviorAsyncType = typeof(IActionBehaviorAsync<>);
         private static readonly Type GenericActionBehaviorType = typeof(IActionBehavior<>);
 
         /// <inheritdoc/>
