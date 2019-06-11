@@ -11,6 +11,7 @@ using System.Reactive.Subjects;
 using System.Text;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
+using SoloX.ActionDispatch.Core.Utils;
 using Xunit;
 
 namespace SoloX.ActionDispatch.Core.UTest.Utils
@@ -25,10 +26,21 @@ namespace SoloX.ActionDispatch.Core.UTest.Utils
                 Value = "Some initial value",
             };
 
+            var newValue = "Some new text";
+
+            string changed = null;
             using (var stateSubject = new BehaviorSubject<IStateB>(initialState))
+            using (var subscription = stateSubject.SelectWhenChanged(s => s.Value)
+                .Subscribe(s =>
+                {
+                    changed = s;
+                }))
             {
-                // stateSubject.OnNext();
+                initialState.Value = newValue;
+                stateSubject.OnNext(initialState);
             }
+
+            Assert.Equal(newValue, changed);
         }
     }
 }
