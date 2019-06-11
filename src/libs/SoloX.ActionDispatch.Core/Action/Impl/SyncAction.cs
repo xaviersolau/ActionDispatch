@@ -16,7 +16,7 @@ using SoloX.ActionDispatch.Core.State.Impl;
 namespace SoloX.ActionDispatch.Core.Action.Impl
 {
     /// <inheritdoc/>
-    internal sealed class SyncAction<TRootState, TState> : AAction<TRootState, TState>, IAction<TRootState, IActionBehavior<TRootState, TState>>
+    internal sealed class SyncAction<TRootState, TState> : AAction<TRootState, TState>, IAction<TRootState, IActionBehavior<TState>>
         where TRootState : IState
         where TState : IState
     {
@@ -26,7 +26,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         /// <param name="behavior">The action behavior.</param>
         /// <param name="stateSelector">The action state selector expression.</param>
         public SyncAction(
-            IActionBehavior<TRootState, TState> behavior,
+            IActionBehavior<TState> behavior,
             Expression<Func<TRootState, TState>> stateSelector)
             : base(stateSelector)
         {
@@ -34,7 +34,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         }
 
         /// <inheritdoc/>
-        public IActionBehavior<TRootState, TState> Behavior { get; }
+        public IActionBehavior<TState> Behavior { get; }
 
         /// <inheritdoc/>
         public override TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState rootState)

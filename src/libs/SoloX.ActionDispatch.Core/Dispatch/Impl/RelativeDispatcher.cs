@@ -42,7 +42,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         public IDispatcher<TRootState> Dispatcher { get; }
 
         /// <inheritdoc/>
-        public void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
+        public void Dispatch<TState>(IActionBehavior<TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
             where TState : IState
         {
             var absolutSelector = this.ComputeAbsolutSelector(selector);

@@ -24,12 +24,13 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         internal const string IsAsynchronous = "isAsynchronous";
         internal const string BehaviorType = "behaviorType";
         internal const string Behavior = "behavior";
+        internal const string RootStateType = "rootStateType";
         internal const string Selector = "selector";
 
         private static readonly Type GenericAsyncActionType = typeof(AsyncAction<,>);
         private static readonly Type GenericSyncActionType = typeof(SyncAction<,>);
         private static readonly Type GenericActionBehaviorAsyncType = typeof(IActionBehaviorAsync<,>);
-        private static readonly Type GenericActionBehaviorType = typeof(IActionBehavior<,>);
+        private static readonly Type GenericActionBehaviorType = typeof(IActionBehavior<>);
 
         /// <inheritdoc/>
         public override bool CanConvert(Type objectType)
@@ -75,10 +76,13 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
 
             writer.WritePropertyName(BehaviorType);
             var behaviorType = action.Behavior.GetType();
-            serializer.Serialize(writer, $"{behaviorType.FullName}, {behaviorType.Assembly.FullName}");
+            serializer.Serialize(writer, behaviorType);
 
             writer.WritePropertyName(Behavior);
             serializer.Serialize(writer, action.Behavior);
+
+            writer.WritePropertyName(RootStateType);
+            serializer.Serialize(writer, action.RootStateType);
 
             writer.WritePropertyName(Selector);
             serializer.Serialize(writer, action.Selector.ToString());
@@ -94,6 +98,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
             string selector = null;
             Type behaviorType = null;
             dynamic behavior = null;
+            Type rootStateType = null;
 
             var tknType = reader.TokenType;
             while (!done)
@@ -109,6 +114,9 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
                         {
                             case IsAsynchronous:
                                 isAsync = ReadAsBoolean(reader);
+                                break;
+                            case RootStateType:
+                                rootStateType = Type.GetType(ReadAsString(reader));
                                 break;
                             case Selector:
                                 selector = ReadAsString(reader);
@@ -135,15 +143,15 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
                 }
             }
 
-            if (behavior == null || behaviorType == null || !isAsync.HasValue || selector == null)
+            if (behavior == null || behaviorType == null || !isAsync.HasValue || selector == null || rootStateType == null)
             {
                 throw new JsonException("Missing json properties to create the action.");
             }
 
-            return CreateAction(behaviorType, behavior, isAsync.Value, selector);
+            return CreateAction(behaviorType, behavior, isAsync.Value, rootStateType, selector);
         }
 
-        private static object CreateAction(Type behaviorType, dynamic behavior, bool isAsync, string selector)
+        private static object CreateAction(Type behaviorType, dynamic behavior, bool isAsync, Type rootStateType, string selector)
         {
             Type genericActionType;
             Type genericBehaviorType;
@@ -162,12 +170,11 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
                 .First(i => i.IsGenericType && ReferenceEquals(i.GetGenericTypeDefinition(), genericBehaviorType));
 
             var genArgs = behaviorInterface.GetGenericArguments();
-            var appStateType = genArgs[0];
-            var stateType = genArgs[1];
+            var stateType = genArgs[0];
 
-            var actionType = genericActionType.MakeGenericType(appStateType, stateType);
+            var actionType = genericActionType.MakeGenericType(rootStateType, stateType);
 
-            var expressionParser = new ExpressionParser(parameterTypeResolver: new ParameterTypeResolver(appStateType));
+            var expressionParser = new ExpressionParser(parameterTypeResolver: new ParameterTypeResolver(rootStateType));
             var selectorExpression = expressionParser.Parse(selector);
 
             return Activator.CreateInstance(actionType, behavior, selectorExpression);

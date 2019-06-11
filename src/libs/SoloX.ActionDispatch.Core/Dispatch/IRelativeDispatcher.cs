@@ -35,7 +35,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch
         /// <typeparam name="TState">The target state type.</typeparam>
         /// <param name="actionBehavior">The action behavior to apply.</param>
         /// <param name="selector">The target state selector expression.</param>
-        void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
+        void Dispatch<TState>(IActionBehavior<TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
             where TState : IState;
 
         /// <summary>

@@ -47,6 +47,13 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
             this.selectorFunc = stateSelector.Compile();
         }
 
+#pragma warning disable CA1822 // Member RootStateType does not access instance data and can be marked as static
+        /// <summary>
+        /// Gets the action Root state type.
+        /// </summary>
+        internal Type RootStateType => typeof(TRootState);
+#pragma warning restore CA1822 // Member RootStateType does not access instance data and can be marked as static
+
         /// <summary>
         /// Gets action state selector expression.
         /// </summary>

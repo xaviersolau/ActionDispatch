@@ -27,7 +27,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Action
             current.Lock();
 
             IStateA newState = new StateA();
-            var ib = new InitializeBehavior<IStateA, IStateA>(newState);
+            var ib = new InitializeBehavior<IStateA>(newState);
 
             var action = new SyncAction<IStateA, IStateA>(ib, s => s);
 
@@ -51,7 +51,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Action
             current.Lock();
 
             IStateBa newState = new StateBa();
-            var ib = new InitializeBehavior<IStateB, IStateBa>(newState);
+            var ib = new InitializeBehavior<IStateBa>(newState);
 
             var action = new SyncAction<IStateB, IStateBa>(ib, s => s.Child);
 

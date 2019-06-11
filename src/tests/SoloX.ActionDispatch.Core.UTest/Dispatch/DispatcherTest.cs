@@ -27,7 +27,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
         {
             var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
 
-            var actionBehaviorMock = new Mock<IActionBehavior<IStateA, IStateA>>();
+            var actionBehaviorMock = new Mock<IActionBehavior<IStateA>>();
 
             var state = new StateA();
 

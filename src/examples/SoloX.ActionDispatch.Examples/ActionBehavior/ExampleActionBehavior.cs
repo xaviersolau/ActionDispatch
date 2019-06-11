@@ -15,7 +15,7 @@ namespace SoloX.ActionDispatch.Examples.ActionBehavior
     /// <summary>
     /// Example action.
     /// </summary>
-    public class ExampleActionBehavior : IActionBehavior<IExampleAppState, IExampleChildState>
+    public class ExampleActionBehavior : IActionBehavior<IExampleChildState>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ExampleActionBehavior"/> class.

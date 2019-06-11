@@ -17,7 +17,7 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior
 {
     public class DelayActionBehavior : IActionBehaviorAsync<IStateA, IStateA>
     {
-        public DelayActionBehavior(int delay, IActionBehavior<IStateA, IStateA> behavior)
+        public DelayActionBehavior(int delay, IActionBehavior<IStateA> behavior)
         {
             this.Delay = delay;
             this.Behavior = behavior;
@@ -25,7 +25,7 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior
 
         public int Delay { get; }
 
-        public IActionBehavior<IStateA, IStateA> Behavior { get; }
+        public IActionBehavior<IStateA> Behavior { get; }
 
         public async Task Apply(IRelativeDispatcher<IStateA, IStateA> dispatcher, IStateA state)
         {

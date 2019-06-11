@@ -14,7 +14,7 @@ using SoloX.ActionDispatch.Core.State;
 
 namespace SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior
 {
-    public class ThrowActionBehavior : IActionBehavior<IStateA, IStateA>
+    public class ThrowActionBehavior : IActionBehavior<IStateA>
     {
         public ApplicationException Exception { get; } = new ApplicationException("What if we throw an exception here?");
 

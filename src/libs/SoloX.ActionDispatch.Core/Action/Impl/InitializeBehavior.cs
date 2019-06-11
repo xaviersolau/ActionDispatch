@@ -15,14 +15,12 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
     /// <summary>
     /// Initialize state behavior.
     /// </summary>
-    /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
     /// <typeparam name="TState">The state type the action apply on.</typeparam>
-    public class InitializeBehavior<TRootState, TState> : IActionBehavior<TRootState, TState>
-        where TRootState : IState
+    public class InitializeBehavior<TState> : IActionBehavior<TState>
         where TState : IState
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="InitializeBehavior{TRootState, TState}"/> class.
+        /// Initializes a new instance of the <see cref="InitializeBehavior{TState}"/> class.
         /// </summary>
         /// <param name="state">The state to use as initial value.</param>
         public InitializeBehavior(TState state)

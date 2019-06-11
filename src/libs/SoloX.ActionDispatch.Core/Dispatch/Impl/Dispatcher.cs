@@ -69,7 +69,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         public IObservable<TRootState> State => this.state.AsObservable();
 
         /// <inheritdoc />
-        public void Dispatch<TState>(IActionBehavior<TRootState, TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
+        public void Dispatch<TState>(IActionBehavior<TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
             where TState : IState
         {
             this.Dispatch(new SyncAction<TRootState, TState>(actionBehavior, selector));

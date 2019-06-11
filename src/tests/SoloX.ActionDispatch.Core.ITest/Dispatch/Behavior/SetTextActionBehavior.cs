@@ -14,7 +14,7 @@ using SoloX.ActionDispatch.Core.State;
 
 namespace SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior
 {
-    public class SetTextActionBehavior : IActionBehavior<IStateA, IStateA>
+    public class SetTextActionBehavior : IActionBehavior<IStateA>
     {
         public SetTextActionBehavior(string text)
         {
