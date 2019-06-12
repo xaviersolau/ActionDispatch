@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reactive.Linq;
 using System.Text;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.State;
@@ -25,23 +26,28 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         where TRootState : IState
         where TIntermediatState : IState
     {
-        private LambdaExpression baseSelector;
+        private Expression<Func<TRootState, TIntermediatState>> baseSelector;
+        private Func<TRootState, TIntermediatState> selectorFunc;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RelativeDispatcher{TRootState, TIntermediatState}"/> class.
         /// </summary>
         /// <param name="dispatcher">The base application dispatcher.</param>
         /// <param name="baseSelector">The base selector that is driving to the intermediate state.</param>
-        public RelativeDispatcher(IDispatcher<TRootState> dispatcher, LambdaExpression baseSelector)
+        public RelativeDispatcher(IDispatcher<TRootState> dispatcher, Expression<Func<TRootState, TIntermediatState>> baseSelector)
         {
             this.Dispatcher = dispatcher;
             this.baseSelector = baseSelector;
+            this.selectorFunc = baseSelector.Compile();
         }
 
         /// <summary>
         /// Gets the root dispatcher.
         /// </summary>
         public IDispatcher<TRootState> Dispatcher { get; }
+
+        /// <inheritdoc/>
+        public IObservable<TIntermediatState> State => this.Dispatcher.State.Select(this.selectorFunc);
 
         /// <inheritdoc/>
         public void Dispatch<TState>(IActionBehavior<TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)

@@ -11,7 +11,7 @@ Don't hesitate to post issue, pull request on the project or to fork and improve
 
 ## License and credits
 
-ExpressionTools project is written by Xavier Solau. It's licensed under the MIT license.
+ActionDispatch project is written by Xavier Solau. It's licensed under the MIT license.
 
  * * *
 
@@ -21,20 +21,20 @@ You can checkout this Github repository or you can use the NuGet package:
 
 **Install using the command line from the Package Manager:**
 ```bash
-Install-Package SoloX.ActionDispatch.Core -version 1.0.0-alpha.4
-Install-Package SoloX.ActionDispatch.State.Build -version 1.0.0-alpha.4
+Install-Package SoloX.ActionDispatch.Core -version 1.0.0-alpha.5
+Install-Package SoloX.ActionDispatch.State.Build -version 1.0.0-alpha.5
 ```
 
 **Install using the .Net CLI:**
 ```bash
-dotnet add package SoloX.ActionDispatch.Core --version 1.0.0-alpha.4
-dotnet add package SoloX.ActionDispatch.State.Build --version 1.0.0-alpha.4
+dotnet add package SoloX.ActionDispatch.Core --version 1.0.0-alpha.5
+dotnet add package SoloX.ActionDispatch.State.Build --version 1.0.0-alpha.5
 ```
 
 **Install editing your project file (csproj):**
 ```xml
-<PackageReference Include="SoloX.ActionDispatch.Core" Version="1.0.0-alpha.4" />
-<PackageReference Include="SoloX.ActionDispatch.State.Build" Version="1.0.0-alpha.4" />
+<PackageReference Include="SoloX.ActionDispatch.Core" Version="1.0.0-alpha.5" />
+<PackageReference Include="SoloX.ActionDispatch.State.Build" Version="1.0.0-alpha.5" />
 ```
 
 Note that including the `SoloX.ActionDispatch.State.Build` package will automatically install `SoloX.ActionDispatch.Core`.
