@@ -57,7 +57,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         /// <summary>
         /// Gets action state selector expression.
         /// </summary>
-        internal LambdaExpression Selector { get; }
+        internal Expression<Func<TRootState, TState>> Selector { get; }
 
         /// <summary>
         /// Select the target state.

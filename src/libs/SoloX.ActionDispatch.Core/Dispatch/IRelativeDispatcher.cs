@@ -23,6 +23,11 @@ namespace SoloX.ActionDispatch.Core.Dispatch
         where TIntermediatState : IState
     {
         /// <summary>
+        /// Gets current state.
+        /// </summary>
+        IObservable<TIntermediatState> State { get; }
+
+        /// <summary>
         /// Dispatch an action on a current state.
         /// </summary>
         /// <typeparam name="TState">The target state type.</typeparam>

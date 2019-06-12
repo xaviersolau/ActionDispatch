@@ -149,7 +149,7 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch
                 });
         }
 
-        private static void SetupAndTestDispatcher<TRootState>(TRootState initialState, Action<IDispatcher<TRootState>> testHandler)
+        internal static void SetupAndTestDispatcher<TRootState>(TRootState initialState, Action<IDispatcher<TRootState>> testHandler)
             where TRootState : IState
         {
             var logger = Mock.Of<ILogger<Dispatcher<TRootState>>>();
