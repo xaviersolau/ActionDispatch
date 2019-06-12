@@ -11,7 +11,7 @@ Don't hesitate to post issue, pull request on the project or to fork and improve
 
 ## License and credits
 
-ExpressionTools project is written by Xavier Solau. It's licensed under the MIT license.
+ActionDispatch project is written by Xavier Solau. It's licensed under the MIT license.
 
  * * *
 
