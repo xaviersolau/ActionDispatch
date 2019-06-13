@@ -175,10 +175,21 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
                 itfParentPattern.Properties.Single(x => x.PropertyType.Declaration == itfChildPattern),
                 itfDeclaration.Properties.Where(p => p.PropertyType.Declaration is IInterfaceDeclaration).ToArray());
 
+            var itfNs = new HashSet<string>();
+            itfNs.Add(itfDeclaration.DeclarationNameSpace);
+            foreach (var ns in itfDeclaration.Properties.Select(m => m.PropertyType.Declaration.DeclarationNameSpace))
+            {
+                if (!string.IsNullOrEmpty(ns))
+                {
+                    itfNs.Add(ns);
+                }
+            }
+
+            var usingWriter = new StringReplaceWriter("SoloX.ActionDispatch.State.Generator.Patterns.Itf", itfNs.ToArray());
             var itfNameWriter = new StringReplaceWriter(itfParentPattern.Name, itfDeclaration.Name);
             var implNameWriter = new StringReplaceWriter(implPattern.Name, implName);
 
-            return new WriterSelector(propertyChildWriter, propertyWriter, itfNameWriter, implNameWriter);
+            return new WriterSelector(propertyChildWriter, propertyWriter, usingWriter, itfNameWriter, implNameWriter);
         }
     }
 }
