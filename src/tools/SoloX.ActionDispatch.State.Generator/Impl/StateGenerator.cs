@@ -77,12 +77,17 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             var inputs = new HashSet<string>();
             var outputs = new HashSet<string>();
 
-            var fileGenerator = new FileGenerator(".generated.cs", f => outputs.Add(Path.GetFullPath(f)));
-            var generator = new ImplementationGenerator(
-                fileGenerator,
-                locator,
-                itfParentPatternDeclaration,
-                implPatternDeclaration);
+            FileGenerator fileGenerator = null;
+            ImplementationGenerator generator = null;
+            if (generate)
+            {
+                fileGenerator = new FileGenerator(".generated.cs", f => outputs.Add(Path.GetFullPath(f)));
+                generator = new ImplementationGenerator(
+                    fileGenerator,
+                    locator,
+                    itfParentPatternDeclaration,
+                    implPatternDeclaration);
+            }
 
             var generatedClasses = new List<(string, string)>();
             var interfaceNameSpaceList = new HashSet<string>();
