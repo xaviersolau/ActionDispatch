@@ -109,7 +109,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
                         tknType = ReadNextToken(reader);
                         break;
                     case JsonToken.PropertyName:
-                        var name = reader.Path;
+                        var name = (string)reader.Value;
                         switch (name)
                         {
                             case IsAsynchronous:
