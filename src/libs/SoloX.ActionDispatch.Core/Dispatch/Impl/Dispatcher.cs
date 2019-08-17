@@ -85,6 +85,11 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         /// <inheritdoc />
         public void AddObserver(Func<IObservable<IAction<TRootState, IActionBehavior>>, IObservable<IAction<TRootState, IActionBehavior>>> observer)
         {
+            if (observer == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(observer)} was null.");
+            }
+
             var subscription = observer(this.listenerActions.AsObservable())
                 .CatchAndContinue<IAction<TRootState, IActionBehavior>, Exception>(e =>
                 {

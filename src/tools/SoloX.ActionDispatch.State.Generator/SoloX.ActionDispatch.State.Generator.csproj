@@ -21,20 +21,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\libs\SoloX.ActionDispatch.Core\State\IState.cs"
-             Link="Resources\IState.cs">
+    <Content Include="..\..\libs\SoloX.ActionDispatch.Core\State\IState.cs" Link="Resources\IState.cs">
       <PackagePath>lib/$(TargetFramework)/Resources</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\libs\SoloX.ActionDispatch.Core\State\IStateFactory.cs"
-             Link="Resources\IStateFactory.cs">
+    <Content Include="..\..\libs\SoloX.ActionDispatch.Core\State\IStateFactory.cs" Link="Resources\IStateFactory.cs">
       <PackagePath>lib/$(TargetFramework)/Resources</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SoloX.CodeQuality.Prod" Version="1.0.0" />
+    <PackageReference Include="SoloX.CodeQuality.Prod" Version="1.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="2.10.0" />
     <PackageReference Include="SoloX.GeneratorTools.Core.CSharp" Version="1.0.0-alpha.4" />

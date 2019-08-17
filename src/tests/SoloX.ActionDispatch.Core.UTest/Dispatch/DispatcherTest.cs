@@ -60,21 +60,22 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
             var stateMock = new Mock<IStateA>();
 
             var isThreadPoolThread = false;
-            var waitHandler = new ManualResetEvent(false);
-
-            actionBehaviorMock
-                .Setup(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA>>(), stateMock.Object))
-                .Callback(() =>
-                {
-                    isThreadPoolThread = Thread.CurrentThread.IsThreadPoolThread;
-                    waitHandler.Set();
-                });
-
-            using (var dispatcher = new Dispatcher<IStateA>(stateMock.Object, logger))
+            using (var waitHandler = new ManualResetEvent(false))
             {
-                dispatcher.Dispatch(actionBehaviorMock.Object, s => s);
+                actionBehaviorMock
+                    .Setup(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA>>(), stateMock.Object))
+                    .Callback(() =>
+                    {
+                        isThreadPoolThread = Thread.CurrentThread.IsThreadPoolThread;
+                        waitHandler.Set();
+                    });
 
-                waitHandler.WaitOne(2000);
+                using (var dispatcher = new Dispatcher<IStateA>(stateMock.Object, logger))
+                {
+                    dispatcher.Dispatch(actionBehaviorMock.Object, s => s);
+
+                    waitHandler.WaitOne(2000);
+                }
             }
 
             actionBehaviorMock.Verify(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA>>(), stateMock.Object));

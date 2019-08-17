@@ -59,7 +59,10 @@ namespace SoloX.ActionDispatch.Examples
         /// </summary>
         public static void Main()
         {
-            new Program().Run();
+            using (var program = new Program())
+            {
+                program.Run();
+            }
         }
 
         /// <inheritdoc/>

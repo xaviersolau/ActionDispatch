@@ -23,6 +23,11 @@ namespace SoloX.ActionDispatch.Examples.ActionBehavior
         /// <inheritdoc/>
         public async Task Apply(IRelativeDispatcher<IExampleChildState> dispatcher, IExampleChildState state)
         {
+            if (dispatcher == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(dispatcher)} was null.");
+            }
+
             await Task.Delay(2000).ConfigureAwait(false);
 
             dispatcher.Dispatch(new ExampleActionBehavior(2), s => s);

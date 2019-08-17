@@ -118,6 +118,11 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
         /// <param name="deep">Tells if we need to make a deep copy.</param>
         protected void CopyToParentStatePattern(ParentStatePattern state, bool deep)
         {
+            if (state == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(state)} was null.");
+            }
+
             this.CopyToAStateBase(state, deep);
 
             state.propertyPattern = this.propertyPattern;

@@ -36,6 +36,11 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         /// <inheritdoc/>
         public void Apply(IStateContainer<TState> stateContainer)
         {
+            if (stateContainer == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(stateContainer)} was null.");
+            }
+
             stateContainer.State = this.State;
         }
     }
