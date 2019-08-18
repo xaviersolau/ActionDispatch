@@ -151,6 +151,11 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         protected void CopyToAStateBase(AStateBase<TState> state, bool deep)
 #pragma warning restore CA1801 // Parameter deep of method CopyToAStateBase is never used. Remove the parameter or use it in the method body.
         {
+            if (state == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(state)} was null.");
+            }
+
             state.Version = this.Version;
         }
 

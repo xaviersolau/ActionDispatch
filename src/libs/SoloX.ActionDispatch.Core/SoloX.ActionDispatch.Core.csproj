@@ -28,11 +28,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="SoloX.CodeQuality.Prod" Version="1.0.0" />
+    <PackageReference Include="SoloX.CodeQuality.Prod" Version="1.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
-    <PackageReference Include="System.Reactive" Version="4.1.5" />
-    <PackageReference Include="SoloX.ExpressionTools.Parser" Version="1.0.0-alpha.1" />
-    <PackageReference Include="SoloX.ExpressionTools.Transform" Version="1.0.0-alpha.1" />
+    <PackageReference Include="System.Reactive" Version="4.1.6" />
+    <PackageReference Include="SoloX.ExpressionTools.Parser" Version="1.0.0-alpha.2" />
+    <PackageReference Include="SoloX.ExpressionTools.Transform" Version="1.0.0-alpha.2" />
   </ItemGroup>
 
 </Project>

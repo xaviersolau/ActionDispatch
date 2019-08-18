@@ -36,6 +36,11 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         /// <param name="baseSelector">The base selector that is driving to the intermediate state.</param>
         public RelativeDispatcher(IDispatcher<TRootState> dispatcher, Expression<Func<TRootState, TIntermediatState>> baseSelector)
         {
+            if (baseSelector == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(baseSelector)} was null.");
+            }
+
             this.Dispatcher = dispatcher;
             this.baseSelector = baseSelector;
             this.selectorFunc = baseSelector.Compile();

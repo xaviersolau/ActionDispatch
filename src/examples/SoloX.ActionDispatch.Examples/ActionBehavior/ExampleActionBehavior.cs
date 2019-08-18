@@ -34,6 +34,11 @@ namespace SoloX.ActionDispatch.Examples.ActionBehavior
         /// <inheritdoc />
         public void Apply(IStateContainer<IExampleChildState> stateContainer)
         {
+            if (stateContainer == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(stateContainer)} was null.");
+            }
+
             stateContainer.LoadState();
 
             var state = stateContainer.State;

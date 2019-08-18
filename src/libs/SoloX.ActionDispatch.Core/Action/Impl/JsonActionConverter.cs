@@ -35,7 +35,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         /// <inheritdoc/>
         public override bool CanConvert(Type objectType)
         {
-            if (!objectType.IsGenericType)
+            if (objectType == null || !objectType.IsGenericType)
             {
                 return false;
             }
@@ -49,6 +49,16 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         /// <inheritdoc/>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
+            if (writer == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(writer)} was null.");
+            }
+
+            if (value == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(value)} was null.");
+            }
+
             var valueType = value.GetType();
 
             // Check value type
@@ -100,6 +110,16 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
             dynamic behavior = null;
             Type rootStateType = null;
 
+            if (reader == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(reader)} was null.");
+            }
+
+            if (serializer == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(serializer)} was null.");
+            }
+
             var tknType = reader.TokenType;
             while (!done)
             {
@@ -109,7 +129,7 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
                         tknType = ReadNextToken(reader);
                         break;
                     case JsonToken.PropertyName:
-                        var name = reader.Path;
+                        var name = (string)reader.Value;
                         switch (name)
                         {
                             case IsAsynchronous:
