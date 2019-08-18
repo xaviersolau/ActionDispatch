@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using SoloX.ActionDispatch.State.Generator.Patterns.Itf;
 using SoloX.GeneratorTools.Core.CSharp.Generator.Impl;
@@ -66,11 +67,15 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             var resolver = this.workspace.DeepLoad();
 
-            var declaration = resolver.Find("SoloX.ActionDispatch.Core.State.IState").Cast<IGenericDeclaration>().Single();
-            var itfParentPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Itf.IParentStatePattern").Single() as IInterfaceDeclaration;
-            var itfChildPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Itf.IChildStatePattern").Single() as IInterfaceDeclaration;
+            var declaration = resolver.Find("SoloX.ActionDispatch.Core.State.IState")
+                .Cast<IGenericDeclaration<SyntaxNode>>().Single();
+            var itfParentPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Itf.IParentStatePattern")
+                .Single() as IInterfaceDeclaration;
+            var itfChildPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Itf.IChildStatePattern")
+                .Single() as IInterfaceDeclaration;
 
-            var implPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.ParentStatePattern").Single() as IGenericDeclaration;
+            var implPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.ParentStatePattern")
+                .Single() as IGenericDeclaration<SyntaxNode>;
 
             var locator = new RelativeLocator(projectFolder, project.RootNameSpace, suffix: "Impl");
 
@@ -92,7 +97,10 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             var generatedClasses = new List<(string, string)>();
             var interfaceNameSpaceList = new HashSet<string>();
 
-            foreach (var extendedByItem in declaration.ExtendedBy.Where(d => d is IInterfaceDeclaration && d != itfParentPatternDeclaration && d != itfChildPatternDeclaration))
+            var extendedBy = declaration.ExtendedBy
+                .Where(d => d is IInterfaceDeclaration && d != itfParentPatternDeclaration && d != itfChildPatternDeclaration);
+
+            foreach (var extendedByItem in extendedBy)
             {
                 var itfDeclaration = (IInterfaceDeclaration)extendedByItem;
 
@@ -104,7 +112,12 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
                     var implName = GeneratorHelper.ComputeClassName(itfDeclaration.Name);
 
-                    var writerSelector = this.CreateWriterSelector(itfParentPatternDeclaration, itfChildPatternDeclaration, implPatternDeclaration, itfDeclaration, implName);
+                    var writerSelector = this.CreateWriterSelector(
+                        itfParentPatternDeclaration,
+                        itfChildPatternDeclaration,
+                        implPatternDeclaration,
+                        itfDeclaration,
+                        implName);
 
                     var className = generator.Generate(writerSelector, itfDeclaration, implName);
                     generatedClasses.Add(className);
@@ -142,8 +155,12 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             List<(string nameSpace, string name)> generatedClasses,
             HashSet<string> interfaceNameSpaceList)
         {
-            var stateFactoryItfDecl = resolver.Find("SoloX.ActionDispatch.Core.State.IStateFactory").Single() as IInterfaceDeclaration;
-            var factoryPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.StateFactoryPattern").Single() as IGenericDeclaration;
+            var stateFactoryItfDecl = resolver
+                .Find("SoloX.ActionDispatch.Core.State.IStateFactory")
+                .Single() as IInterfaceDeclaration;
+            var factoryPatternDeclaration = resolver
+                .Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.StateFactoryPattern")
+                .Single() as IGenericDeclaration<SyntaxNode>;
 
             var generator = new ImplementationGenerator(
                 fileGenerator,
@@ -155,9 +172,16 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             var nsList = new HashSet<string>(generatedClasses.Select(n => n.nameSpace));
 
-            var nsWriter = new StringReplaceWriter("SoloX.ActionDispatch.State.Generator.Patterns.Impl", nsList.ToArray());
-            var nsItfWriter = new StringReplaceWriter("SoloX.ActionDispatch.State.Generator.Patterns.Itf", interfaceNameSpaceList.ToArray());
-            var ctorWriter = new StringReplaceWriter("ParentStatePattern", generatedClasses.Select(n => n.name).ToArray());
+            var nsWriter = new StringReplaceWriter(
+                "SoloX.ActionDispatch.State.Generator.Patterns.Impl",
+                nsList.ToArray());
+            var nsItfWriter = new StringReplaceWriter(
+                "SoloX.ActionDispatch.State.Generator.Patterns.Itf",
+                interfaceNameSpaceList.ToArray());
+            var ctorWriter = new StringReplaceWriter(
+                "ParentStatePattern",
+                generatedClasses.Select(n => n.name).ToArray());
+
             var implNameWriter = new StringReplaceWriter(factoryPatternDeclaration.Name, implName);
 
             var writerSelector = new WriterSelector(ctorWriter, nsWriter, nsItfWriter, implNameWriter);
@@ -168,7 +192,7 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
         private IWriterSelector CreateWriterSelector(
             IInterfaceDeclaration itfParentPattern,
             IInterfaceDeclaration itfChildPattern,
-            IGenericDeclaration implPattern,
+            IGenericDeclaration<SyntaxNode> implPattern,
             IInterfaceDeclaration itfDeclaration,
             string implName)
         {
