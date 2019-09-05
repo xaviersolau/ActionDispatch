@@ -12,9 +12,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SoloX.ActionDispatch.Core;
+using SoloX.ActionDispatch.Core.Action.Impl;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
 using SoloX.ActionDispatch.Core.State;
+using SoloX.ActionDispatch.Core.State.Impl;
 using SoloX.ActionDispatch.Examples.ActionBehavior;
 using SoloX.ActionDispatch.Examples.State;
 
@@ -79,14 +81,14 @@ namespace SoloX.ActionDispatch.Examples
             {
                 this.logger.LogWarning($"Processing action with behavior: {a.Behavior}");
 
-                this.logger.LogWarning(JsonConvert.SerializeObject(a));
+                this.logger.LogWarning(JsonConvert.SerializeObject(a, new JsonActionConverter()));
             }));
 
             using (var stateSubscribtion = dispatcher.State.Do(s =>
             {
                 this.logger.LogWarning($"State: {s.Version}");
 
-                this.logger.LogWarning(JsonConvert.SerializeObject(s));
+                this.logger.LogWarning(JsonConvert.SerializeObject(s, new JsonStateConverter(this.Service.GetService<IStateFactory>())));
             }).Subscribe())
             {
                 dispatcher.Dispatch(new ExampleAsyncActionBehavior(), s => s.ChildState);

@@ -68,7 +68,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Action
             string behaviorSomeValue;
             if (async)
             {
-                var action = JsonConvert.DeserializeObject<AsyncAction<IStateA, IStateA>>(jsonAction);
+                var action = JsonConvert.DeserializeObject<AsyncAction<IStateA, IStateA>>(jsonAction, new JsonActionConverter());
                 Assert.NotNull(action);
 
                 var behavior = Assert.IsType<AsyncBehavior>(action.Behavior);
@@ -77,7 +77,7 @@ namespace SoloX.ActionDispatch.Core.UTest.Action
             }
             else
             {
-                var action = JsonConvert.DeserializeObject<SyncAction<IStateA, IStateA>>(jsonAction);
+                var action = JsonConvert.DeserializeObject<SyncAction<IStateA, IStateA>>(jsonAction, new JsonActionConverter());
                 Assert.NotNull(action);
 
                 var behavior = Assert.IsType<SyncBehavior>(action.Behavior);
@@ -100,12 +100,12 @@ namespace SoloX.ActionDispatch.Core.UTest.Action
             if (async)
             {
                 var action = new AsyncAction<IStateA, IStateA>(new AsyncBehavior(someText), s => s);
-                return JsonConvert.SerializeObject(action);
+                return JsonConvert.SerializeObject(action, new JsonActionConverter());
             }
             else
             {
                 var action = new SyncAction<IStateA, IStateA>(new SyncBehavior(someText), s => s);
-                return JsonConvert.SerializeObject(action);
+                return JsonConvert.SerializeObject(action, new JsonActionConverter());
             }
         }
     }
