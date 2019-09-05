@@ -19,9 +19,12 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
     /// </summary>
     public class StateFactoryPattern : IStateFactory
     {
+        private static Dictionary<Type, Func<IState>> map = new Dictionary<Type, Func<IState>>();
+
         static StateFactoryPattern()
         {
             Key<IParentStatePattern>.Create = () => new ParentStatePattern();
+            map.Add(typeof(IParentStatePattern), () => new ParentStatePattern());
         }
 
         /// <inheritdoc/>
@@ -32,6 +35,17 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
             if (create == null)
             {
                 throw new ArgumentException($"Unknown state type: {typeof(TState).Name}.");
+            }
+
+            return create();
+        }
+
+        /// <inheritdoc/>
+        public IState Create(Type stateType)
+        {
+            if (!map.TryGetValue(stateType, out var create))
+            {
+                throw new ArgumentException($"Unknown state type: {stateType?.Name}.");
             }
 
             return create();
