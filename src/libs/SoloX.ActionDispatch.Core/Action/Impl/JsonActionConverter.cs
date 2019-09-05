@@ -54,9 +54,15 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
                 throw new ArgumentNullException($"The argument {nameof(writer)} was null.");
             }
 
+            if (serializer == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(serializer)} was null.");
+            }
+
             if (value == null)
             {
-                throw new ArgumentNullException($"The argument {nameof(value)} was null.");
+                writer.WriteNull();
+                return;
             }
 
             var valueType = value.GetType();

@@ -7,14 +7,12 @@
 
 using System;
 using System.Linq.Expressions;
-using Newtonsoft.Json;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.State;
 
 namespace SoloX.ActionDispatch.Core.Action.Impl
 {
     /// <inheritdoc/>
-    [JsonConverter(typeof(JsonActionConverter))]
     internal abstract class AAction<TRootState> : IAction<TRootState>
         where TRootState : IState
     {
