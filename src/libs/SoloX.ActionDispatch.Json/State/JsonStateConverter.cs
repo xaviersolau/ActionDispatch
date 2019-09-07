@@ -10,8 +10,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
+using SoloX.ActionDispatch.Core.State;
+using SoloX.ActionDispatch.Core.State.Impl;
 
-namespace SoloX.ActionDispatch.Core.State.Impl
+namespace SoloX.ActionDispatch.Json.State
 {
     /// <summary>
     /// Json converter that handles the State Json serialization.

@@ -8,3 +8,5 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("SoloX.ActionDispatch.Core.UTest")]
+[assembly: InternalsVisibleTo("SoloX.ActionDispatch.Json")]
+[assembly: InternalsVisibleTo("SoloX.ActionDispatch.Json.UTest")]

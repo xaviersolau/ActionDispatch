@@ -22,6 +22,10 @@ jobs:
             dotnet test -c Release --no-build
             cd ../../..
 
+            cd src/tests/SoloX.ActionDispatch.Json.UTest
+            dotnet test -c Release --no-build
+            cd ../../..
+
             cd src/tests/SoloX.ActionDispatch.Core.ITest
             dotnet test -c Release --no-build
             cd ../../..
@@ -32,6 +36,10 @@ jobs:
             dotnet tool install coveralls.net --version 1.0.0 --tool-path coveralls
 
             cd src/tests/SoloX.ActionDispatch.Core.UTest
+            dotnet test -c Release --no-build -p:CollectCoverage=true -p:Exclude=\"[xunit.*]*,[SoloX.*.Sample*]*,[SoloX.*.UTest]*\" -p:MergeWith="../../../result.coverlet.json" -p:CoverletOutput="../../../result.coverlet.json"
+            cd ../../..
+
+            cd src/tests/SoloX.ActionDispatch.Json.UTest
             dotnet test -c Release --no-build -p:CollectCoverage=true -p:Exclude=\"[xunit.*]*,[SoloX.*.Sample*]*,[SoloX.*.UTest]*\" -p:MergeWith="../../../result.coverlet.json" -p:CoverletOutput="../../../result.coverlet.json"
             cd ../../..
 
@@ -55,6 +63,11 @@ jobs:
             dotnet pack -c Release --no-build
             cd ../../..
             mv src/libs/SoloX.ActionDispatch.Core/bin/Release/*.nupkg packages/
+
+            cd src/libs/SoloX.ActionDispatch.Json
+            dotnet pack -c Release --no-build
+            cd ../../..
+            mv src/libs/SoloX.ActionDispatch.Json/bin/Release/*.nupkg packages/
 
             cd src/tools/SoloX.ActionDispatch.Tools
             dotnet pack -c Release --no-build

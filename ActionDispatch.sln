@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.Core", "src\libs\SoloX.ActionDispatch.Core\SoloX.ActionDispatch.Core.csproj", "{F730E09C-3DD9-4625-90C1-3816A8C8E81E}"
 EndProject
@@ -35,6 +35,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.Core.Sample", "src\tests\SoloX.ActionDispatch.Core.Sample\SoloX.ActionDispatch.Core.Sample.csproj", "{CD1BCA06-4D6B-4FAE-B6C8-141FAEB21DFE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.State.Build", "src\tools\SoloX.ActionDispatch.State.Build\SoloX.ActionDispatch.State.Build.csproj", "{5ABBDCA7-271D-43FC-82F7-79F055C691B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoloX.ActionDispatch.Json", "src\libs\SoloX.ActionDispatch.Json\SoloX.ActionDispatch.Json.csproj", "{33B03718-F1F2-45EB-9C6A-26AFA3BF581E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoloX.ActionDispatch.Json.UTest", "src\tests\SoloX.ActionDispatch.Json.UTest\SoloX.ActionDispatch.Json.UTest.csproj", "{6B1FEC6E-247A-4C1F-A8DD-755CC127A8FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +82,14 @@ Global
 		{5ABBDCA7-271D-43FC-82F7-79F055C691B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5ABBDCA7-271D-43FC-82F7-79F055C691B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5ABBDCA7-271D-43FC-82F7-79F055C691B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33B03718-F1F2-45EB-9C6A-26AFA3BF581E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33B03718-F1F2-45EB-9C6A-26AFA3BF581E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33B03718-F1F2-45EB-9C6A-26AFA3BF581E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33B03718-F1F2-45EB-9C6A-26AFA3BF581E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B1FEC6E-247A-4C1F-A8DD-755CC127A8FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B1FEC6E-247A-4C1F-A8DD-755CC127A8FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B1FEC6E-247A-4C1F-A8DD-755CC127A8FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B1FEC6E-247A-4C1F-A8DD-755CC127A8FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +104,8 @@ Global
 		{0E49D5F4-5CBE-41B0-99F9-8051EB4EAF91} = {9CC5872A-041F-4058-A338-803653E3141B}
 		{CD1BCA06-4D6B-4FAE-B6C8-141FAEB21DFE} = {9CC5872A-041F-4058-A338-803653E3141B}
 		{5ABBDCA7-271D-43FC-82F7-79F055C691B4} = {BEE0C98F-8C65-4EED-B56D-E5307A495005}
+		{33B03718-F1F2-45EB-9C6A-26AFA3BF581E} = {8A1BF072-D6FD-4D7D-BAD2-304D6260BD4A}
+		{6B1FEC6E-247A-4C1F-A8DD-755CC127A8FF} = {9CC5872A-041F-4058-A338-803653E3141B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C234AD4E-8AE5-4C97-91A7-CE66AE5EFF32}

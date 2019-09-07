@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libs\SoloX.ActionDispatch.Core\SoloX.ActionDispatch.Core.csproj" />
+    <ProjectReference Include="..\..\libs\SoloX.ActionDispatch.Json\SoloX.ActionDispatch.Json.csproj" />
   </ItemGroup>
 
   <ItemGroup>
