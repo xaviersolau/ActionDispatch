@@ -9,8 +9,10 @@ launchSettings.json
 
 src/examples/SoloX.ActionDispatch.Examples/SoloX.ActionDispatch.Examples.xml
 src/libs/SoloX.ActionDispatch.Core/SoloX.ActionDispatch.Core.xml
+src/libs/SoloX.ActionDispatch.Json/SoloX.ActionDispatch.Json.xml
 src/tests/SoloX.ActionDispatch.Core.Sample/SoloX.ActionDispatch.Core.Sample.xml
 src/tests/SoloX.ActionDispatch.Core.UTest/SoloX.ActionDispatch.Core.UTest.xml
+src/tests/SoloX.ActionDispatch.Json.UTest/SoloX.ActionDispatch.Json.UTest.xml
 src/tests/SoloX.ActionDispatch.Core.ITest/SoloX.ActionDispatch.Core.ITest.xml
 src/tools/SoloX.ActionDispatch.Tools/SoloX.ActionDispatch.Tools.xml
 src/tools/SoloX.ActionDispatch.State.Generator/SoloX.ActionDispatch.State.Generator.xml
