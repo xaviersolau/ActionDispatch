@@ -11,6 +11,7 @@ using System.Linq.Expressions;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Action.Impl;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
@@ -65,29 +66,28 @@ namespace SoloX.ActionDispatch.Json.UTest.Action
 
             string jsonAction = GetJsonAction(async, someText);
 
-            AAction<IStateA, IStateA> deserializedAction;
+            var action = JsonConvert.DeserializeObject<AAction<IStateA, IStateA>>(jsonAction, new JsonActionConverter());
+
+            Assert.NotNull(action);
+
             string behaviorSomeValue;
             if (async)
             {
-                var action = JsonConvert.DeserializeObject<AsyncAction<IStateA, IStateA>>(jsonAction, new JsonActionConverter());
-                Assert.NotNull(action);
+                var asyncAction = Assert.IsType<AsyncAction<IStateA, IStateA>>(action);
 
-                var behavior = Assert.IsType<AsyncBehavior>(action.Behavior);
+                var behavior = Assert.IsType<AsyncBehavior>(asyncAction.Behavior);
                 behaviorSomeValue = behavior.SomeValue;
-                deserializedAction = action;
             }
             else
             {
-                var action = JsonConvert.DeserializeObject<SyncAction<IStateA, IStateA>>(jsonAction, new JsonActionConverter());
-                Assert.NotNull(action);
+                var syncAction = Assert.IsType<SyncAction<IStateA, IStateA>>(action);
 
-                var behavior = Assert.IsType<SyncBehavior>(action.Behavior);
+                var behavior = Assert.IsType<SyncBehavior>(syncAction.Behavior);
                 behaviorSomeValue = behavior.SomeValue;
-                deserializedAction = action;
             }
 
             Assert.Equal(someText, behaviorSomeValue);
-            var selector = deserializedAction.Selector;
+            var selector = action.Selector;
 
             Assert.NotNull(selector);
             Func<IStateA, IStateA> exp = Assert.IsType<Func<IStateA, IStateA>>(selector.Compile());

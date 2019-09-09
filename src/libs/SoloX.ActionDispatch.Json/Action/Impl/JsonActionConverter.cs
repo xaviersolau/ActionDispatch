@@ -29,6 +29,8 @@ namespace SoloX.ActionDispatch.Json.Action.Impl
         internal const string RootStateType = "rootStateType";
         internal const string Selector = "selector";
 
+        private static readonly Type GenericAActionType1 = typeof(AAction<>);
+        private static readonly Type GenericAActionType2 = typeof(AAction<,>);
         private static readonly Type GenericAsyncActionType = typeof(AsyncAction<,>);
         private static readonly Type GenericSyncActionType = typeof(SyncAction<,>);
         private static readonly Type GenericActionBehaviorAsyncType = typeof(IActionBehaviorAsync<>);
@@ -45,7 +47,9 @@ namespace SoloX.ActionDispatch.Json.Action.Impl
             var genericType = objectType.GetGenericTypeDefinition();
             return objectType.IsGenericType
                 && (ReferenceEquals(genericType, GenericAsyncActionType)
-                || ReferenceEquals(genericType, GenericSyncActionType));
+                || ReferenceEquals(genericType, GenericSyncActionType)
+                || ReferenceEquals(genericType, GenericAActionType1)
+                || ReferenceEquals(genericType, GenericAActionType2));
         }
 
         /// <inheritdoc/>
