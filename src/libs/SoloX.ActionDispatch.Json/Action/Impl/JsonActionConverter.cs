@@ -16,7 +16,7 @@ using SoloX.ActionDispatch.Core.State;
 using SoloX.ExpressionTools.Parser;
 using SoloX.ExpressionTools.Parser.Impl;
 
-namespace SoloX.ActionDispatch.Json.Action
+namespace SoloX.ActionDispatch.Json.Action.Impl
 {
     /// <summary>
     /// Json converter that handles the Action Json serialization.

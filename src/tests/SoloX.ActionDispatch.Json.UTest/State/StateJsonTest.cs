@@ -13,7 +13,7 @@ using SoloX.ActionDispatch.Core.Sample.Impl;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
 using SoloX.ActionDispatch.Core.State.Impl;
-using SoloX.ActionDispatch.Json.State;
+using SoloX.ActionDispatch.Json.State.Impl;
 using Xunit;
 
 namespace SoloX.ActionDispatch.Json.UTest.State

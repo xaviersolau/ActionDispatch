@@ -19,8 +19,8 @@ using SoloX.ActionDispatch.Core.State;
 using SoloX.ActionDispatch.Core.State.Impl;
 using SoloX.ActionDispatch.Examples.ActionBehavior;
 using SoloX.ActionDispatch.Examples.State;
-using SoloX.ActionDispatch.Json.Action;
-using SoloX.ActionDispatch.Json.State;
+using SoloX.ActionDispatch.Json.Action.Impl;
+using SoloX.ActionDispatch.Json.State.Impl;
 
 namespace SoloX.ActionDispatch.Examples
 {
