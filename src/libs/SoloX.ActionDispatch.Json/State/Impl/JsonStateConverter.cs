@@ -4,6 +4,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // ----------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ using Newtonsoft.Json;
 using SoloX.ActionDispatch.Core.State;
 using SoloX.ActionDispatch.Core.State.Impl;
 
-namespace SoloX.ActionDispatch.Json.State
+namespace SoloX.ActionDispatch.Json.State.Impl
 {
     /// <summary>
     /// Json converter that handles the State Json serialization.
