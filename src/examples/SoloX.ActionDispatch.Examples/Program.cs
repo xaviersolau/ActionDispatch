@@ -10,17 +10,13 @@ using System.Linq.Expressions;
 using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using SoloX.ActionDispatch.Core;
-using SoloX.ActionDispatch.Core.Action.Impl;
+using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
 using SoloX.ActionDispatch.Core.State;
-using SoloX.ActionDispatch.Core.State.Impl;
 using SoloX.ActionDispatch.Examples.ActionBehavior;
 using SoloX.ActionDispatch.Examples.State;
-using SoloX.ActionDispatch.Json.Action.Impl;
-using SoloX.ActionDispatch.Json.State.Impl;
+using SoloX.ActionDispatch.Json;
 
 namespace SoloX.ActionDispatch.Examples
 {
@@ -37,6 +33,7 @@ namespace SoloX.ActionDispatch.Examples
 
             sc.AddLogging(b => b.AddConsole());
             sc.AddSingleton<IStateFactory>(new Impl.StateFactory());
+            sc.AddActionDispatchJsonSupport();
             sc.AddSingleton<IDispatcher<IExampleAppState>>(
                 r =>
                 {
@@ -79,18 +76,21 @@ namespace SoloX.ActionDispatch.Examples
         {
             var dispatcher = this.Service.GetService<IDispatcher<IExampleAppState>>();
 
+            var actionSerializer = this.Service.GetService<IActionSerializer>();
+            var stateSerializer = this.Service.GetService<IStateSerializer>();
+
             dispatcher.AddObserver(obs => obs.Do(a =>
             {
                 this.logger.LogWarning($"Processing action with behavior: {a.Behavior}");
 
-                this.logger.LogWarning(JsonConvert.SerializeObject(a, new JsonActionConverter()));
+                this.logger.LogWarning(actionSerializer.Serialize(a));
             }));
 
             using (var stateSubscribtion = dispatcher.State.Do(s =>
             {
                 this.logger.LogWarning($"State: {s.Version}");
 
-                this.logger.LogWarning(JsonConvert.SerializeObject(s, new JsonStateConverter(this.Service.GetService<IStateFactory>())));
+                this.logger.LogWarning(stateSerializer.Serialize(s));
             }).Subscribe())
             {
                 dispatcher.Dispatch(new ExampleAsyncActionBehavior(), s => s.ChildState);
