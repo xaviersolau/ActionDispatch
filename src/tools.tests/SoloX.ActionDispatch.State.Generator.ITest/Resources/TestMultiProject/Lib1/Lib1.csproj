@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SoloX.ActionDispatch.State.Generator.ITest.Resources.TestMultiProject.Lib1</RootNamespace>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>TestLib1</PackageId>
+    <Version>0.0.1</Version>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SoloX.ActionDispatch.Core" Version="1.0.0-alpha.7" />
+  </ItemGroup>
+  
+</Project>

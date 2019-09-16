@@ -63,7 +63,6 @@ namespace SoloX.ActionDispatch.Tools
         /// <returns>Error code.</returns>
         public int Run()
         {
-            // var projectFile = @"../../../../SoloX.ActionDispatch.State.Sample\SoloX.ActionDispatch.State.Sample.csproj";
             var projectFile = this.configuration.GetValue<string>("project");
             var inputsFile = this.configuration.GetValue<string>("inputs");
             var outputsFile = this.configuration.GetValue<string>("outputs");
