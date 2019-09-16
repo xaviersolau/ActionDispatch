@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SoloX.ActionDispatch.State.Generator.ITest</name>
+    </assembly>
+    <members>
+        <member name="T:SoloX.ActionDispatch.State.Generator.ITest.Resources.TestMultiProject.Lib1.IMyChildState">
+            <summary>
+            IMyChildState is a child state to use in the tests.
+            </summary>
+        </member>
+    </members>
+</doc>

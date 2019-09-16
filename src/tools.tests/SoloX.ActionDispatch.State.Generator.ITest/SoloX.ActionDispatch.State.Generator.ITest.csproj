@@ -1,0 +1,76 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\TestMultiProject\Lib1\nuget.config" />
+    <None Remove="Resources\TestMultiProject\Lib2\nuget.config" />
+    <None Remove="Resources\TestMultiProject\Lib3\nuget.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SoloX.CodeQuality.Test" Version="1.0.2" />
+    <PackageReference Include="coverlet.msbuild" Version="2.6.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="Moq" Version="4.12.0" />
+    <PackageReference Include="SoloX.CodeQuality.Test.Helpers" Version="1.0.3" />
+    <PackageReference Include="SoloX.GeneratorTools.Core.CSharp" Version="1.0.0-alpha.6" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\TestMultiProject\Lib1\nuget.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\TestMultiProject\Lib2\nuget.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\TestMultiProject\Lib3\nuget.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\TestMultiProject\Lib3\Lib3.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\TestMultiProject\TestMultiProject.sln">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\TestMultiProject\Lib1\Lib1.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\TestMultiProject\Lib2\Lib2.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\libs\SoloX.ActionDispatch.Core\SoloX.ActionDispatch.Core.csproj" />
+    <ProjectReference Include="..\..\tools\SoloX.ActionDispatch.State.Generator\SoloX.ActionDispatch.State.Generator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\TestMultiProject\Lib1\IMyChildState.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="Resources\TestMultiProject\Lib3\IMyRootState.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="Resources\TestMultiProject\Lib2\IMyRootState.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
+</Project>

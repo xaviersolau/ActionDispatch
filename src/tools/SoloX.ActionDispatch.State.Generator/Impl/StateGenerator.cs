@@ -98,6 +98,9 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             {
                 var itfDeclaration = (IInterfaceDeclaration)extendedByItem;
 
+                // We must generate only the current project classes.
+                var isInProject = IsDeclarationInProject(itfDeclaration, project);
+
                 if (generate)
                 {
                     this.logger.LogInformation(extendedByItem.FullName);
@@ -106,18 +109,24 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
                     var implName = GeneratorHelper.ComputeClassName(itfDeclaration.Name);
 
-                    var writerSelector = this.CreateWriterSelector(
-                        itfParentPatternDeclaration,
-                        itfChildPatternDeclaration,
-                        implPatternDeclaration,
-                        itfDeclaration,
-                        implName);
+                    if (isInProject)
+                    {
+                        var writerSelector = this.CreateWriterSelector(
+                            itfParentPatternDeclaration,
+                            itfChildPatternDeclaration,
+                            implPatternDeclaration,
+                            itfDeclaration,
+                            implName);
 
-                    var className = generator.Generate(writerSelector, itfDeclaration, implName);
-                    generatedClasses.Add(className);
+                        var className = generator.Generate(writerSelector, itfDeclaration, implName);
+                        generatedClasses.Add(className);
+                    }
                 }
 
-                inputs.Add(itfDeclaration.Location);
+                if (isInProject)
+                {
+                    inputs.Add(itfDeclaration.Location);
+                }
             }
 
             if (generate)
@@ -127,6 +136,23 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             }
 
             WriteFileList(inputs, inputsFile, Path.GetFullPath(Path.GetDirectoryName(projectFile)));
+        }
+
+        private static bool IsDeclarationInProject(IInterfaceDeclaration itfDeclaration, ICSharpProject project)
+        {
+            var baseNameSpace = project.RootNameSpace;
+            var itfNameSpace = itfDeclaration.DeclarationNameSpace;
+
+            if (baseNameSpace.Length == itfNameSpace.Length)
+            {
+                return baseNameSpace == itfNameSpace;
+            }
+            else if (baseNameSpace.Length < itfNameSpace.Length)
+            {
+                return itfNameSpace.StartsWith(baseNameSpace, StringComparison.InvariantCulture);
+            }
+
+            return false;
         }
 
         private static void WriteFileList(HashSet<string> list, string file, string projectFolder)
