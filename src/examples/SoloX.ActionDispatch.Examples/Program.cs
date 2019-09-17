@@ -10,9 +10,9 @@ using System.Linq.Expressions;
 using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SoloX.ActionDispatch.Core;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
-using SoloX.ActionDispatch.Core.Dispatch.Impl;
 using SoloX.ActionDispatch.Core.State;
 using SoloX.ActionDispatch.Examples.ActionBehavior;
 using SoloX.ActionDispatch.Examples.State;
@@ -32,21 +32,16 @@ namespace SoloX.ActionDispatch.Examples
             IServiceCollection sc = new ServiceCollection();
 
             sc.AddLogging(b => b.AddConsole());
-            sc.AddSingleton<IStateFactory>(new Impl.StateFactory());
-            sc.AddActionDispatchJsonSupport();
-            sc.AddSingleton<IDispatcher<IExampleAppState>>(
-                r =>
+            sc.AddActionDispatchSupport(
+                factory =>
                 {
-                    var factory = r.GetService<IStateFactory>();
                     var state = factory.Create<IExampleAppState>();
                     state.ChildState = factory.Create<IExampleChildState>();
-
-                    state.Lock();
-
-                    return new Dispatcher<IExampleAppState>(
-                        state,
-                        r.GetService<ILogger<Dispatcher<IExampleAppState>>>());
+                    return state;
                 });
+            sc.AddActionDispatchJsonSupport();
+
+            sc.AddSingleton<IStateFactoryProvider, Impl.StateFactoryProvider>();
 
             this.Service = sc.BuildServiceProvider();
 
