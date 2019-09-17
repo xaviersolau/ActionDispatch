@@ -16,3 +16,4 @@ src/tests/SoloX.ActionDispatch.Json.UTest/SoloX.ActionDispatch.Json.UTest.xml
 src/tests/SoloX.ActionDispatch.Core.ITest/SoloX.ActionDispatch.Core.ITest.xml
 src/tools/SoloX.ActionDispatch.Tools/SoloX.ActionDispatch.Tools.xml
 src/tools/SoloX.ActionDispatch.State.Generator/SoloX.ActionDispatch.State.Generator.xml
+src/tools.tests/SoloX.ActionDispatch.State.Generator.ITest/SoloX.ActionDispatch.State.Generator.ITest.xml
