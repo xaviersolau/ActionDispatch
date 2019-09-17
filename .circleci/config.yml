@@ -15,6 +15,10 @@ jobs:
 
             dotnet build -c Release
 
+            mkdir -p src/libs/SoloX.ActionDispatch.Core/bin/Debug
+            mkdir -p src/tools.tests/SoloX.ActionDispatch.State.Generator.ITest/bin/Release/netcoreapp2.1/Resources/TestMultiProject/Lib1/bin/Debug
+            mkdir -p src/tools.tests/SoloX.ActionDispatch.State.Generator.ITest/bin/Release/netcoreapp2.1/Resources/TestMultiProject/Lib1/bin/Release
+
       - run:
           name: Run Unit Tests
           command: |
