@@ -57,7 +57,7 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             this.workspace.RegisterFile(GetContentFile("./Patterns/Itf/IParentStatePattern.cs"));
             this.workspace.RegisterFile(GetContentFile("./Patterns/Itf/IChildStatePattern.cs"));
             this.workspace.RegisterFile(GetContentFile("./Patterns/Impl/ParentStatePattern.cs"));
-            this.workspace.RegisterFile(GetContentFile("./Patterns/Impl/StateFactoryPattern.cs"));
+            this.workspace.RegisterFile(GetContentFile("./Patterns/Impl/StateFactoryProviderPattern.cs"));
 
             var resolver = this.workspace.DeepLoad();
 
@@ -176,10 +176,10 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             HashSet<string> interfaceNameSpaceList)
         {
             var stateFactoryItfDecl = resolver
-                .Find("SoloX.ActionDispatch.Core.State.IStateFactory")
+                .Find("SoloX.ActionDispatch.Core.State.IStateFactoryProvider")
                 .Single() as IInterfaceDeclaration;
             var factoryPatternDeclaration = resolver
-                .Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.StateFactoryPattern")
+                .Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.StateFactoryProviderPattern")
                 .Single() as IGenericDeclaration<SyntaxNode>;
 
             var generator = new ImplementationGenerator(
