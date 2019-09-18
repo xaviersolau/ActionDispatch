@@ -16,7 +16,8 @@ namespace SoloX.ActionDispatch.Core.State.Impl
     /// </summary>
     public class StateFactory : IStateFactory
     {
-        private static readonly Dictionary<Type, Func<IState>> Map = new Dictionary<Type, Func<IState>>();
+        private static readonly Dictionary<Type, Entry> Map
+            = new Dictionary<Type, Entry>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StateFactory"/> class.
@@ -49,12 +50,12 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         /// <inheritdoc/>
         public IState Create(Type stateType)
         {
-            if (!Map.TryGetValue(stateType, out var create))
+            if (!Map.TryGetValue(stateType, out var entry))
             {
                 throw new ArgumentException($"Unknown state type: {stateType?.Name}.");
             }
 
-            return create();
+            return entry.Create();
         }
 
         /// <summary>
@@ -71,8 +72,21 @@ namespace SoloX.ActionDispatch.Core.State.Impl
                 if (Key<TStateItf>.Create == null)
                 {
                     Key<TStateItf>.Create = () => new TStateImpl();
-                    Map.Add(typeof(TStateItf), () => new TStateImpl());
+                    Map.Add(typeof(TStateItf), new Entry(() => new TStateImpl(), () => Key<TStateItf>.Create = null));
                 }
+            }
+        }
+
+        internal void Reset()
+        {
+            lock (Map)
+            {
+                foreach (var item in Map)
+                {
+                    item.Value.Reset();
+                }
+
+                Map.Clear();
             }
         }
 
@@ -80,6 +94,19 @@ namespace SoloX.ActionDispatch.Core.State.Impl
             where T : IState
         {
             internal static Func<T> Create { get; set; }
+        }
+
+        private class Entry
+        {
+            public Entry(Func<IState> create, System.Action reset)
+            {
+                this.Create = create;
+                this.Reset = reset;
+            }
+
+            public Func<IState> Create { get; }
+
+            public System.Action Reset { get; }
         }
     }
 }
