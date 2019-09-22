@@ -22,10 +22,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SoloX.CodeQuality.Prod" Version="1.0.2" />
+    <PackageReference Include="SoloX.CodeQuality.Prod" Version="1.0.4" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="System.Reactive" Version="4.1.6" />
-    <PackageReference Include="SoloX.ExpressionTools.Transform" Version="1.0.0-alpha.2" />
+    <PackageReference Include="SoloX.ExpressionTools.Transform" Version="1.0.0-alpha.3" />
   </ItemGroup>
 
 </Project>

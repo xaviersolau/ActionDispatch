@@ -12,13 +12,24 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SoloX.ActionDispatch.State.Generator.Impl;
 using SoloX.CodeQuality.Test.Helpers;
+using SoloX.CodeQuality.Test.Helpers.Logger;
 using SoloX.GeneratorTools.Core.CSharp.Workspace.Impl;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace SoloX.ActionDispatch.State.Generator.ITest
 {
-    public class GeneratorTest
+    public class GeneratorTest : IDisposable
     {
+        private ITestOutputHelper testOutputHelper;
+        private ILoggerFactory testLoggerFactory;
+
+        public GeneratorTest(ITestOutputHelper testOutputHelper)
+        {
+            this.testOutputHelper = testOutputHelper;
+            this.testLoggerFactory = new TestLoggerFactory(this.testOutputHelper);
+        }
+
         [Fact]
         public void BasicProjectGenerationTest()
         {
@@ -33,7 +44,7 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
                 "Impl/StateFactory.generated.cs",
             };
 
-            AssertGeneration(
+            this.AssertGeneration(
                 projectFile,
                 nameof(GeneratorTest.BasicProjectGenerationTest),
                 expectedInputs,
@@ -54,7 +65,7 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
                 "Impl/StateFactory.generated.cs",
             };
 
-            AssertGeneration(
+            this.AssertGeneration(
                 projectFile,
                 nameof(GeneratorTest.ProjectWithProjectReferenceGenerationTest),
                 expectedInputs,
@@ -81,14 +92,25 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
             DotnetHelper.Build(projectLib1Path, out var stdout, out var stderr);
 
             // And generate Lib3
-            AssertGeneration(
+            this.AssertGeneration(
                 projectFile,
                 nameof(GeneratorTest.ProjectWithPackageReferenceGenerationTest),
                 expectedInputs,
                 expectedOutputs);
         }
 
-        private static void AssertGeneration(string projectFile, string testName, string[] expectedInputs, string[] expectedOutputs)
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            this.testLoggerFactory.Dispose();
+        }
+
+        private void AssertGeneration(string projectFile, string testName, string[] expectedInputs, string[] expectedOutputs)
         {
             var inputsFile = $"{testName}.inputsFile";
             var outputsFile = $"{testName}.outputsFile";
@@ -105,7 +127,10 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
 
             var generator = new StateGenerator(
                 Mock.Of<ILogger<StateGenerator>>(),
-                new CSharpWorkspace(new CSharpFactory(), new CSharpLoader()));
+                new CSharpWorkspace(
+                    new TestLogger<CSharpWorkspace>(this.testOutputHelper),
+                    new CSharpFactory(this.testLoggerFactory),
+                    new CSharpLoader()));
             generator.Generate(projectFile, inputsFile, outputsFile, true);
 
             Assert.True(File.Exists(inputsFile));
