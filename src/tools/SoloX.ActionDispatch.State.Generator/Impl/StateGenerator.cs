@@ -140,19 +140,10 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
         private static bool IsDeclarationInProject(IInterfaceDeclaration itfDeclaration, ICSharpProject project)
         {
-            var baseNameSpace = project.RootNameSpace;
-            var itfNameSpace = itfDeclaration.DeclarationNameSpace;
+            var filePath = itfDeclaration.Location;
+            var projectPath = project.ProjectPath;
 
-            if (baseNameSpace.Length == itfNameSpace.Length)
-            {
-                return baseNameSpace == itfNameSpace;
-            }
-            else if (baseNameSpace.Length < itfNameSpace.Length)
-            {
-                return itfNameSpace.StartsWith(baseNameSpace, StringComparison.InvariantCulture);
-            }
-
-            return false;
+            return filePath.StartsWith(projectPath, StringComparison.InvariantCulture);
         }
 
         private static void WriteFileList(HashSet<string> list, string file, string projectFolder)
