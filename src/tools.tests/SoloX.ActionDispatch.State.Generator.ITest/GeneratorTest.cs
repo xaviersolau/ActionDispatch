@@ -41,7 +41,7 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
             var expectedOutputs = new string[]
             {
                 "Impl/MyChildState.generated.cs",
-                "Impl/StateFactory.generated.cs",
+                "Impl/StateFactoryProvider.generated.cs",
             };
 
             this.AssertGeneration(
@@ -62,7 +62,7 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
             var expectedOutputs = new string[]
             {
                 "Impl/MyRootState.generated.cs",
-                "Impl/StateFactory.generated.cs",
+                "Impl/StateFactoryProvider.generated.cs",
             };
 
             this.AssertGeneration(
@@ -85,7 +85,7 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
             var expectedOutputs = new string[]
             {
                 "Impl/MyRootState.generated.cs",
-                "Impl/StateFactory.generated.cs",
+                "Impl/StateFactoryProvider.generated.cs",
             };
 
             // Generate nuget from Lib1
@@ -139,8 +139,16 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
             var outputs = File.ReadAllLines(outputsFile);
             Assert.Equal(expectedInputs.Length, inputs.Length);
             Assert.Equal(expectedOutputs.Length, outputs.Length);
-            Assert.All(inputs, i => expectedInputs.Contains(i.Replace('\\', '/')));
-            Assert.All(outputs, i => expectedOutputs.Contains(i.Replace('\\', '/')));
+
+            foreach (var expectedInput in expectedInputs)
+            {
+                Assert.Contains(expectedInput, inputs.Select(x => x.Replace('\\', '/')));
+            }
+
+            foreach (var expectedOutput in expectedOutputs)
+            {
+                Assert.Contains(expectedOutput, outputs.Select(x => x.Replace('\\', '/')));
+            }
         }
     }
 }
