@@ -82,6 +82,18 @@ namespace SoloX.ActionDispatch.Tools
                 return -1;
             }
 
+            if (string.IsNullOrEmpty(inputsFile))
+            {
+                this.logger.LogError($"Missing inputs file parameter.");
+                return -1;
+            }
+
+            if (string.IsNullOrEmpty(outputsFile))
+            {
+                this.logger.LogError($"Missing outputs file parameter.");
+                return -1;
+            }
+
             if (!File.Exists(projectFile))
             {
                 this.logger.LogError($"Could not find project file {projectFile}");
