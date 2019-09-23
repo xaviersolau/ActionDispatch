@@ -88,7 +88,7 @@ namespace SoloX.ActionDispatch.Tools
                 return -1;
             }
 
-            if (string.IsNullOrEmpty(outputsFile))
+            if (string.IsNullOrEmpty(outputsFile) && generate)
             {
                 this.logger.LogError($"Missing outputs file parameter.");
                 return -1;
