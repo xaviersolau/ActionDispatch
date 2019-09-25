@@ -16,7 +16,8 @@ namespace SoloX.ActionDispatch.Core.Dispatch
 {
     /// <summary>
     /// IRelativeDispatcher interface. Used to dispatch IAction from an asynchronous action that will change
-    /// the root state object hierarchy.
+    /// the root state object hierarchy or just used in a Component library that is not aware of the root state type
+    /// so that it doesn't know its location in the state object hierarchy.
     /// </summary>
     /// <typeparam name="TIntermediatState">Type of the intermediate state object on witch actions will apply.</typeparam>
     public interface IRelativeDispatcher<TIntermediatState>

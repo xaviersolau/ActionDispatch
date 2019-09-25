@@ -18,32 +18,9 @@ namespace SoloX.ActionDispatch.Core.Dispatch
     /// IDispatcher interface. Used to dispatch IAction that will change the root state object hierarchy.
     /// </summary>
     /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
-    public interface IDispatcher<TRootState>
+    public interface IDispatcher<TRootState> : IRelativeDispatcher<TRootState>
         where TRootState : IState
     {
-        /// <summary>
-        /// Gets current state.
-        /// </summary>
-        IObservable<TRootState> State { get; }
-
-        /// <summary>
-        /// Dispatch an action on a current state.
-        /// </summary>
-        /// <typeparam name="TState">The target state type.</typeparam>
-        /// <param name="actionBehavior">The action behavior to apply.</param>
-        /// <param name="selector">The target state selector expression.</param>
-        void Dispatch<TState>(IActionBehavior<TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
-            where TState : IState;
-
-        /// <summary>
-        /// Dispatch an action on a current state.
-        /// </summary>
-        /// <typeparam name="TState">The target state type.</typeparam>
-        /// <param name="actionBehavior">The asynchronous action behavior to apply.</param>
-        /// <param name="selector">The target state selector expression.</param>
-        void Dispatch<TState>(IActionBehaviorAsync<TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
-            where TState : IState;
-
         /// <summary>
         /// Add an action observer.
         /// </summary>
