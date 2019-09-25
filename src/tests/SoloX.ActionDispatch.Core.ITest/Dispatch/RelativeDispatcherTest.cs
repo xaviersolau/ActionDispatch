@@ -38,11 +38,13 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch
                     string valueToSet = "some text";
                     string newValueFromRootDispatcher = null;
                     string newValueFromRelativeDispatcher = null;
-                    using (var subscriber1 = dispatcher.State.SelectWhenChanged(s => s.Child.Value).Subscribe(v => newValueFromRootDispatcher = v))
+                    using (var subscriber1 = dispatcher.State.SelectWhenChanged(s => s.Child.Value)
+                        .Subscribe(v => newValueFromRootDispatcher = v))
                     {
-                        var relativeDispatcher = new RelativeDispatcher<IStateB, IStateBa>(dispatcher, s => s.Child);
+                        var relativeDispatcher = dispatcher.CreateRelativeDispatcher(s => s.Child);
 
-                        using (var subscriber2 = relativeDispatcher.State.SelectWhenChanged(s => s.Value).Subscribe(v => newValueFromRelativeDispatcher = v))
+                        using (var subscriber2 = relativeDispatcher.State.SelectWhenChanged(s => s.Value)
+                            .Subscribe(v => newValueFromRelativeDispatcher = v))
                         {
                             relativeDispatcher.Dispatch(new SetTextOnIStateBaActionBehavior(valueToSet), s => s);
                         }

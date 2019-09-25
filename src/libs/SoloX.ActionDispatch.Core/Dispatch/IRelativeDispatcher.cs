@@ -45,5 +45,14 @@ namespace SoloX.ActionDispatch.Core.Dispatch
         /// <param name="selector">The target state selector expression.</param>
         void Dispatch<TState>(IActionBehaviorAsync<TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
             where TState : IState;
+
+        /// <summary>
+        /// Create a Relative dispatcher from the current one with the given child state selector.
+        /// </summary>
+        /// <typeparam name="TState">The type of the child state.</typeparam>
+        /// <param name="selector">The selector driving to the target child state.</param>
+        /// <returns>The created relative dispatcher.</returns>
+        IRelativeDispatcher<TState> CreateRelativeDispatcher<TState>(Expression<Func<TIntermediatState, TState>> selector)
+            where TState : IState;
     }
 }

@@ -83,6 +83,13 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         }
 
         /// <inheritdoc />
+        public IRelativeDispatcher<TState> CreateRelativeDispatcher<TState>(Expression<Func<TRootState, TState>> selector)
+            where TState : IState
+        {
+            return new RelativeDispatcher<TRootState, TState>(this, selector);
+        }
+
+        /// <inheritdoc />
         public void AddObserver(Func<IObservable<IAction<TRootState, IActionBehavior>>, IObservable<IAction<TRootState, IActionBehavior>>> observer)
         {
             if (observer == null)

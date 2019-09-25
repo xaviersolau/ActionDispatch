@@ -55,6 +55,15 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         public IObservable<TIntermediatState> State => this.Dispatcher.State.Select(this.selectorFunc);
 
         /// <inheritdoc/>
+        public IRelativeDispatcher<TState> CreateRelativeDispatcher<TState>(Expression<Func<TIntermediatState, TState>> selector)
+            where TState : IState
+        {
+            var absolutSelector = this.ComputeAbsolutSelector(selector);
+
+            return new RelativeDispatcher<TRootState, TState>(this.Dispatcher, absolutSelector);
+        }
+
+        /// <inheritdoc/>
         public void Dispatch<TState>(IActionBehavior<TState> actionBehavior, Expression<Func<TIntermediatState, TState>> selector)
             where TState : IState
         {
