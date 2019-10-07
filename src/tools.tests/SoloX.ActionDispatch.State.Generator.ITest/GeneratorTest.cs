@@ -8,26 +8,26 @@
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SoloX.ActionDispatch.State.Generator.Impl;
 using SoloX.CodeQuality.Test.Helpers;
-using SoloX.CodeQuality.Test.Helpers.Logger;
-using SoloX.GeneratorTools.Core.CSharp.Workspace.Impl;
+using SoloX.GeneratorTools.Core.CSharp;
+using SoloX.GeneratorTools.Core.CSharp.Workspace;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace SoloX.ActionDispatch.State.Generator.ITest
 {
-    public class GeneratorTest : IDisposable
+    public class GeneratorTest
     {
         private ITestOutputHelper testOutputHelper;
-        private ILoggerFactory testLoggerFactory;
 
         public GeneratorTest(ITestOutputHelper testOutputHelper)
         {
             this.testOutputHelper = testOutputHelper;
-            this.testLoggerFactory = new TestLoggerFactory(this.testOutputHelper);
         }
 
         [Fact]
@@ -99,17 +99,6 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
                 expectedOutputs);
         }
 
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            this.testLoggerFactory.Dispose();
-        }
-
         private void AssertGeneration(string projectFile, string testName, string[] expectedInputs, string[] expectedOutputs)
         {
             var inputsFile = $"{testName}.inputsFile";
@@ -125,29 +114,36 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
                 File.Delete(outputsFile);
             }
 
-            var generator = new StateGenerator(
-                Mock.Of<ILogger<StateGenerator>>(),
-                new CSharpWorkspace(
-                    new TestLogger<CSharpWorkspace>(this.testOutputHelper),
-                    new CSharpFactory(this.testLoggerFactory),
-                    new CSharpLoader()));
-            generator.Generate(projectFile, inputsFile, outputsFile, true);
+            var sc = new ServiceCollection();
+            sc.AddTestLogging(this.testOutputHelper);
+            sc.AddCSharpToolsGenerator();
 
-            Assert.True(File.Exists(inputsFile));
-            Assert.True(File.Exists(outputsFile));
-            var inputs = File.ReadAllLines(inputsFile);
-            var outputs = File.ReadAllLines(outputsFile);
-            Assert.Equal(expectedInputs.Length, inputs.Length);
-            Assert.Equal(expectedOutputs.Length, outputs.Length);
-
-            foreach (var expectedInput in expectedInputs)
+            using (var sp = sc.BuildServiceProvider())
             {
-                Assert.Contains(expectedInput, inputs.Select(x => x.Replace('\\', '/')));
-            }
+                var workspace = sp.GetService<ICSharpWorkspace>();
 
-            foreach (var expectedOutput in expectedOutputs)
-            {
-                Assert.Contains(expectedOutput, outputs.Select(x => x.Replace('\\', '/')));
+                var generator = new StateGenerator(
+                    sp.GetService<ILogger<StateGenerator>>(),
+                    workspace);
+
+                generator.Generate(projectFile, inputsFile, outputsFile, true);
+
+                Assert.True(File.Exists(inputsFile));
+                Assert.True(File.Exists(outputsFile));
+                var inputs = File.ReadAllLines(inputsFile);
+                var outputs = File.ReadAllLines(outputsFile);
+                Assert.Equal(expectedInputs.Length, inputs.Length);
+                Assert.Equal(expectedOutputs.Length, outputs.Length);
+
+                foreach (var expectedInput in expectedInputs)
+                {
+                    Assert.Contains(expectedInput, inputs.Select(x => x.Replace('\\', '/')));
+                }
+
+                foreach (var expectedOutput in expectedOutputs)
+                {
+                    Assert.Contains(expectedOutput, outputs.Select(x => x.Replace('\\', '/')));
+                }
             }
         }
     }
