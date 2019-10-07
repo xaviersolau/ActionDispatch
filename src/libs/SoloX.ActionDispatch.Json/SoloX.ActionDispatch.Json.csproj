@@ -24,7 +24,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="SoloX.CodeQuality.Prod" Version="1.0.5" />
+    <PackageReference Include="SoloX.CodeQuality.Prod" Version="1.0.6" />
     <PackageReference Include="SoloX.ExpressionTools.Parser" Version="1.0.0-alpha.4" />
   </ItemGroup>
 
