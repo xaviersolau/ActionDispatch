@@ -21,23 +21,23 @@ You can checkout this Github repository or you can use the NuGet package:
 
 **Install using the command line from the Package Manager:**
 ```bash
-Install-Package SoloX.ActionDispatch.Core -version 1.0.0-alpha.10
-Install-Package SoloX.ActionDispatch.Json -version 1.0.0-alpha.10
-Install-Package SoloX.ActionDispatch.State.Build -version 1.0.0-alpha.10
+Install-Package SoloX.ActionDispatch.Core -version 1.0.0-alpha.11
+Install-Package SoloX.ActionDispatch.Json -version 1.0.0-alpha.11
+Install-Package SoloX.ActionDispatch.State.Build -version 1.0.0-alpha.11
 ```
 
 **Install using the .Net CLI:**
 ```bash
-dotnet add package SoloX.ActionDispatch.Core --version 1.0.0-alpha.10
-dotnet add package SoloX.ActionDispatch.Json --version 1.0.0-alpha.10
-dotnet add package SoloX.ActionDispatch.State.Build --version 1.0.0-alpha.10
+dotnet add package SoloX.ActionDispatch.Core --version 1.0.0-alpha.11
+dotnet add package SoloX.ActionDispatch.Json --version 1.0.0-alpha.11
+dotnet add package SoloX.ActionDispatch.State.Build --version 1.0.0-alpha.11
 ```
 
 **Install editing your project file (csproj):**
 ```xml
-<PackageReference Include="SoloX.ActionDispatch.Core" Version="1.0.0-alpha.10" />
-<PackageReference Include="SoloX.ActionDispatch.Json" Version="1.0.0-alpha.10" />
-<PackageReference Include="SoloX.ActionDispatch.State.Build" Version="1.0.0-alpha.10" />
+<PackageReference Include="SoloX.ActionDispatch.Core" Version="1.0.0-alpha.11" />
+<PackageReference Include="SoloX.ActionDispatch.Json" Version="1.0.0-alpha.11" />
+<PackageReference Include="SoloX.ActionDispatch.State.Build" Version="1.0.0-alpha.11" />
 ```
 
 Note that including the `SoloX.ActionDispatch.State.Build` package will automatically install `SoloX.ActionDispatch.Core`.
