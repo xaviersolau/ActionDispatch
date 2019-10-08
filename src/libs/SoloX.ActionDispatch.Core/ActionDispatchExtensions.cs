@@ -28,15 +28,21 @@ namespace SoloX.ActionDispatch.Core
         /// <typeparam name="TRootState">The root type of the action dispatcher.</typeparam>
         /// <param name="services">The services collection to setup.</param>
         /// <param name="stateInit">The initial state delegate.</param>
+        /// <param name="serviceLifetime">Dispatcher service lifetime.</param>
         /// <returns>The service collection given as input.</returns>
         public static IServiceCollection AddActionDispatchSupport<TRootState>(
             this IServiceCollection services,
-            Func<IStateFactory, TRootState> stateInit)
+            Func<IStateFactory, TRootState> stateInit,
+            ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TRootState : IState
         {
-            return services
-                .AddSingleton<IStateFactory, StateFactory>()
-                .AddSingleton<IDispatcher<TRootState>>(
+            if (services == null)
+            {
+                throw new ArgumentNullException($"{nameof(services)} must not be null.");
+            }
+
+            services.Add(ServiceDescriptor.Describe(
+                typeof(IDispatcher<TRootState>),
                 r =>
                 {
                     var factory = r.GetService<IStateFactory>();
@@ -47,7 +53,11 @@ namespace SoloX.ActionDispatch.Core
                     return new Dispatcher<TRootState>(
                         state,
                         r.GetService<ILogger<Dispatcher<TRootState>>>());
-                });
+                },
+                serviceLifetime));
+
+            return services
+                .AddSingleton<IStateFactory, StateFactory>();
         }
     }
 }
