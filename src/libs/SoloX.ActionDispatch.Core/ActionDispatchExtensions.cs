@@ -36,6 +36,26 @@ namespace SoloX.ActionDispatch.Core
             ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
             where TRootState : IState
         {
+            return AddActionDispatchSupport(
+                services,
+                (provider, factory) => stateInit(factory),
+                serviceLifetime);
+        }
+
+        /// <summary>
+        /// Setup the action dispatcher services.
+        /// </summary>
+        /// <typeparam name="TRootState">The root type of the action dispatcher.</typeparam>
+        /// <param name="services">The services collection to setup.</param>
+        /// <param name="stateInit">The initial state delegate.</param>
+        /// <param name="serviceLifetime">Dispatcher service lifetime.</param>
+        /// <returns>The service collection given as input.</returns>
+        public static IServiceCollection AddActionDispatchSupport<TRootState>(
+            this IServiceCollection services,
+            Func<IServiceProvider, IStateFactory, TRootState> stateInit,
+            ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+            where TRootState : IState
+        {
             if (services == null)
             {
                 throw new ArgumentNullException($"{nameof(services)} must not be null.");
@@ -43,16 +63,16 @@ namespace SoloX.ActionDispatch.Core
 
             services.Add(ServiceDescriptor.Describe(
                 typeof(IDispatcher<TRootState>),
-                r =>
+                provider =>
                 {
-                    var factory = r.GetService<IStateFactory>();
-                    var state = stateInit(factory);
+                    var factory = provider.GetService<IStateFactory>();
+                    var state = stateInit(provider, factory);
 
                     state.Lock();
 
                     return new Dispatcher<TRootState>(
                         state,
-                        r.GetService<ILogger<Dispatcher<TRootState>>>());
+                        provider.GetService<ILogger<Dispatcher<TRootState>>>());
                 },
                 serviceLifetime));
 
