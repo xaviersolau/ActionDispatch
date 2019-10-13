@@ -54,6 +54,30 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             var project = this.workspace.RegisterProject(projectFile);
 
+            var inputs = new HashSet<string>();
+            var outputs = new HashSet<string>();
+
+            var locator = new RelativeLocator(projectFolder, project.RootNameSpace, suffix: "Impl");
+            var fileGenerator = new FileGenerator(".generated.cs", f => outputs.Add(Path.GetFullPath(f)));
+
+            // Generate with a filter on current project interface declarations.
+            this.Generate(
+                locator,
+                fileGenerator,
+                inputs,
+                generate,
+                itfDeclaration => IsDeclarationInProject(itfDeclaration, project));
+
+            if (generate)
+            {
+                WriteFileList(outputs, outputsFile, Path.GetFullPath(Path.GetDirectoryName(projectFile)));
+            }
+
+            WriteFileList(inputs, inputsFile, Path.GetFullPath(Path.GetDirectoryName(projectFile)));
+        }
+
+        internal void Generate(ILocator locator, IGenerator fileGenerator, HashSet<string> inputs, bool generate, Func<IInterfaceDeclaration, bool> generateFilter)
+        {
             this.workspace.RegisterFile(GetContentFile("./Patterns/Itf/IParentStatePattern.cs"));
             this.workspace.RegisterFile(GetContentFile("./Patterns/Itf/IChildStatePattern.cs"));
             this.workspace.RegisterFile(GetContentFile("./Patterns/Impl/ParentStatePattern.cs"));
@@ -71,16 +95,9 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             var implPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.ParentStatePattern")
                 .Single() as IGenericDeclaration<SyntaxNode>;
 
-            var locator = new RelativeLocator(projectFolder, project.RootNameSpace, suffix: "Impl");
-
-            var inputs = new HashSet<string>();
-            var outputs = new HashSet<string>();
-
-            FileGenerator fileGenerator = null;
             ImplementationGenerator generator = null;
             if (generate)
             {
-                fileGenerator = new FileGenerator(".generated.cs", f => outputs.Add(Path.GetFullPath(f)));
                 generator = new ImplementationGenerator(
                     fileGenerator,
                     locator,
@@ -98,8 +115,8 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             {
                 var itfDeclaration = (IInterfaceDeclaration)extendedByItem;
 
-                // We must generate only the current project classes.
-                var isInProject = IsDeclarationInProject(itfDeclaration, project);
+                // We must generate only the filtered interface declaration.
+                var isInProject = generateFilter(itfDeclaration);
 
                 if (generate)
                 {
@@ -111,7 +128,7 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
                     if (isInProject)
                     {
-                        var writerSelector = this.CreateWriterSelector(
+                        var writerSelector = CreateWriterSelector(
                             itfParentPatternDeclaration,
                             itfChildPatternDeclaration,
                             implPatternDeclaration,
@@ -131,11 +148,8 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             if (generate)
             {
-                this.GenerateFactory(resolver, locator, fileGenerator, generatedClasses, interfaceNameSpaceList);
-                WriteFileList(outputs, outputsFile, Path.GetFullPath(Path.GetDirectoryName(projectFile)));
+                GenerateFactory(resolver, locator, fileGenerator, generatedClasses, interfaceNameSpaceList);
             }
-
-            WriteFileList(inputs, inputsFile, Path.GetFullPath(Path.GetDirectoryName(projectFile)));
         }
 
         private static bool IsDeclarationInProject(IInterfaceDeclaration itfDeclaration, ICSharpProject project)
@@ -159,10 +173,10 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             return Path.Combine(Path.GetDirectoryName(typeof(StateGenerator).Assembly.Location), contentFile);
         }
 
-        private void GenerateFactory(
+        private static void GenerateFactory(
             IDeclarationResolver resolver,
-            RelativeLocator locator,
-            FileGenerator fileGenerator,
+            ILocator locator,
+            IGenerator fileGenerator,
             List<(string nameSpace, string name)> generatedClasses,
             HashSet<string> interfaceNameSpaceList)
         {
@@ -200,7 +214,7 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             generator.Generate(writerSelector, stateFactoryItfDecl, implName);
         }
 
-        private IWriterSelector CreateWriterSelector(
+        private static IWriterSelector CreateWriterSelector(
             IInterfaceDeclaration itfParentPattern,
             IInterfaceDeclaration itfChildPattern,
             IGenericDeclaration<SyntaxNode> implPattern,

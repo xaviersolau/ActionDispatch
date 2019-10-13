@@ -1,0 +1,139 @@
+---------------------
+SimpleState
+---------------------
+// ----------------------------------------------------------------------
+// <copyright file="SimpleState.cs" company="SoloX Software">
+// Copyright (c) SoloX Software. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+// ----------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using SoloX.ActionDispatch.Core.State.Impl;
+using SoloX.ActionDispatch.State.Generator.ITest.Resources.State;
+
+namespace target.name.space
+{
+    /// <summary>
+    /// State implementation pattern.
+    /// </summary>
+    public class SimpleState : AStateBase<ISimpleState>, ISimpleState
+    {
+        private string value1;
+
+        /// <inheritdoc/>
+        public override ISimpleState Identity => this;
+
+        /// <inheritdoc/>
+        public string Value1
+        {
+            get
+            {
+                return this.value1;
+            }
+
+            set
+            {
+                if (this.value1 != value)
+                {
+                    this.CheckUnlock();
+                    this.MakeDirty();
+                    this.value1 = value;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override bool CheckPatch<TPatchState>(
+            AStateBase<TPatchState> oldState,
+            AStateBase<TPatchState> newState,
+            out Action<ISimpleState> patcher)
+        {
+            if (base.CheckPatch(oldState, newState, out patcher))
+            {
+                return true;
+            }
+
+            patcher = null;
+            return false;
+        }
+
+        /// <inheritdoc/>
+        protected override bool LockChildrenAndCheckDirty()
+        {
+            var dirty = base.LockChildrenAndCheckDirty();
+
+            return dirty;
+        }
+
+        /// <inheritdoc/>
+        protected override AStateBase<ISimpleState> CreateAndClone(bool deep)
+        {
+            var clone = new SimpleState();
+
+            this.CopyToSimpleState(clone, deep);
+
+            return clone;
+        }
+
+        /// <summary>
+        /// Copy current StatePattern data to the given state target.
+        /// </summary>
+        /// <param name="state">Target state where to copy current object data.</param>
+        /// <param name="deep">Tells if we need to make a deep copy.</param>
+        protected void CopyToSimpleState(SimpleState state, bool deep)
+        {
+            if (state == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(state)} was null.");
+            }
+
+            this.CopyToAStateBase(state, deep);
+
+            state.value1 = this.value1;
+
+            if (deep)
+            {
+            }
+            else
+            {
+            }
+        }
+    }
+}
+
+---------------------
+StateFactoryProvider
+---------------------
+// ----------------------------------------------------------------------
+// <copyright file="StateFactoryProvider.cs" company="SoloX Software">
+// Copyright (c) SoloX Software. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+// ----------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using SoloX.ActionDispatch.Core.State;
+using SoloX.ActionDispatch.Core.State.Impl;
+using target.name.space;
+using SoloX.ActionDispatch.State.Generator.ITest.Resources.State;
+
+namespace target.name.space
+{
+    /// <summary>
+    /// StateFactoryProviderPattern implementation.
+    /// </summary>
+    public class StateFactoryProvider : AStateFactoryProvider, IStateFactoryProvider
+    {
+        /// <inheritdoc/>
+        public override void Register()
+        {
+            Register<ISimpleState, SimpleState>();
+        }
+    }
+}
+

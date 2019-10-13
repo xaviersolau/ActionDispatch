@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------
-// <copyright file="GeneratorTest.cs" company="SoloX Software">
+// <copyright file="ProjectGeneratorTest.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -21,11 +21,11 @@ using Xunit.Abstractions;
 
 namespace SoloX.ActionDispatch.State.Generator.ITest
 {
-    public class GeneratorTest
+    public class ProjectGeneratorTest
     {
         private ITestOutputHelper testOutputHelper;
 
-        public GeneratorTest(ITestOutputHelper testOutputHelper)
+        public ProjectGeneratorTest(ITestOutputHelper testOutputHelper)
         {
             this.testOutputHelper = testOutputHelper;
         }
@@ -46,7 +46,7 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
 
             this.AssertGeneration(
                 projectFile,
-                nameof(GeneratorTest.BasicProjectGenerationTest),
+                nameof(ProjectGeneratorTest.BasicProjectGenerationTest),
                 expectedInputs,
                 expectedOutputs);
         }
@@ -67,7 +67,7 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
 
             this.AssertGeneration(
                 projectFile,
-                nameof(GeneratorTest.ProjectWithProjectReferenceGenerationTest),
+                nameof(ProjectGeneratorTest.ProjectWithProjectReferenceGenerationTest),
                 expectedInputs,
                 expectedOutputs);
         }
@@ -94,7 +94,7 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
             // And generate Lib3
             this.AssertGeneration(
                 projectFile,
-                nameof(GeneratorTest.ProjectWithPackageReferenceGenerationTest),
+                nameof(ProjectGeneratorTest.ProjectWithPackageReferenceGenerationTest),
                 expectedInputs,
                 expectedOutputs);
         }
