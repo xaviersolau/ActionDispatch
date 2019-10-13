@@ -21,7 +21,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="Moq" Version="4.13.0" />
     <PackageReference Include="SoloX.CodeQuality.Test.Helpers" Version="1.0.6" />
-    <PackageReference Include="SoloX.GeneratorTools.Core.CSharp" Version="1.0.0-alpha.10" />
+    <PackageReference Include="SoloX.GeneratorTools.Core.CSharp" Version="1.0.0-alpha.13" />
+    <PackageReference Include="SoloX.GeneratorTools.Core.Test.Helpers" Version="1.0.0-alpha.13" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
       <PrivateAssets>all</PrivateAssets>
@@ -62,6 +63,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Resources\State\ISimpleState.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Update="Resources\TestMultiProject\Lib1\IMyChildState.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
