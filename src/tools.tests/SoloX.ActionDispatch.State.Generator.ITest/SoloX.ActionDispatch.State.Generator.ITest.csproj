@@ -63,6 +63,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Resources\State\IObjectArrayPropertyState.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="Resources\State\IObjectPropertyState.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Update="Resources\State\ISimpleState.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

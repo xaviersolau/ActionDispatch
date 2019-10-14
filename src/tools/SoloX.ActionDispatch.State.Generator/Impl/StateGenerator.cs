@@ -31,6 +31,8 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
     /// </summary>
     public class StateGenerator : IStateGenerator
     {
+        private const string IStateFullName = "SoloX.ActionDispatch.Core.State.IState";
+
         private readonly ILogger<StateGenerator> logger;
         private readonly ICSharpWorkspace workspace;
 
@@ -85,7 +87,7 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             var resolver = this.workspace.DeepLoad();
 
-            var declaration = resolver.Find("SoloX.ActionDispatch.Core.State.IState")
+            var declaration = resolver.Find(IStateFullName)
                 .Cast<IGenericDeclaration<SyntaxNode>>().Single();
             var itfParentPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Itf.IParentStatePattern")
                 .Single() as IInterfaceDeclaration;
@@ -221,13 +223,28 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             IInterfaceDeclaration itfDeclaration,
             string implName)
         {
+            bool IsIStateProperty(IPropertyDeclaration p)
+            {
+                if (p.PropertyType.Declaration is IInterfaceDeclaration idef)
+                {
+                    return idef.Extends.Any(d => d.Declaration.FullName == IStateFullName);
+                }
+
+                return false;
+            }
+
+            bool IsNotIStateProperty(IPropertyDeclaration p)
+            {
+                return !IsIStateProperty(p);
+            }
+
             var propertyWriter = new PropertyWriter(
                 itfParentPattern.Properties.Single(x => x.PropertyType.Declaration != itfChildPattern),
-                itfDeclaration.Properties.Where(p => p.PropertyType.Declaration is IPredefinedDeclaration).ToArray());
+                itfDeclaration.Properties.Where(IsNotIStateProperty).ToArray());
 
             var propertyChildWriter = new PropertyWriter(
                 itfParentPattern.Properties.Single(x => x.PropertyType.Declaration == itfChildPattern),
-                itfDeclaration.Properties.Where(p => p.PropertyType.Declaration is IInterfaceDeclaration).ToArray());
+                itfDeclaration.Properties.Where(IsIStateProperty).ToArray());
 
             var itfNs = new HashSet<string>();
             itfNs.Add(itfDeclaration.DeclarationNameSpace);
