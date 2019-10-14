@@ -34,6 +34,8 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
 
         [Theory]
         [InlineData(@"Resources/State/ISimpleState.cs")]
+        [InlineData(@"Resources/State/IObjectPropertyState.cs")]
+        [InlineData(@"Resources/State/IObjectArrayPropertyState.cs")]
         public void GenerateStateClassTest(string stateInterfaceFile)
         {
             var snapshotName = nameof(this.GenerateStateClassTest) + Path.GetFileNameWithoutExtension(stateInterfaceFile);
