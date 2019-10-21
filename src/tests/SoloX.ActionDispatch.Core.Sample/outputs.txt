@@ -1,0 +1,6 @@
+State\Basic\Impl\RootState.generated.cs
+State\Basic\Impl\StateA.generated.cs
+State\Basic\Impl\StateB.generated.cs
+State\Basic\Impl\StateBa.generated.cs
+State\Collection\Impl\RootCollectionState.generated.cs
+Impl\StateFactoryProvider.generated.cs

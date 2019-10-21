@@ -17,11 +17,6 @@
     <ProjectReference Include="..\..\libs\SoloX.ActionDispatch.Json\SoloX.ActionDispatch.Json.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Impl\" />
-    <Folder Include="State\Impl\" />
-  </ItemGroup>
-
   <PropertyGroup>
     <ActionDispatchToolsWorkingDirectory>../../tools/SoloX.ActionDispatch.Tools</ActionDispatchToolsWorkingDirectory>
     <ActionDispatchToolsCommand>dotnet run -c Release --no-build --</ActionDispatchToolsCommand>

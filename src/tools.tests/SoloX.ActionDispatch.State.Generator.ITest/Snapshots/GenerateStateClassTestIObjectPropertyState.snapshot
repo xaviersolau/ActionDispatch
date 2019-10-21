@@ -11,8 +11,10 @@ ObjectPropertyState
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SoloX.ActionDispatch.Core.State;
 using SoloX.ActionDispatch.Core.State.Impl;
 using SoloX.ActionDispatch.State.Generator.ITest.Resources.State;
+using SoloX.ActionDispatch.State.Generator.ITest.Resources.State.Data;
 
 namespace target.name.space
 {

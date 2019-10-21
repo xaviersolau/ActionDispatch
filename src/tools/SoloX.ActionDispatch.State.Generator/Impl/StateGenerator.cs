@@ -12,11 +12,14 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
+using SoloX.ActionDispatch.Core.State;
+using SoloX.ActionDispatch.State.Generator.Patterns.Impl;
 using SoloX.ActionDispatch.State.Generator.Patterns.Itf;
 using SoloX.GeneratorTools.Core.CSharp.Generator.Impl;
 using SoloX.GeneratorTools.Core.CSharp.Generator.Writer.Impl;
 using SoloX.GeneratorTools.Core.CSharp.Model;
 using SoloX.GeneratorTools.Core.CSharp.Model.Resolver;
+using SoloX.GeneratorTools.Core.CSharp.Model.Use;
 using SoloX.GeneratorTools.Core.CSharp.Workspace;
 using SoloX.GeneratorTools.Core.Generator;
 using SoloX.GeneratorTools.Core.Generator.Impl;
@@ -31,8 +34,6 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
     /// </summary>
     public class StateGenerator : IStateGenerator
     {
-        private const string IStateFullName = "SoloX.ActionDispatch.Core.State.IState";
-
         private readonly ILogger<StateGenerator> logger;
         private readonly ICSharpWorkspace workspace;
 
@@ -87,14 +88,14 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
             var resolver = this.workspace.DeepLoad();
 
-            var declaration = resolver.Find(IStateFullName)
+            var declaration = resolver.Find(typeof(IState).FullName)
                 .Cast<IGenericDeclaration<SyntaxNode>>().Single();
-            var itfParentPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Itf.IParentStatePattern")
+            var itfParentPatternDeclaration = resolver.Find(typeof(IParentStatePattern).FullName)
                 .Single() as IInterfaceDeclaration;
-            var itfChildPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Itf.IChildStatePattern")
+            var itfChildPatternDeclaration = resolver.Find(typeof(IChildStatePattern).FullName)
                 .Single() as IInterfaceDeclaration;
 
-            var implPatternDeclaration = resolver.Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.ParentStatePattern")
+            var implPatternDeclaration = resolver.Find(typeof(ParentStatePattern).FullName)
                 .Single() as IGenericDeclaration<SyntaxNode>;
 
             ImplementationGenerator generator = null;
@@ -132,7 +133,6 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
                     {
                         var writerSelector = CreateWriterSelector(
                             itfParentPatternDeclaration,
-                            itfChildPatternDeclaration,
                             implPatternDeclaration,
                             itfDeclaration,
                             implName);
@@ -183,10 +183,10 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             HashSet<string> interfaceNameSpaceList)
         {
             var stateFactoryItfDecl = resolver
-                .Find("SoloX.ActionDispatch.Core.State.IStateFactoryProvider")
+                .Find(typeof(IStateFactoryProvider).FullName)
                 .Single() as IInterfaceDeclaration;
             var factoryPatternDeclaration = resolver
-                .Find("SoloX.ActionDispatch.State.Generator.Patterns.Impl.StateFactoryProviderPattern")
+                .Find(typeof(StateFactoryProviderPattern).FullName)
                 .Single() as IGenericDeclaration<SyntaxNode>;
 
             var generator = new ImplementationGenerator(
@@ -204,9 +204,10 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
                 nsList.ToArray());
             var nsItfWriter = new StringReplaceWriter(
                 "SoloX.ActionDispatch.State.Generator.Patterns.Itf",
-                interfaceNameSpaceList.ToArray());
+                interfaceNameSpaceList.Where(ns => !factoryPatternDeclaration.UsingDirectives.Contains(ns))
+                .ToArray());
             var ctorWriter = new StringReplaceWriter(
-                "ParentStatePattern",
+                nameof(ParentStatePattern),
                 generatedClasses.Select(n => n.name).ToArray());
 
             var implNameWriter = new StringReplaceWriter(factoryPatternDeclaration.Name, implName);
@@ -218,39 +219,28 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
 
         private static IWriterSelector CreateWriterSelector(
             IInterfaceDeclaration itfParentPattern,
-            IInterfaceDeclaration itfChildPattern,
             IGenericDeclaration<SyntaxNode> implPattern,
             IInterfaceDeclaration itfDeclaration,
             string implName)
         {
-            bool IsIStateProperty(IPropertyDeclaration p)
-            {
-                if (p.PropertyType.Declaration is IInterfaceDeclaration idef)
-                {
-                    return idef.Extends.Any(d => d.Declaration.FullName == IStateFullName);
-                }
-
-                return false;
-            }
-
-            bool IsNotIStateProperty(IPropertyDeclaration p)
-            {
-                return !IsIStateProperty(p);
-            }
-
             var propertyWriter = new PropertyWriter(
-                itfParentPattern.Properties.Single(x => x.PropertyType.Declaration != itfChildPattern),
+                itfParentPattern.Properties.Single(x => x.Name == nameof(IParentStatePattern.PropertyPattern)),
                 itfDeclaration.Properties.Where(IsNotIStateProperty).ToArray());
 
             var propertyChildWriter = new PropertyWriter(
-                itfParentPattern.Properties.Single(x => x.PropertyType.Declaration == itfChildPattern),
+                itfParentPattern.Properties.Single(x => x.Name == nameof(IParentStatePattern.ChildPattern)),
                 itfDeclaration.Properties.Where(IsIStateProperty).ToArray());
+
+            var propertyChildrenWriter = new PropertyWriter(
+                itfParentPattern.Properties.Single(x => x.Name == nameof(IParentStatePattern.ChildrenPattern)),
+                itfDeclaration.Properties.Where(IsIStateCollectionProperty).ToArray(),
+                TypeParamExtract);
 
             var itfNs = new HashSet<string>();
             itfNs.Add(itfDeclaration.DeclarationNameSpace);
-            foreach (var ns in itfDeclaration.Properties.Select(m => m.PropertyType.Declaration.DeclarationNameSpace))
+            foreach (var ns in itfDeclaration.UsingDirectives)
             {
-                if (!string.IsNullOrEmpty(ns))
+                if (!implPattern.UsingDirectives.Contains(ns))
                 {
                     itfNs.Add(ns);
                 }
@@ -260,7 +250,61 @@ namespace SoloX.ActionDispatch.State.Generator.Impl
             var itfNameWriter = new StringReplaceWriter(itfParentPattern.Name, itfDeclaration.Name);
             var implNameWriter = new StringReplaceWriter(implPattern.Name, implName);
 
-            return new WriterSelector(propertyChildWriter, propertyWriter, usingWriter, itfNameWriter, implNameWriter);
+            return new WriterSelector(propertyChildrenWriter, propertyChildWriter, propertyWriter, usingWriter, itfNameWriter, implNameWriter);
+        }
+
+        private static string TypeParamExtract(string type)
+        {
+            var start = type.IndexOf('<');
+            var end = type.IndexOf('>');
+            if (start > 0 && end > start
+                && (type.Substring(0, start) == nameof(ICollection<object>)
+                    || type.Substring(0, start) == nameof(IList<object>)
+                    || type.Substring(0, start) == nameof(IEnumerable<object>)
+                    || type.Substring(0, start) == nameof(IStateCollection<IState>)))
+            {
+                return type.Substring(start, end - start).Trim();
+            }
+
+            return type;
+        }
+
+        private static bool IsIStateDeclaration(IDeclaration<SyntaxNode> declaration)
+        {
+            if (declaration is IInterfaceDeclaration idef
+                && declaration.FullName != $"{typeof(IStateCollection<>).Namespace}.{nameof(IStateCollection<IState>)}")
+            {
+                return idef.Extends
+                    .Any(d => d.Declaration.FullName == typeof(IState).FullName);
+            }
+
+            return false;
+        }
+
+        private static bool IsIStateProperty(IPropertyDeclaration p)
+        {
+            return IsIStateDeclaration(p.PropertyType.Declaration);
+        }
+
+        private static bool IsIStateCollectionProperty(IPropertyDeclaration p)
+        {
+            if (p.PropertyType is IGenericDeclarationUse genUse
+                && p.PropertyType.Declaration is IInterfaceDeclaration iDef)
+            {
+                if (iDef.FullName == $"{typeof(ICollection<>).Namespace}.{nameof(ICollection<object>)}"
+                    || iDef.FullName == $"{typeof(IList<>).Namespace}.{nameof(IList<object>)}"
+                    || iDef.FullName == $"{typeof(IStateCollection<>).Namespace}.{nameof(IStateCollection<IState>)}")
+                {
+                    return IsIStateDeclaration(genUse.GenericParameters.First().Declaration);
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsNotIStateProperty(IPropertyDeclaration p)
+        {
+            return !IsIStateProperty(p) && !IsIStateCollectionProperty(p);
         }
     }
 }

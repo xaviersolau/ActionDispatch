@@ -1,8 +1,8 @@
 ---------------------
-SimpleState
+StatePropertyState
 ---------------------
 // ----------------------------------------------------------------------
-// <copyright file="SimpleState.cs" company="SoloX Software">
+// <copyright file="StatePropertyState.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -20,28 +20,28 @@ namespace target.name.space
     /// <summary>
     /// State implementation pattern.
     /// </summary>
-    public class SimpleState : AStateBase<ISimpleState>, ISimpleState
+    public class StatePropertyState : AStateBase<IStatePropertyState>, IStatePropertyState
     {
-        private string value1;
+        private AStateBase<ISimpleState> child;
 
         /// <inheritdoc/>
-        public override ISimpleState Identity => this;
+        public override IStatePropertyState Identity => this;
 
         /// <inheritdoc/>
-        public string Value1
+        public ISimpleState Child
         {
             get
             {
-                return this.value1;
+                return this.child?.Identity;
             }
 
             set
             {
-                if (this.value1 != value)
+                if (this.child != value)
                 {
                     this.CheckUnlock();
                     this.MakeDirty();
-                    this.value1 = value;
+                    this.child = value?.ToStateBase();
                 }
             }
         }
@@ -50,10 +50,16 @@ namespace target.name.space
         protected override bool CheckPatch<TPatchState>(
             AStateBase<TPatchState> oldState,
             AStateBase<TPatchState> newState,
-            out Action<ISimpleState> patcher)
+            out Action<IStatePropertyState> patcher)
         {
             if (base.CheckPatch(oldState, newState, out patcher))
             {
+                return true;
+            }
+
+            if (this.child != null && this.child.Patch(oldState, newState, out var childPatched))
+            {
+                patcher = (s) => { s.Child = childPatched.Identity; };
                 return true;
             }
 
@@ -66,15 +72,22 @@ namespace target.name.space
         {
             var dirty = base.LockChildrenAndCheckDirty();
 
+            if (this.child != null)
+            {
+                var oldVersion = this.child.Version;
+                this.child.Lock();
+                dirty |= oldVersion != this.child.Version;
+            }
+
             return dirty;
         }
 
         /// <inheritdoc/>
-        protected override AStateBase<ISimpleState> CreateAndClone(bool deep)
+        protected override AStateBase<IStatePropertyState> CreateAndClone(bool deep)
         {
-            var clone = new SimpleState();
+            var clone = new StatePropertyState();
 
-            this.CopyToSimpleState(clone, deep);
+            this.CopyToStatePropertyState(clone, deep);
 
             return clone;
         }
@@ -84,7 +97,7 @@ namespace target.name.space
         /// </summary>
         /// <param name="state">Target state where to copy current object data.</param>
         /// <param name="deep">Tells if we need to make a deep copy.</param>
-        protected void CopyToSimpleState(SimpleState state, bool deep)
+        protected void CopyToStatePropertyState(StatePropertyState state, bool deep)
         {
             if (state == null)
             {
@@ -93,13 +106,13 @@ namespace target.name.space
 
             this.CopyToAStateBase(state, deep);
 
-            state.value1 = this.value1;
-
             if (deep)
             {
+                state.child = this.child?.DeepClone();
             }
             else
             {
+                state.child = this.child;
             }
         }
     }
@@ -133,7 +146,7 @@ namespace target.name.space
         /// <inheritdoc/>
         public override void Register()
         {
-            Register<ISimpleState, SimpleState>();
+            Register<IStatePropertyState, StatePropertyState>();
         }
     }
 }
