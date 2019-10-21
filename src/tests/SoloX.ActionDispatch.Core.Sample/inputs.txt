@@ -1,5 +1,0 @@
-State\Basic\IRootState.cs
-State\Basic\IStateA.cs
-State\Basic\IStateB.cs
-State\Basic\IStateBa.cs
-State\Collection\IRootCollectionState.cs
