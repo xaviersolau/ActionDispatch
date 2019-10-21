@@ -24,7 +24,7 @@
     <PackageReference Include="SoloX.CodeQuality.Prod" Version="1.0.6" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.3.1" />
-    <PackageReference Include="SoloX.GeneratorTools.Core.CSharp" Version="1.0.0-alpha.13" />
+    <PackageReference Include="SoloX.GeneratorTools.Core.CSharp" Version="1.0.0-alpha.16" />
   </ItemGroup>
 
   <ItemGroup>

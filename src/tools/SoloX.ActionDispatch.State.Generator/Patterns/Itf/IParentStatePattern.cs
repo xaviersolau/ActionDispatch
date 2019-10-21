@@ -26,5 +26,10 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Itf
         /// Gets or sets PropertyPattern.
         /// </summary>
         IChildStatePattern ChildPattern { get; set; }
+
+        /// <summary>
+        /// Gets collection PropertyPattern.
+        /// </summary>
+        ICollection<IChildStatePattern> ChildrenPattern { get; }
     }
 }

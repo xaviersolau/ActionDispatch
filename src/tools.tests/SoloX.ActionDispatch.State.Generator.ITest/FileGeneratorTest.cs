@@ -38,8 +38,31 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
         [InlineData(@"Resources/State/IObjectArrayPropertyState.cs")]
         public void GenerateStateClassTest(string stateInterfaceFile)
         {
-            var snapshotName = nameof(this.GenerateStateClassTest) + Path.GetFileNameWithoutExtension(stateInterfaceFile);
+            var snapshotName = nameof(this.GenerateStateClassTest)
+                + Path.GetFileNameWithoutExtension(stateInterfaceFile);
 
+            this.GenerateSnapshot(
+                snapshotName,
+                Path.GetFileNameWithoutExtension(stateInterfaceFile),
+                new[] { stateInterfaceFile });
+        }
+
+        [Theory]
+        [InlineData(@"Resources/State/IStatePropertyState.cs")]
+        [InlineData(@"Resources/State/IStateCollectionPropertyState.cs")]
+        public void GenerateStateClassWithChildStateTest(string stateInterfaceFile)
+        {
+            var snapshotName = nameof(this.GenerateStateClassWithChildStateTest)
+                + Path.GetFileNameWithoutExtension(stateInterfaceFile);
+
+            this.GenerateSnapshot(
+                snapshotName,
+                Path.GetFileNameWithoutExtension(stateInterfaceFile),
+                new[] { stateInterfaceFile, @"Resources/State/ISimpleState.cs" });
+        }
+
+        private void GenerateSnapshot(string snapshotName, string itfName, string[] files)
+        {
             var sc = new ServiceCollection();
             sc.AddTestLogging(this.testOutputHelper);
             sc.AddCSharpToolsGenerator();
@@ -48,8 +71,13 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
             {
                 var workspace = sp.GetService<ICSharpWorkspace>();
 
+                workspace.RegisterAssembly(typeof(ICollection<>).Assembly.Location);
                 workspace.RegisterAssembly(typeof(IState).Assembly.Location);
-                workspace.RegisterFile(stateInterfaceFile);
+
+                foreach (var file in files)
+                {
+                    workspace.RegisterFile(file);
+                }
 
                 var generator = new StateGenerator(
                     sp.GetService<ILogger<StateGenerator>>(),
@@ -60,7 +88,7 @@ namespace SoloX.ActionDispatch.State.Generator.ITest
 
                 var snapshotGenerator = new SnapshotGenerator();
 
-                generator.Generate(locator, snapshotGenerator, inputs, true, i => true);
+                generator.Generate(locator, snapshotGenerator, inputs, true, i => i.Name == itfName);
 
                 var location = SnapshotHelper.GetLocationFromCallingProjectRoot(null);
                 SnapshotHelper.AssertSnapshot(snapshotGenerator.GetAllGenerated(), snapshotName, location);

@@ -1,8 +1,8 @@
 ---------------------
-SimpleState
+StateCollectionPropertyState
 ---------------------
 // ----------------------------------------------------------------------
-// <copyright file="SimpleState.cs" company="SoloX Software">
+// <copyright file="StateCollectionPropertyState.cs" company="SoloX Software">
 // Copyright (c) SoloX Software. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -20,37 +20,21 @@ namespace target.name.space
     /// <summary>
     /// State implementation pattern.
     /// </summary>
-    public class SimpleState : AStateBase<ISimpleState>, ISimpleState
+    public class StateCollectionPropertyState : AStateBase<IStateCollectionPropertyState>, IStateCollectionPropertyState
     {
-        private string value1;
+        private AStateBase<IStateCollection<ISimpleState>> children = new StateCollection<ISimpleState>();
 
         /// <inheritdoc/>
-        public override ISimpleState Identity => this;
+        public override IStateCollectionPropertyState Identity => this;
 
         /// <inheritdoc/>
-        public string Value1
-        {
-            get
-            {
-                return this.value1;
-            }
-
-            set
-            {
-                if (this.value1 != value)
-                {
-                    this.CheckUnlock();
-                    this.MakeDirty();
-                    this.value1 = value;
-                }
-            }
-        }
+        public ICollection<ISimpleState> Children => this.children.Identity;
 
         /// <inheritdoc/>
         protected override bool CheckPatch<TPatchState>(
             AStateBase<TPatchState> oldState,
             AStateBase<TPatchState> newState,
-            out Action<ISimpleState> patcher)
+            out Action<IStateCollectionPropertyState> patcher)
         {
             if (base.CheckPatch(oldState, newState, out patcher))
             {
@@ -66,15 +50,19 @@ namespace target.name.space
         {
             var dirty = base.LockChildrenAndCheckDirty();
 
+            var childrenOldVersion = this.children.Version;
+            this.children.Lock();
+            dirty |= childrenOldVersion != this.children.Version;
+
             return dirty;
         }
 
         /// <inheritdoc/>
-        protected override AStateBase<ISimpleState> CreateAndClone(bool deep)
+        protected override AStateBase<IStateCollectionPropertyState> CreateAndClone(bool deep)
         {
-            var clone = new SimpleState();
+            var clone = new StateCollectionPropertyState();
 
-            this.CopyToSimpleState(clone, deep);
+            this.CopyToStateCollectionPropertyState(clone, deep);
 
             return clone;
         }
@@ -84,7 +72,7 @@ namespace target.name.space
         /// </summary>
         /// <param name="state">Target state where to copy current object data.</param>
         /// <param name="deep">Tells if we need to make a deep copy.</param>
-        protected void CopyToSimpleState(SimpleState state, bool deep)
+        protected void CopyToStateCollectionPropertyState(StateCollectionPropertyState state, bool deep)
         {
             if (state == null)
             {
@@ -93,13 +81,13 @@ namespace target.name.space
 
             this.CopyToAStateBase(state, deep);
 
-            state.value1 = this.value1;
-
             if (deep)
             {
+                state.children = this.children.DeepClone();
             }
             else
             {
+                state.children = this.children;
             }
         }
     }
@@ -133,7 +121,7 @@ namespace target.name.space
         /// <inheritdoc/>
         public override void Register()
         {
-            Register<ISimpleState, SimpleState>();
+            Register<IStateCollectionPropertyState, StateCollectionPropertyState>();
         }
     }
 }

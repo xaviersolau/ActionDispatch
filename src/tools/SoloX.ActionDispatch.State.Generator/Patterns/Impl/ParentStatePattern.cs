@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SoloX.ActionDispatch.Core.State;
 using SoloX.ActionDispatch.Core.State.Impl;
 using SoloX.ActionDispatch.State.Generator.Patterns.Itf;
 using SoloX.GeneratorTools.Core.CSharp.Generator.Attributes;
@@ -21,6 +22,7 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
     {
         private object propertyPattern;
         private AStateBase<IChildStatePattern> childPattern;
+        private AStateBase<IStateCollection<IChildStatePattern>> childrenPattern = new StateCollection<IChildStatePattern>();
 
         /// <inheritdoc/>
         public override IParentStatePattern Identity => this;
@@ -64,6 +66,9 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
         }
 
         /// <inheritdoc/>
+        public ICollection<IChildStatePattern> ChildrenPattern => this.childrenPattern.Identity;
+
+        /// <inheritdoc/>
         [PackStatements]
         protected override bool CheckPatch<TPatchState>(
             AStateBase<TPatchState> oldState,
@@ -98,6 +103,10 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
                 dirty |= oldVersion != this.childPattern.Version;
             }
 
+            var childrenPatternOldVersion = this.childrenPattern.Version;
+            this.childrenPattern.Lock();
+            dirty |= childrenPatternOldVersion != this.childrenPattern.Version;
+
             return dirty;
         }
 
@@ -130,10 +139,12 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
             if (deep)
             {
                 state.childPattern = this.childPattern?.DeepClone();
+                state.childrenPattern = this.childrenPattern.DeepClone();
             }
             else
             {
                 state.childPattern = this.childPattern;
+                state.childrenPattern = this.childrenPattern;
             }
         }
     }
