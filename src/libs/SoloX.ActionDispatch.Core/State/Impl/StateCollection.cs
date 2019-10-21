@@ -100,5 +100,20 @@ namespace SoloX.ActionDispatch.Core.State.Impl
 
             return clone;
         }
+
+        /// <inheritdoc/>
+        protected override bool LockChildrenAndCheckDirty()
+        {
+            var dirty = base.LockChildrenAndCheckDirty();
+
+            foreach (var item in this.items)
+            {
+                var oldVersion = item.Version;
+                item.Lock();
+                dirty |= oldVersion != item.Version;
+            }
+
+            return dirty;
+        }
     }
 }

@@ -8,10 +8,6 @@
     <ProjectReference Include="..\..\libs\SoloX.ActionDispatch.Core\SoloX.ActionDispatch.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Impl\" />
-  </ItemGroup>
-
   <PropertyGroup>
     <ActionDispatchToolsWorkingDirectory>../SoloX.ActionDispatch.Tools</ActionDispatchToolsWorkingDirectory>
     <ActionDispatchToolsCommand>dotnet run -c Release --no-build --</ActionDispatchToolsCommand>
