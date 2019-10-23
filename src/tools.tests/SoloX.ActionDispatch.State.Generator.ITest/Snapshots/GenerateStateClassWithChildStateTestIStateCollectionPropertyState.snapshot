@@ -41,6 +41,12 @@ namespace target.name.space
                 return true;
             }
 
+            if (this.children.Patch(oldState, newState, out var childrenPatched))
+            {
+                patcher = (s) => CastToImplementation(s).SetChildren(childrenPatched);
+                return true;
+            }
+
             patcher = null;
             return false;
         }
@@ -89,6 +95,16 @@ namespace target.name.space
             {
                 state.children = this.children;
             }
+        }
+
+        private static StateCollectionPropertyState CastToImplementation(IStateCollectionPropertyState state)
+        {
+            return (StateCollectionPropertyState)state;
+        }
+
+        private void SetChildren(AStateBase<IStateCollection<ISimpleState>> children)
+        {
+            this.children = children;
         }
     }
 }

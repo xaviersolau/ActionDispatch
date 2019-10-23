@@ -31,6 +31,22 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         public override IStateCollection<TStateItem> Identity => this;
 
         /// <inheritdoc/>
+        public TStateItem this[int index]
+        {
+            get
+            {
+                return this.items[index];
+            }
+
+            set
+            {
+                this.CheckUnlock();
+                this.MakeDirty();
+                this.items[index] = value;
+            }
+        }
+
+        /// <inheritdoc/>
         public void Add(TStateItem item)
         {
             this.CheckUnlock();
@@ -73,9 +89,55 @@ namespace SoloX.ActionDispatch.Core.State.Impl
         }
 
         /// <inheritdoc/>
+        public int IndexOf(TStateItem item)
+        {
+            return this.items.IndexOf(item);
+        }
+
+        /// <inheritdoc/>
+        public void Insert(int index, TStateItem item)
+        {
+            this.CheckUnlock();
+            this.MakeDirty();
+            this.items.Insert(index, item);
+        }
+
+        /// <inheritdoc/>
+        public void RemoveAt(int index)
+        {
+            this.CheckUnlock();
+            this.MakeDirty();
+            this.items.RemoveAt(index);
+        }
+
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        /// <inheritdoc/>
+        protected override bool CheckPatch<TPatchState>(AStateBase<TPatchState> oldState, AStateBase<TPatchState> newState, out Action<IStateCollection<TStateItem>> patcher)
+        {
+            if (base.CheckPatch(oldState, newState, out patcher))
+            {
+                return true;
+            }
+
+            int i = 0;
+            foreach (var item in this.items)
+            {
+                if (item != null && item.ToStateBase().Patch(oldState, newState, out var itemPatched))
+                {
+                    patcher = (s) => { s[i] = itemPatched.Identity; };
+                    return true;
+                }
+
+                i++;
+            }
+
+            patcher = null;
+            return false;
         }
 
         /// <inheritdoc/>
