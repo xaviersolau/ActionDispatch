@@ -102,6 +102,11 @@ namespace target.name.space
             {
             }
         }
+
+        private static SimpleState CastToImplementation(ISimpleState state)
+        {
+            return (SimpleState)state;
+        }
     }
 }
 

@@ -103,6 +103,11 @@ namespace target.name.space
             {
             }
         }
+
+        private static ObjectArrayPropertyState CastToImplementation(IObjectArrayPropertyState state)
+        {
+            return (ObjectArrayPropertyState)state;
+        }
     }
 }
 

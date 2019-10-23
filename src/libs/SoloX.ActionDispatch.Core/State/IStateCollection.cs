@@ -15,7 +15,7 @@ namespace SoloX.ActionDispatch.Core.State
     /// IState collection interface.
     /// </summary>
     /// <typeparam name="TStateItem">Type of the collection state items.</typeparam>
-    public interface IStateCollection<TStateItem> : IState, ICollection<TStateItem>
+    public interface IStateCollection<TStateItem> : IState, IList<TStateItem>
         where TStateItem : IState
     {
     }

@@ -86,6 +86,12 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
                 return true;
             }
 
+            if (this.childrenPattern.Patch(oldState, newState, out var childrenPatternPatched))
+            {
+                patcher = (s) => CastToImplementation(s).SetChildrenPattern(childrenPatternPatched);
+                return true;
+            }
+
             patcher = null;
             return false;
         }
@@ -146,6 +152,16 @@ namespace SoloX.ActionDispatch.State.Generator.Patterns.Impl
                 state.childPattern = this.childPattern;
                 state.childrenPattern = this.childrenPattern;
             }
+        }
+
+        private static ParentStatePattern CastToImplementation(IParentStatePattern state)
+        {
+            return (ParentStatePattern)state;
+        }
+
+        private void SetChildrenPattern(AStateBase<IStateCollection<IChildStatePattern>> childrenPattern)
+        {
+            this.childrenPattern = childrenPattern;
         }
     }
 }

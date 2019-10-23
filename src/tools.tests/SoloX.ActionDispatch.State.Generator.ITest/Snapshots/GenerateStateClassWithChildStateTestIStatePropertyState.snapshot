@@ -115,6 +115,11 @@ namespace target.name.space
                 state.child = this.child;
             }
         }
+
+        private static StatePropertyState CastToImplementation(IStatePropertyState state)
+        {
+            return (StatePropertyState)state;
+        }
     }
 }
 
