@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SoloX.ActionDispatch.Core" Version="1.0.0-alpha.11" />
+    <PackageReference Include="SoloX.ActionDispatch.Core" Version="1.0.0-alpha.12" />
   </ItemGroup>
 
   <ItemGroup>
