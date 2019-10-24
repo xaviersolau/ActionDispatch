@@ -44,6 +44,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.State.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoloX.ActionDispatch.State.Sample", "src\tools\SoloX.ActionDispatch.State.Sample\SoloX.ActionDispatch.State.Sample.csproj", "{CE10A03A-4BC8-49CC-988B-5A7E56C4EF77}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoloX.ActionDispatch.Json.State", "src\libs\SoloX.ActionDispatch.Json.State\SoloX.ActionDispatch.Json.State.csproj", "{C5BC2710-C8B6-458E-BBA4-23F599F6149D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,10 @@ Global
 		{CE10A03A-4BC8-49CC-988B-5A7E56C4EF77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE10A03A-4BC8-49CC-988B-5A7E56C4EF77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE10A03A-4BC8-49CC-988B-5A7E56C4EF77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5BC2710-C8B6-458E-BBA4-23F599F6149D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5BC2710-C8B6-458E-BBA4-23F599F6149D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5BC2710-C8B6-458E-BBA4-23F599F6149D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5BC2710-C8B6-458E-BBA4-23F599F6149D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,6 +121,7 @@ Global
 		{6B1FEC6E-247A-4C1F-A8DD-755CC127A8FF} = {9CC5872A-041F-4058-A338-803653E3141B}
 		{B900FBEC-2AD5-49C5-8145-4EDC001A2376} = {C1CD4C8D-8092-41CF-9DA6-E4DF13A6F39C}
 		{CE10A03A-4BC8-49CC-988B-5A7E56C4EF77} = {BEE0C98F-8C65-4EED-B56D-E5307A495005}
+		{C5BC2710-C8B6-458E-BBA4-23F599F6149D} = {8A1BF072-D6FD-4D7D-BAD2-304D6260BD4A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C234AD4E-8AE5-4C97-91A7-CE66AE5EFF32}
