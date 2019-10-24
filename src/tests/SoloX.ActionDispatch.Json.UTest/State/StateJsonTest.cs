@@ -7,12 +7,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Moq;
 using Newtonsoft.Json;
 using SoloX.ActionDispatch.Core.Sample.Impl;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
+using SoloX.ActionDispatch.Core.Sample.State.Collection;
+using SoloX.ActionDispatch.Core.Sample.State.Collection.Impl;
 using SoloX.ActionDispatch.Core.State;
 using SoloX.ActionDispatch.Core.State.Impl;
 using SoloX.ActionDispatch.Json.State.Impl;
@@ -61,7 +64,34 @@ namespace SoloX.ActionDispatch.Json.UTest.State
         }
 
         [Fact]
-        public void StateSerializerDeserializationTest()
+        public void CollectionStateSerializationTest()
+        {
+            var state = SetupStateCollection();
+
+            var json = JsonConvert.SerializeObject(state, new JsonStateConverter(Mock.Of<IStateFactory>()));
+
+            AssertRootCollectionStateJson(json, state);
+        }
+
+        [Fact]
+        public void CollectionStateDeserializationTest()
+        {
+            var state = SetupStateCollection();
+
+            var json = JsonConvert.SerializeObject(state, new JsonStateConverter(Mock.Of<IStateFactory>()));
+
+            var stateFactoryMock = SetupStateFactoryMock();
+
+            var deserializedState = JsonConvert.DeserializeObject<IRootCollectionState>(json, new JsonStateConverter(stateFactoryMock.Object));
+
+            stateFactoryMock.Verify(f => f.Create(typeof(IRootCollectionState)));
+            stateFactoryMock.Verify(f => f.Create(typeof(IStateA)), Times.Exactly(3));
+
+            AssertSameState(state, deserializedState);
+        }
+
+        [Fact]
+        public void StateSerializerSerializationTest()
         {
             var state = SetupStateA();
 
@@ -96,19 +126,53 @@ namespace SoloX.ActionDispatch.Json.UTest.State
             return state;
         }
 
+        private static RootCollectionState SetupStateCollection()
+        {
+            var state = new RootCollectionState();
+            state.Items.Add(new StateA()
+            {
+                Value = "ValueIdx0",
+            });
+            state.Items.Add(new StateA()
+            {
+                Value = "ValueIdx1",
+            });
+            state.Items.Add(new StateA()
+            {
+                Value = "ValueIdx2",
+            });
+            state.Lock();
+            return state;
+        }
+
         private static Mock<IStateFactory> SetupStateFactoryMock()
         {
             var stateFactoryMock = new Mock<IStateFactory>();
-            stateFactoryMock.Setup(f => f.Create(typeof(IStateA))).Returns(new StateA());
+            stateFactoryMock.Setup(f => f.Create(typeof(IStateA))).Returns(() => new StateA());
+            stateFactoryMock.Setup(f => f.Create(typeof(IRootCollectionState))).Returns(() => new RootCollectionState());
             return stateFactoryMock;
         }
 
-        private static void AssertSameState(StateA state, IStateA deserializedState)
+        private static void AssertSameState(IStateA state, IStateA deserializedState)
         {
             Assert.NotNull(deserializedState);
 
             Assert.Equal(state.Value, deserializedState.Value);
             Assert.Equal(state.Version, deserializedState.Version);
+            Assert.False(deserializedState.IsLocked);
+        }
+
+        private static void AssertSameState(RootCollectionState state, IRootCollectionState deserializedState)
+        {
+            Assert.NotNull(deserializedState);
+
+            Assert.Equal(state.Items.Count, deserializedState.Items.Count);
+
+            for (int i = 0; i < state.Items.Count; i++)
+            {
+                AssertSameState(state.Items.ElementAt(i), deserializedState.Items.ElementAt(i));
+            }
+
             Assert.False(deserializedState.IsLocked);
         }
 
@@ -121,6 +185,21 @@ namespace SoloX.ActionDispatch.Json.UTest.State
 
             Assert.Contains(nameof(state.Version), json, StringComparison.InvariantCulture);
             Assert.Contains($"{state.Version}", json, StringComparison.InvariantCulture);
+
+            Assert.DoesNotContain(nameof(state.IsLocked), json, StringComparison.InvariantCulture);
+            Assert.DoesNotContain(nameof(state.Identity), json, StringComparison.InvariantCulture);
+        }
+
+        private static void AssertRootCollectionStateJson(string json, RootCollectionState state)
+        {
+            Assert.NotNull(json);
+
+            Assert.Contains(nameof(state.Items), json, StringComparison.InvariantCulture);
+
+            for (int i = 0; i < state.Items.Count; i++)
+            {
+                Assert.Contains(state.Items.ElementAt(i).Value, json, StringComparison.InvariantCulture);
+            }
 
             Assert.DoesNotContain(nameof(state.IsLocked), json, StringComparison.InvariantCulture);
             Assert.DoesNotContain(nameof(state.Identity), json, StringComparison.InvariantCulture);

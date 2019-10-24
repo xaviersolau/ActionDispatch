@@ -106,18 +106,47 @@ namespace SoloX.ActionDispatch.Json.State.Impl
                             .GetProperty(name, BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
                         tknType = ReadNextToken(reader);
-                        var value = serializer.Deserialize(reader, property.PropertyType);
+                        var propertyType = property.PropertyType;
 
-                        if (property.GetSetMethod() != null)
+                        if (typeof(IEnumerable<IState>).IsAssignableFrom(propertyType)
+                            && (propertyType.GetGenericTypeDefinition() == typeof(ICollection<>)
+                                || propertyType.GetGenericTypeDefinition() == typeof(IList<>)
+                                || propertyType.GetGenericTypeDefinition() == typeof(IStateCollection<>)))
                         {
-                            property.SetValue(state, value);
+                            var itemType = propertyType.GetGenericArguments().First();
+
+                            dynamic items = property.GetValue(state);
+
+                            if (tknType != JsonToken.StartArray)
+                            {
+                                throw new FormatException("Expecting StartArray");
+                            }
+
+                            tknType = ReadNextToken(reader);
+
+                            while (tknType != JsonToken.EndArray)
+                            {
+                                dynamic item = serializer.Deserialize(reader, itemType);
+                                items.Add(item);
+
+                                tknType = ReadNextToken(reader);
+                            }
                         }
                         else
                         {
-                            var fieldName = $"<{property.Name}>k__BackingField";
-                            var field = property.DeclaringType
-                                .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
-                            field.SetValue(state, value);
+                            var value = serializer.Deserialize(reader, property.PropertyType);
+
+                            if (property.GetSetMethod() != null)
+                            {
+                                property.SetValue(state, value);
+                            }
+                            else
+                            {
+                                var fieldName = $"<{property.Name}>k__BackingField";
+                                var field = property.DeclaringType
+                                    .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+                                field.SetValue(state, value);
+                            }
                         }
 
                         tknType = ReadNextToken(reader);
@@ -156,7 +185,21 @@ namespace SoloX.ActionDispatch.Json.State.Impl
             foreach (var property in properties.Where(p => p.Name != IdentityPropertyName && p.Name != IsLockedPropertyName))
             {
                 writer.WritePropertyName(property.Name);
-                serializer.Serialize(writer, property.GetGetMethod().Invoke(value, null));
+                if (typeof(IEnumerable<IState>).IsAssignableFrom(property.PropertyType))
+                {
+                    writer.WriteStartArray();
+                    var items = (IEnumerable<IState>)property.GetGetMethod().Invoke(value, null);
+                    foreach (var item in items)
+                    {
+                        serializer.Serialize(writer, item);
+                    }
+
+                    writer.WriteEndArray();
+                }
+                else
+                {
+                    serializer.Serialize(writer, property.GetGetMethod().Invoke(value, null));
+                }
             }
 
             writer.WriteEndObject();
