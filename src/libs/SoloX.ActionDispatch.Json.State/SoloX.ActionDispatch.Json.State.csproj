@@ -6,17 +6,16 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
 
-    <PackageId>SoloX.ActionDispatch.Json</PackageId>
+    <PackageId>SoloX.ActionDispatch.Json.State</PackageId>
 
     <NoPackageAnalysis>true</NoPackageAnalysis>
 
     <PackageTags>action, dispatch, state, serialization, json</PackageTags>
     <PackageReleaseNotes>
-      - Implement Action Json converter for serialization.
       - Implement a State Json converter for serialization.
     </PackageReleaseNotes>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <Description>SoloX.ActionDispatch.Json provides the action and state Newtonsoft Json converter.</Description>
+    <Description>SoloX.ActionDispatch.Json.State provides the state Newtonsoft Json converter.</Description>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
@@ -25,12 +24,10 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="SoloX.CodeQuality.Prod" Version="1.0.6" />
-    <PackageReference Include="SoloX.ExpressionTools.Parser" Version="1.0.0-alpha.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SoloX.ActionDispatch.Core\SoloX.ActionDispatch.Core.csproj" />
-    <ProjectReference Include="..\SoloX.ActionDispatch.Json.State\SoloX.ActionDispatch.Json.State.csproj" />
   </ItemGroup>
 
 </Project>
