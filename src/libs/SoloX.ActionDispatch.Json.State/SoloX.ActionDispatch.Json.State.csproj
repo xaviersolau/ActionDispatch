@@ -18,6 +18,10 @@
     <Description>SoloX.ActionDispatch.Json.State provides the state Newtonsoft Json converter.</Description>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
   </PropertyGroup>
 
   <ItemGroup>

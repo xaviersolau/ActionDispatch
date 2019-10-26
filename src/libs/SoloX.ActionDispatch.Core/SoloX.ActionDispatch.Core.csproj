@@ -19,6 +19,10 @@
     <Description>SoloX.ActionDispatch.Core provides a c# dispatcher to process actions on an application state.</Description>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
   </PropertyGroup>
 
   <ItemGroup>
