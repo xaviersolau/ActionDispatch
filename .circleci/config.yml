@@ -75,16 +75,19 @@ jobs:
             dotnet pack -c Release --no-build
             cd ../../..
             mv src/libs/SoloX.ActionDispatch.Core/bin/Release/*.nupkg packages/
+            mv src/libs/SoloX.ActionDispatch.Core/bin/Release/*.snupkg packages/
 
             cd src/libs/SoloX.ActionDispatch.Json.State
             dotnet pack -c Release --no-build
             cd ../../..
             mv src/libs/SoloX.ActionDispatch.Json.State/bin/Release/*.nupkg packages/
+            mv src/libs/SoloX.ActionDispatch.Json.State/bin/Release/*.snupkg packages/
 
             cd src/libs/SoloX.ActionDispatch.Json
             dotnet pack -c Release --no-build
             cd ../../..
             mv src/libs/SoloX.ActionDispatch.Json/bin/Release/*.nupkg packages/
+            mv src/libs/SoloX.ActionDispatch.Json/bin/Release/*.snupkg packages/
 
             cd src/tools/SoloX.ActionDispatch.Tools
             dotnet pack -c Release --no-build
@@ -95,6 +98,7 @@ jobs:
             dotnet pack -c Release --no-build
             cd ../../..
             mv src/tools/SoloX.ActionDispatch.State.Generator/bin/Release/*.nupkg packages/
+            mv src/tools/SoloX.ActionDispatch.State.Generator/bin/Release/*.snupkg packages/
 
             cd src/tools/SoloX.ActionDispatch.State.Build
             dotnet pack -c Release --no-build
