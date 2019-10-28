@@ -3,6 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
 
+    <!-- Enable CopyLocalLockFileAssemblies to work around an issue with Coverlet: https://github.com/tonerdo/coverlet/issues/560 -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
