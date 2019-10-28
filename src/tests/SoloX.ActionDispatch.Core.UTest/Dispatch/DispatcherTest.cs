@@ -6,6 +6,7 @@
 // ----------------------------------------------------------------------
 
 using System;
+using System.Linq.Expressions;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -81,6 +82,63 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
             actionBehaviorMock.Verify(ab => ab.Apply(It.IsAny<IRelativeDispatcher<IStateA>>(), stateMock.Object));
             Assert.True(isThreadPoolThread);
             Assert.False(Thread.CurrentThread.IsThreadPoolThread);
+        }
+
+        [Fact]
+        public void SynchronizedDispatcherCreateRelativeDispatcherTest()
+        {
+            var dispatcherMock = new Mock<IDispatcher<IStateA>>();
+            var syncContext = new TestSynchronizationContext();
+            var synchronizedDispatcher = new SynchronizedDispatcher<IStateA>(dispatcherMock.Object, syncContext);
+
+            var relativeDispatcher = synchronizedDispatcher.CreateRelativeDispatcher(s => s);
+
+            var relativeDispatcherImpl = Assert.IsType<RelativeDispatcher<IStateA, IStateA>>(relativeDispatcher);
+
+            Assert.Same(synchronizedDispatcher, relativeDispatcherImpl.Dispatcher);
+        }
+
+        [Fact]
+        public void SynchronizedDispatcherWithSyncActionTest()
+        {
+            var dispatcherMock = new Mock<IDispatcher<IStateA>>();
+            var syncContext = new TestSynchronizationContext();
+            var synchronizedDispatcher = new SynchronizedDispatcher<IStateA>(dispatcherMock.Object, syncContext);
+
+            var actionBehaviorMock = new Mock<IActionBehavior<IStateA>>();
+            Expression<Func<IStateA, IStateA>> selector = s => s;
+
+            synchronizedDispatcher.Dispatch(actionBehaviorMock.Object, selector);
+
+            dispatcherMock.Verify(d => d.Dispatch(actionBehaviorMock.Object, selector));
+        }
+
+        [Fact]
+        public void SynchronizedDispatcherWithAsyncActionTest()
+        {
+            var dispatcherMock = new Mock<IDispatcher<IStateA>>();
+            var syncContext = new TestSynchronizationContext();
+            var synchronizedDispatcher = new SynchronizedDispatcher<IStateA>(dispatcherMock.Object, syncContext);
+
+            var actionBehaviorMock = new Mock<IActionBehaviorAsync<IStateA>>();
+            Expression<Func<IStateA, IStateA>> selector = s => s;
+
+            synchronizedDispatcher.Dispatch(actionBehaviorMock.Object, selector);
+
+            dispatcherMock.Verify(d => d.Dispatch(actionBehaviorMock.Object, selector));
+        }
+
+        private class TestSynchronizationContext : SynchronizationContext
+        {
+            public override void Post(SendOrPostCallback d, object state)
+            {
+                d(state);
+            }
+
+            public override void Send(SendOrPostCallback d, object state)
+            {
+                d(state);
+            }
         }
     }
 }
