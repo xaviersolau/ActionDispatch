@@ -39,8 +39,15 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
         /// <inheritdoc/>
         public override TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState rootState)
         {
+            var targetStateItf = this.SelectState(rootState);
+
+            if (targetStateItf == null)
+            {
+                throw new NullReferenceException("The target state is null");
+            }
+
             // Get the target state object. It is locked so we won't be able to write it.
-            var targetState = this.SelectState(rootState).ToStateBase();
+            var targetState = targetStateItf.ToStateBase();
 
             var stateContainer = new StateContainer<TState>(targetState);
 
