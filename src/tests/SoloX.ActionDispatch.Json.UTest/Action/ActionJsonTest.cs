@@ -17,8 +17,8 @@ using SoloX.ActionDispatch.Core.Action.Impl;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
 using SoloX.ActionDispatch.Core.State;
-using SoloX.ActionDispatch.Core.UTest.Action.Basic;
 using SoloX.ActionDispatch.Json.Action.Impl;
+using SoloX.ActionDispatch.Json.UTest.Action.Basic;
 using Xunit;
 
 namespace SoloX.ActionDispatch.Json.UTest.Action
