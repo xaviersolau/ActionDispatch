@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SoloX.ActionDispatch.Core.Dispatch;
@@ -29,17 +30,20 @@ namespace SoloX.ActionDispatch.Core
         /// <param name="services">The services collection to setup.</param>
         /// <param name="stateInit">The initial state delegate.</param>
         /// <param name="serviceLifetime">Dispatcher service lifetime.</param>
+        /// <param name="useSynchronizationContext">Tells if the current SynchronizationContext must be used.</param>
         /// <returns>The service collection given as input.</returns>
         public static IServiceCollection AddActionDispatchSupport<TRootState>(
             this IServiceCollection services,
             Func<IStateFactory, TRootState> stateInit,
-            ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+            ServiceLifetime serviceLifetime = ServiceLifetime.Singleton,
+            bool useSynchronizationContext = false)
             where TRootState : IState
         {
             return AddActionDispatchSupport(
                 services,
                 (provider, factory) => stateInit(factory),
-                serviceLifetime);
+                serviceLifetime,
+                useSynchronizationContext);
         }
 
         /// <summary>
@@ -49,11 +53,13 @@ namespace SoloX.ActionDispatch.Core
         /// <param name="services">The services collection to setup.</param>
         /// <param name="stateInit">The initial state delegate.</param>
         /// <param name="serviceLifetime">Dispatcher service lifetime.</param>
+        /// <param name="useSynchronizationContext">Tells if the current SynchronizationContext must be used.</param>
         /// <returns>The service collection given as input.</returns>
         public static IServiceCollection AddActionDispatchSupport<TRootState>(
             this IServiceCollection services,
             Func<IServiceProvider, IStateFactory, TRootState> stateInit,
-            ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+            ServiceLifetime serviceLifetime = ServiceLifetime.Singleton,
+            bool useSynchronizationContext = false)
             where TRootState : IState
         {
             if (services == null)
@@ -70,9 +76,21 @@ namespace SoloX.ActionDispatch.Core
 
                     state.Lock();
 
-                    return new Dispatcher<TRootState>(
+                    IDispatcher<TRootState> dispatcher = new Dispatcher<TRootState>(
                         state,
                         provider.GetService<ILogger<Dispatcher<TRootState>>>());
+
+                    if (useSynchronizationContext)
+                    {
+                        if (SynchronizationContext.Current == null)
+                        {
+                            throw new NotSupportedException("Could not find any synchronization context in SynchronizationContext.Current.");
+                        }
+
+                        dispatcher = new SynchronizedDispatcher<TRootState>(dispatcher, SynchronizationContext.Current);
+                    }
+
+                    return dispatcher;
                 },
                 serviceLifetime));
 
