@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
 using SoloX.ActionDispatch.Core.Sample.State.Collection.Impl;
 using Xunit;
@@ -20,21 +21,14 @@ namespace SoloX.ActionDispatch.Core.UTest.State
         [Fact]
         public void LockStateTest()
         {
-            var state = new RootCollectionState();
-
-            var stateA1 = new StateA()
-            {
-                Value = "Some value...",
-            };
+            var state = CreateOneItemRootCollectionState(out var stateA1);
 
             Assert.False(state.IsLocked);
-
-            state.Items.Add(stateA1);
+            Assert.False(stateA1.IsLocked);
 
             state.Lock();
 
             Assert.True(state.IsLocked);
-
             Assert.True(stateA1.IsLocked);
 
             var stateA2 = new StateA();
@@ -45,14 +39,9 @@ namespace SoloX.ActionDispatch.Core.UTest.State
         [Fact]
         public void CloneStateTest()
         {
-            var childValue = "Test";
-            var state = new RootCollectionState();
-            var stateA1 = new StateA()
-            {
-                Value = childValue,
-            };
+            var state = CreateOneItemRootCollectionState(out var stateA);
 
-            state.Items.Add(stateA1);
+            var childValue = stateA.Value;
 
             state.Lock();
 
@@ -71,23 +60,9 @@ namespace SoloX.ActionDispatch.Core.UTest.State
         [Fact]
         public void PatchChildStateTest()
         {
-            var childValue = "Test";
-            var child2Value = "Test2";
             var childNewValue = "NewTest";
 
-            var child2 = new StateA()
-            {
-                Value = child2Value,
-            };
-
-            var oldChild1 = new StateA()
-            {
-                Value = childValue,
-            };
-
-            var state = new RootCollectionState();
-            state.Items.Add(oldChild1);
-            state.Items.Add(child2);
+            var state = CreateTwoItemsRootCollectionState(out var oldChild1, out var child2);
 
             state.Lock();
 
@@ -107,6 +82,145 @@ namespace SoloX.ActionDispatch.Core.UTest.State
             Assert.Equal(childNewValue, patchedState.Items.First().Value);
 
             Assert.Same(state.Items.Last(), patchedState.Items.Last());
+        }
+
+        [Fact]
+        public void StateCollectionIsReadOnlyTest()
+        {
+            var state = new RootCollectionState();
+
+            Assert.False(state.Items.IsReadOnly);
+
+            state.Lock();
+
+            Assert.True(state.Items.IsReadOnly);
+        }
+
+        [Fact]
+        public void StateCollectionClearTest()
+        {
+            var state = CreateOneItemRootCollectionState(out _);
+
+            Assert.Equal(1, state.Items.Count);
+
+            state.Items.Clear();
+
+            Assert.Equal(0, state.Items.Count);
+        }
+
+        [Fact]
+        public void StateCollectionContainsTest()
+        {
+            var state = new RootCollectionState();
+            var stateA1 = new StateA()
+            {
+                Value = "Some value",
+            };
+
+            Assert.False(state.Items.Contains(stateA1));
+
+            state.Items.Add(stateA1);
+
+            Assert.True(state.Items.Contains(stateA1));
+        }
+
+        [Fact]
+        public void StateCollectionCopyToTest()
+        {
+            var state = CreateOneItemRootCollectionState(out var stateA);
+
+            var array = new IStateA[1];
+            state.Items.CopyTo(array, 0);
+
+            Assert.Same(stateA, array[0]);
+        }
+
+        [Fact]
+        public void StateCollectionRemoveTest()
+        {
+            var state = CreateTwoItemsRootCollectionState(out var stateA1, out var stateA2);
+
+            Assert.Equal(2, state.Items.Count);
+            state.Items.Remove(stateA2);
+
+            Assert.Equal(1, state.Items.Count);
+            Assert.True(state.Items.Contains(stateA1));
+            Assert.False(state.Items.Contains(stateA2));
+        }
+
+        [Fact]
+        public void StateCollectionIndexOfTest()
+        {
+            var state = CreateTwoItemsRootCollectionState(out var stateA1, out var stateA2);
+
+            Assert.Equal(0, state.Items.IndexOf(stateA1));
+            Assert.Equal(1, state.Items.IndexOf(stateA2));
+        }
+
+        [Fact]
+        public void StateCollectionInsertTest()
+        {
+            var state = CreateTwoItemsRootCollectionState(out var stateA1, out var stateA2);
+
+            var stateA = new StateA()
+            {
+                Value = "Some value to insert...",
+            };
+
+            Assert.Equal(0, state.Items.IndexOf(stateA1));
+            Assert.Equal(1, state.Items.IndexOf(stateA2));
+
+            state.Items.Insert(1, stateA);
+
+            Assert.Equal(0, state.Items.IndexOf(stateA1));
+            Assert.Equal(1, state.Items.IndexOf(stateA));
+            Assert.Equal(2, state.Items.IndexOf(stateA2));
+        }
+
+        [Fact]
+        public void StateCollectionRemoveAtTest()
+        {
+            var state = CreateTwoItemsRootCollectionState(out var stateA1, out var stateA2);
+
+            Assert.Equal(0, state.Items.IndexOf(stateA1));
+            Assert.Equal(1, state.Items.IndexOf(stateA2));
+
+            state.Items.RemoveAt(0);
+
+            Assert.Equal(0, state.Items.IndexOf(stateA2));
+            Assert.False(state.Items.Contains(stateA1));
+        }
+
+        private static RootCollectionState CreateOneItemRootCollectionState(out StateA stateA)
+        {
+            var state = new RootCollectionState();
+            stateA = new StateA()
+            {
+                Value = "Some value 1",
+            };
+
+            state.Items.Add(stateA);
+
+            return state;
+        }
+
+        private static RootCollectionState CreateTwoItemsRootCollectionState(out StateA stateA1, out StateA stateA2)
+        {
+            var state = new RootCollectionState();
+            stateA1 = new StateA()
+            {
+                Value = "Some value 1",
+            };
+
+            stateA2 = new StateA()
+            {
+                Value = "Some value 2",
+            };
+
+            state.Items.Add(stateA1);
+            state.Items.Add(stateA2);
+
+            return state;
         }
     }
 }

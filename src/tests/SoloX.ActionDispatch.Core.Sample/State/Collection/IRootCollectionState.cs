@@ -15,6 +15,6 @@ namespace SoloX.ActionDispatch.Core.Sample.State.Collection
 {
     public interface IRootCollectionState : IState
     {
-        ICollection<IStateA> Items { get; }
+        IList<IStateA> Items { get; }
     }
 }
