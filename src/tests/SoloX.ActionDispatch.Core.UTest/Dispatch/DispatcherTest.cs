@@ -85,57 +85,53 @@ namespace SoloX.ActionDispatch.Core.UTest.Dispatch
         }
 
         [Fact]
-        public void SynchronizedDispatcherCreateRelativeDispatcherTest()
+        public void DispatcherUseCallingStrategyWithSyncActionTest()
         {
-            var dispatcherMock = new Mock<IDispatcher<IStateA>>();
-            var syncContext = new TestSynchronizationContext();
-            var synchronizedDispatcher = new SynchronizedDispatcher<IStateA>(dispatcherMock.Object, syncContext);
-
-            var relativeDispatcher = synchronizedDispatcher.CreateRelativeDispatcher(s => s);
-
-            var relativeDispatcherImpl = Assert.IsType<RelativeDispatcher<IStateA, IStateA>>(relativeDispatcher);
-
-            Assert.Same(synchronizedDispatcher, relativeDispatcherImpl.Dispatcher);
-        }
-
-        [Fact]
-        public void SynchronizedDispatcherWithSyncActionTest()
-        {
-            var dispatcherMock = new Mock<IDispatcher<IStateA>>();
-            var syncContext = new TestSynchronizationContext();
-            var synchronizedDispatcher = new SynchronizedDispatcher<IStateA>(dispatcherMock.Object, syncContext);
-
+            var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
             var actionBehaviorMock = new Mock<IActionBehavior<IStateA>>();
-            Expression<Func<IStateA, IStateA>> selector = s => s;
 
-            synchronizedDispatcher.Dispatch(actionBehaviorMock.Object, selector);
+            var callingStrategyMock = new Mock<ICallingStrategy>();
 
-            dispatcherMock.Verify(d => d.Dispatch(actionBehaviorMock.Object, selector));
+            using (var dispatcher = new Dispatcher<IStateA>(
+                new StateA(), logger, callingStrategyMock.Object))
+            {
+                dispatcher.Dispatch(actionBehaviorMock.Object, s => s);
+            }
+
+            callingStrategyMock.Verify(a => a.Invoke(It.IsAny<System.Action>()));
         }
 
         [Fact]
-        public void SynchronizedDispatcherWithAsyncActionTest()
+        public void DispatcherUseCallingStrategyWithAsyncActionTest()
         {
-            var dispatcherMock = new Mock<IDispatcher<IStateA>>();
-            var syncContext = new TestSynchronizationContext();
-            var synchronizedDispatcher = new SynchronizedDispatcher<IStateA>(dispatcherMock.Object, syncContext);
-
+            var logger = Mock.Of<ILogger<Dispatcher<IStateA>>>();
             var actionBehaviorMock = new Mock<IActionBehaviorAsync<IStateA>>();
-            Expression<Func<IStateA, IStateA>> selector = s => s;
 
-            synchronizedDispatcher.Dispatch(actionBehaviorMock.Object, selector);
+            var callingStrategyMock = new Mock<ICallingStrategy>();
 
-            dispatcherMock.Verify(d => d.Dispatch(actionBehaviorMock.Object, selector));
+            using (var dispatcher = new Dispatcher<IStateA>(
+                new StateA(), logger, callingStrategyMock.Object))
+            {
+                dispatcher.Dispatch(actionBehaviorMock.Object, s => s);
+            }
+
+            callingStrategyMock.Verify(a => a.Invoke(It.IsAny<System.Action>()));
+        }
+
+        [Fact]
+        public void SynchronizedCallingStrategyTest()
+        {
+            var strategy = new SynchronizedCallingStrategy(new TestSynchronizationContext());
+
+            var done = false;
+            strategy.Invoke(() => done = true);
+
+            Assert.True(done);
         }
 
         private class TestSynchronizationContext : SynchronizationContext
         {
             public override void Post(SendOrPostCallback d, object state)
-            {
-                d(state);
-            }
-
-            public override void Send(SendOrPostCallback d, object state)
             {
                 d(state);
             }
