@@ -76,21 +76,15 @@ namespace SoloX.ActionDispatch.Core
 
                     state.Lock();
 
-                    IDispatcher<TRootState> dispatcher = new Dispatcher<TRootState>(
-                        state,
-                        provider.GetService<ILogger<Dispatcher<TRootState>>>());
-
-                    if (useSynchronizationContext)
+                    if (useSynchronizationContext && SynchronizationContext.Current == null)
                     {
-                        if (SynchronizationContext.Current == null)
-                        {
-                            throw new NotSupportedException("Could not find any synchronization context in SynchronizationContext.Current.");
-                        }
-
-                        dispatcher = new SynchronizedDispatcher<TRootState>(dispatcher, SynchronizationContext.Current);
+                        throw new NotSupportedException("Could not find any synchronization context in SynchronizationContext.Current.");
                     }
 
-                    return dispatcher;
+                    return new Dispatcher<TRootState>(
+                        state,
+                        provider.GetService<ILogger<Dispatcher<TRootState>>>(),
+                        useSynchronizationContext ? new SynchronizedCallingStrategy(SynchronizationContext.Current) : null);
                 },
                 serviceLifetime));
 

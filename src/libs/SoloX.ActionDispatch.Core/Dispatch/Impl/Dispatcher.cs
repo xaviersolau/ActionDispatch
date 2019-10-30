@@ -39,6 +39,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         private readonly List<IAction<TRootState, IActionBehavior>> actionsToDispatch = new List<IAction<TRootState, IActionBehavior>>();
         private readonly List<IDisposable> listenerActionSubscriptions = new List<IDisposable>();
         private readonly IDisposable actionSubscription;
+        private readonly ICallingStrategy callingStrategy;
 
         private bool isDisposed = false;
 
@@ -47,10 +48,11 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         /// </summary>
         /// <param name="initialState">The initial state to use.</param>
         /// <param name="logger">The logger to use for logging.</param>
-        public Dispatcher(TRootState initialState, ILogger<Dispatcher<TRootState>> logger)
+        /// <param name="callingStrategy">The calling strategy to use to dispatch actions.</param>
+        public Dispatcher(TRootState initialState, ILogger<Dispatcher<TRootState>> logger, ICallingStrategy callingStrategy = null)
         {
             this.logger = logger;
-
+            this.callingStrategy = callingStrategy ?? new DefaultCallingStrategy();
             this.state = new BehaviorSubject<TRootState>(initialState);
             this.action = new Subject<IAction<TRootState, IActionBehavior>>();
             this.listenerActions = new Subject<IAction<TRootState, IActionBehavior>>();
@@ -72,14 +74,16 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         public void Dispatch<TState>(IActionBehavior<TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
             where TState : IState
         {
-            this.Dispatch(new SyncAction<TRootState, TState>(actionBehavior, selector));
+            this.callingStrategy.Invoke(
+                () => this.Dispatch(new SyncAction<TRootState, TState>(actionBehavior, selector)));
         }
 
         /// <inheritdoc />
         public void Dispatch<TState>(IActionBehaviorAsync<TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
             where TState : IState
         {
-            this.Dispatch(new AsyncAction<TRootState, TState>(actionBehavior, selector));
+            this.callingStrategy.Invoke(
+                () => this.Dispatch(new AsyncAction<TRootState, TState>(actionBehavior, selector)));
         }
 
         /// <inheritdoc />
