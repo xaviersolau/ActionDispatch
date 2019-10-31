@@ -24,6 +24,27 @@ namespace SoloX.ActionDispatch.Core
     public static class ActionDispatchExtensions
     {
         /// <summary>
+        /// Setup the action dispatcher services using the injected <see cref="IInitialStateFactory{TRootState}"/>.
+        /// </summary>
+        /// <typeparam name="TRootState">The root type of the action dispatcher.</typeparam>
+        /// <param name="services">The services collection to setup.</param>
+        /// <param name="serviceLifetime">Dispatcher service lifetime.</param>
+        /// <param name="useSynchronizationContext">Tells if the current SynchronizationContext must be used.</param>
+        /// <returns>The service collection given as input.</returns>
+        public static IServiceCollection AddActionDispatchSupport<TRootState>(
+            this IServiceCollection services,
+            ServiceLifetime serviceLifetime = ServiceLifetime.Singleton,
+            bool useSynchronizationContext = false)
+            where TRootState : IState
+        {
+            return AddActionDispatchSupport(
+                services,
+                (provider, factory) => provider.GetService<IInitialStateFactory<TRootState>>().Create(),
+                serviceLifetime,
+                useSynchronizationContext);
+        }
+
+        /// <summary>
         /// Setup the action dispatcher services.
         /// </summary>
         /// <typeparam name="TRootState">The root type of the action dispatcher.</typeparam>
@@ -81,10 +102,12 @@ namespace SoloX.ActionDispatch.Core
                         throw new NotSupportedException("Could not find any synchronization context in SynchronizationContext.Current.");
                     }
 
-                    return new Dispatcher<TRootState>(
+                    var dispatcher = new Dispatcher<TRootState>(
                         state,
                         provider.GetService<ILogger<Dispatcher<TRootState>>>(),
                         useSynchronizationContext ? new SynchronizedCallingStrategy(SynchronizationContext.Current) : null);
+
+                    return dispatcher;
                 },
                 serviceLifetime));
 
