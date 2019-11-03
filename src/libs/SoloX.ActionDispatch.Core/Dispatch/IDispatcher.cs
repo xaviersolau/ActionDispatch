@@ -22,9 +22,15 @@ namespace SoloX.ActionDispatch.Core.Dispatch
         where TRootState : IState
     {
         /// <summary>
+        /// Add an action middle ware.
+        /// </summary>
+        /// <param name="middleware">The middle ware to add.</param>
+        void AddMidlleware(IActionMiddleware<TRootState> middleware);
+
+        /// <summary>
         /// Add an action observer.
         /// </summary>
-        /// <param name="observer">The observer to add.</param>
-        void AddObserver(Func<IObservable<IAction<TRootState, IActionBehavior>>, IObservable<IAction<TRootState, IActionBehavior>>> observer);
+        /// <param name="observer">The action observer to add.</param>
+        void AddObserver(Action<IAction<TRootState, IActionBehavior>> observer);
     }
 }

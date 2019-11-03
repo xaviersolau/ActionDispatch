@@ -33,12 +33,12 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         private readonly ILogger<Dispatcher<TRootState>> logger;
 
         private readonly BehaviorSubject<TRootState> state;
-        private readonly Subject<IAction<TRootState, IActionBehavior>> action;
-        private readonly Subject<IAction<TRootState, IActionBehavior>> listenerActions;
+
+        private readonly List<ActionMiddlewareSubject> actionMiddlewareSubjects = new List<ActionMiddlewareSubject>();
 
         private readonly List<IAction<TRootState, IActionBehavior>> actionsToDispatch = new List<IAction<TRootState, IActionBehavior>>();
-        private readonly List<IDisposable> listenerActionSubscriptions = new List<IDisposable>();
-        private readonly IDisposable actionSubscription;
+        private readonly List<Action<IAction<TRootState, IActionBehavior>>> observers = new List<Action<IAction<TRootState, IActionBehavior>>>();
+
         private readonly ICallingStrategy callingStrategy;
 
         private bool isDisposed = false;
@@ -54,9 +54,6 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
             this.logger = logger;
             this.callingStrategy = callingStrategy ?? new DefaultCallingStrategy();
             this.state = new BehaviorSubject<TRootState>(initialState);
-            this.action = new Subject<IAction<TRootState, IActionBehavior>>();
-            this.listenerActions = new Subject<IAction<TRootState, IActionBehavior>>();
-            this.actionSubscription = this.action.AsObservable().Subscribe(this.ActionSubscriber);
         }
 
         /// <summary>
@@ -94,39 +91,35 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         }
 
         /// <inheritdoc />
-        public void AddObserver(Func<IObservable<IAction<TRootState, IActionBehavior>>, IObservable<IAction<TRootState, IActionBehavior>>> observer)
+        public void AddMidlleware(IActionMiddleware<TRootState> middleware)
+        {
+            if (middleware == null)
+            {
+                throw new ArgumentNullException($"The argument {nameof(middleware)} was null.");
+            }
+
+            this.actionMiddlewareSubjects.Add(new ActionMiddlewareSubject(
+                middleware,
+                action =>
+                {
+                    this.callingStrategy.Invoke(
+                        () => this.Publish(action));
+                },
+                e =>
+                {
+                    this.PostDispatch(CreateUnhandledExceptionAction(e));
+                }));
+        }
+
+        /// <inheritdoc />
+        public void AddObserver(Action<IAction<TRootState, IActionBehavior>> observer)
         {
             if (observer == null)
             {
                 throw new ArgumentNullException($"The argument {nameof(observer)} was null.");
             }
 
-            var subscription = observer(this.listenerActions.AsObservable())
-                .CatchAndContinue<IAction<TRootState, IActionBehavior>, Exception>(e =>
-                {
-                    // we can use Dispatch as action listener are used outside of the _syncObject lock monitor
-                    this.logger.LogError(e, $"ERROR in action listener");
-                    this.Dispatch(CreateUnhandledExceptionAction(e));
-                })
-                .Subscribe(action =>
-                {
-                    var actionBase = (AAction<TRootState>)action;
-                    if (actionBase.State == ActionState.None)
-                    {
-                        Task.Run(() => this.Dispatch(action), CancellationToken.None)
-                            .ContinueWith(
-                                (t) =>
-                                {
-                                    // dispatch an UnhandledExceptionAction (since we are not in the lock monitor we can call Dispatch directly)
-                                    this.logger.LogError(t.Exception, "ERROR while dispatching actions from observer");
-                                    this.Dispatch(CreateUnhandledExceptionAction(t.Exception));
-                                },
-                                CancellationToken.None,
-                                TaskContinuationOptions.OnlyOnFaulted,
-                                TaskScheduler.Current);
-                    }
-                });
-            this.listenerActionSubscriptions.Add(subscription);
+            this.observers.Add(observer);
         }
 
         /// <inheritdoc />
@@ -146,12 +139,9 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
             {
                 this.isDisposed = true;
                 this.state.Dispose();
-                this.action.Dispose();
-                this.listenerActions.Dispose();
 
-                this.listenerActionSubscriptions.ForEach(subscription => subscription.Dispose());
-                this.listenerActionSubscriptions.Clear();
-                this.actionSubscription.Dispose();
+                this.actionMiddlewareSubjects.ForEach(subject => subject.Dispose());
+                this.actionMiddlewareSubjects.Clear();
             }
         }
 
@@ -166,27 +156,29 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         /// <param name="action">The action to apply.</param>
         private void Dispatch(IAction<TRootState, IActionBehavior> action)
         {
-            var actionBase = (AAction<TRootState>)action;
-            if (actionBase.State != ActionState.None)
-            {
-                throw new ArgumentException("Error: Action state must be None in order to be dispatched.");
-            }
-
             IAction<TRootState, IActionBehavior>[] postDispatchRequests;
 
             lock (this.syncObject)
             {
-                this.action.OnNext(action);
+                var done = false;
+                foreach (var actionMiddlewareSubject in this.actionMiddlewareSubjects)
+                {
+                    done = actionMiddlewareSubject.Dispatch(action);
+                    if (done)
+                    {
+                        // The action has been dispatched by the middle ware so we can break.
+                        break;
+                    }
+                }
+
+                if (!done)
+                {
+                    this.Publish(action);
+                }
+
                 postDispatchRequests = this.actionsToDispatch.ToArray();
                 this.actionsToDispatch.Clear();
             }
-
-            if (actionBase.State == ActionState.Success)
-            {
-                this.listenerActions.OnNext(action);
-            }
-
-            actionBase.State = ActionState.None;
 
             foreach (var postDispatchRequest in postDispatchRequests)
             {
@@ -194,12 +186,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
             }
         }
 
-        private void PostDispatch(IAction<TRootState, IActionBehavior> action)
-        {
-            this.actionsToDispatch.Add(action);
-        }
-
-        private void ActionSubscriber(IAction<TRootState, IActionBehavior> action)
+        private void Publish(IAction<TRootState, IActionBehavior> action)
         {
             var actionBase = (AAction<TRootState>)action;
             try
@@ -212,6 +199,8 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
                 {
                     this.state.OnNext(newState);
                 }
+
+                this.TriggerObservers(action);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
@@ -228,6 +217,74 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
                 }
             }
 #pragma warning restore CA1031 // Do not catch general exception types
+        }
+
+        private void PostDispatch(IAction<TRootState, IActionBehavior> action)
+        {
+            this.actionsToDispatch.Add(action);
+        }
+
+        private void TriggerObservers(IAction<TRootState, IActionBehavior> action)
+        {
+            this.observers.ForEach(observer =>
+            {
+                try
+                {
+                    observer(action);
+                }
+#pragma warning disable CA1031 // Do not catch general exception types
+                catch (Exception e)
+                {
+                    this.PostDispatch(CreateUnhandledExceptionAction(e));
+                }
+#pragma warning restore CA1031 // Do not catch general exception types
+            });
+        }
+
+        private class ActionMiddlewareSubject : IDisposable
+        {
+            private readonly Subject<IAction<TRootState, IActionBehavior>> actionSubject;
+            private readonly IDisposable subscription;
+
+            public ActionMiddlewareSubject(
+                IActionMiddleware<TRootState> actionMiddleware,
+                Action<IAction<TRootState, IActionBehavior>> publish,
+                Action<Exception> errorReport)
+            {
+                this.ActionMiddleware = actionMiddleware;
+                this.actionSubject = new Subject<IAction<TRootState, IActionBehavior>>();
+                this.subscription = actionMiddleware
+                    .Setup(this.actionSubject.AsObservable())
+                    .CatchAndContinue(errorReport)
+                    .Subscribe(publish);
+            }
+
+            public IActionMiddleware<TRootState> ActionMiddleware { get; }
+
+            public bool Dispatch(IAction<TRootState, IActionBehavior> action)
+            {
+                if (this.ActionMiddleware.IsApplying(action.Behavior))
+                {
+                    this.actionSubject.OnNext(action);
+                    return true;
+                }
+
+                return false;
+            }
+
+            public void Dispose()
+            {
+                this.Dispose(true);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    this.subscription.Dispose();
+                    this.actionSubject.Dispose();
+                }
+            }
         }
     }
 }

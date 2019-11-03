@@ -28,7 +28,7 @@ namespace SoloX.ActionDispatch.Examples.ActionBehavior
                 throw new ArgumentNullException($"The argument {nameof(dispatcher)} was null.");
             }
 
-            await Task.Delay(2000).ConfigureAwait(false);
+            await Task.Delay(5000).ConfigureAwait(false);
 
             dispatcher.Dispatch(new ExampleActionBehavior(2), s => s);
         }

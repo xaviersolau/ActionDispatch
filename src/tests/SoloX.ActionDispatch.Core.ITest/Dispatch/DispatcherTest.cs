@@ -36,7 +36,7 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch
                     var actionBehavior2 = new SetTextActionBehavior(myText2);
                     IActionBehavior observedBehavior = null;
 
-                    dispatcher.AddObserver(o => o.Do(a => observedBehavior = a.Behavior));
+                    dispatcher.AddObserver(a => observedBehavior = a.Behavior);
 
                     dispatcher.Dispatch(actionBehavior1, s => s);
 
@@ -97,7 +97,7 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch
                 {
                     IActionBehavior observedBehavior = null;
 
-                    dispatcher.AddObserver(o => o.Do(a => observedBehavior = a.Behavior));
+                    dispatcher.AddObserver(a => observedBehavior = a.Behavior);
 
                     var throwBehavior = new ThrowActionBehavior();
                     dispatcher.Dispatch(throwBehavior, s => s);
@@ -119,7 +119,7 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch
                     var behaviorToDelay = new SetTextActionBehavior(someText);
                     var delayBehavior = new DelayActionBehavior(300, behaviorToDelay);
 
-                    dispatcher.AddObserver(o => o.Do(
+                    dispatcher.AddObserver(
                         a =>
                         {
                             // Unlock the wait handle as soon as we observed the expected SetTextAction.
@@ -127,7 +127,7 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch
                             {
                                 waitHandle.Set();
                             }
-                        }));
+                        });
 
                     IStateA lastState = null;
                     using (var subscription = dispatcher.State
