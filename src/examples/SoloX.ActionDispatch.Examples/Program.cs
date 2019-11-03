@@ -14,6 +14,7 @@ using SoloX.ActionDispatch.Core;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.State;
+using SoloX.ActionDispatch.Core.Utils;
 using SoloX.ActionDispatch.Examples.ActionBehavior;
 using SoloX.ActionDispatch.Examples.State;
 using SoloX.ActionDispatch.Json;
@@ -74,27 +75,52 @@ namespace SoloX.ActionDispatch.Examples
             var actionSerializer = this.Service.GetService<IActionSerializer>();
             var stateSerializer = this.Service.GetService<IStateSerializer>();
 
-            dispatcher.AddObserver(obs => obs.Do(a =>
+            dispatcher.AddObserver(a =>
             {
-                this.logger.LogWarning($"Processing action with behavior: {a.Behavior}");
+                this.logger.LogWarning($"Observing action with behavior: {a.Behavior}");
 
                 this.logger.LogWarning(actionSerializer.Serialize(a));
-            }));
 
-            using (var stateSubscribtion = dispatcher.State.Do(s =>
-            {
-                this.logger.LogWarning($"State: {s.Version}");
+                // if (!(a.Behavior is IUnhandledExceptionBehavior<IExampleAppState>))
+                // {
+                //     throw new NotImplementedException("An error in the action observer.");
+                // }
+            });
 
-                this.logger.LogWarning(stateSerializer.Serialize(s));
-            }).Subscribe())
+            dispatcher.AddMidlleware(new Middleware());
+
+            using (var stateSubscribtion = dispatcher.State
+                .SelectWhenChanged(s => s)
+                .Do(s =>
+                {
+                    this.logger.LogWarning(stateSerializer.Serialize(s));
+                })
+                .CatchAndContinue<IExampleAppState, NotImplementedException>(e =>
+                {
+                    this.logger.LogError(e.Message);
+                })
+                .Subscribe())
             {
                 dispatcher.Dispatch(new ExampleAsyncActionBehavior(), s => s.ChildState);
-
                 dispatcher.Dispatch(new ExampleActionBehavior(1), s => s.ChildState);
 
                 dispatcher.Dispatch(new ExampleActionBehavior(3), s => s.ChildState);
 
                 Console.ReadLine();
+            }
+        }
+
+        internal class Middleware : IActionMiddleware<IExampleAppState>
+        {
+            public bool IsApplying(IActionBehavior actionBehavior)
+            {
+                return actionBehavior is ExampleActionBehavior;
+            }
+
+            public IObservable<IAction<IExampleAppState, IActionBehavior>> Setup(
+                IObservable<IAction<IExampleAppState, IActionBehavior>> actionObservable)
+            {
+                return actionObservable.Throttle(TimeSpan.FromMilliseconds(3000));
             }
         }
     }
