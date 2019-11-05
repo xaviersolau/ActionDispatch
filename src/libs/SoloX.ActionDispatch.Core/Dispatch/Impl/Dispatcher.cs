@@ -34,12 +34,18 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
 
         private readonly BehaviorSubject<TRootState> state;
 
-        private readonly List<ActionMiddlewareSubject> actionMiddlewareSubjects = new List<ActionMiddlewareSubject>();
+        private readonly List<ActionMiddlewareSubject<TRootState>> actionMiddlewareSubjects =
+            new List<ActionMiddlewareSubject<TRootState>>();
 
-        private readonly List<IAction<TRootState, IActionBehavior>> actionsToDispatch = new List<IAction<TRootState, IActionBehavior>>();
-        private readonly List<Action<IAction<TRootState, IActionBehavior>>> observers = new List<Action<IAction<TRootState, IActionBehavior>>>();
+        private readonly List<IAction<TRootState, IActionBehavior>> actionsToDispatch =
+            new List<IAction<TRootState, IActionBehavior>>();
+
+        private readonly List<Action<IAction<TRootState, IActionBehavior>>> observers =
+            new List<Action<IAction<TRootState, IActionBehavior>>>();
 
         private readonly ICallingStrategy callingStrategy;
+
+        private Action<IAction<TRootState, IActionBehavior>> postDispatch;
 
         private bool isDisposed = false;
 
@@ -54,6 +60,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
             this.logger = logger;
             this.callingStrategy = callingStrategy ?? new DefaultCallingStrategy();
             this.state = new BehaviorSubject<TRootState>(initialState);
+            this.postDispatch = this.PostDispatchUnlocked;
         }
 
         /// <summary>
@@ -98,17 +105,19 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
                 throw new ArgumentNullException($"The argument {nameof(middleware)} was null.");
             }
 
-            this.actionMiddlewareSubjects.Add(new ActionMiddlewareSubject(
-                middleware,
-                action =>
-                {
-                    this.callingStrategy.Invoke(
-                        () => this.Publish(action));
-                },
-                e =>
-                {
-                    this.PostDispatch(CreateUnhandledExceptionAction(e));
-                }));
+            this.actionMiddlewareSubjects.Add(
+                new ActionMiddlewareSubject<TRootState>(
+                    middleware,
+                    action =>
+                    {
+                        this.callingStrategy.Invoke(
+                            () => this.Publish(action));
+                    },
+                    e =>
+                    {
+                        this.callingStrategy.Invoke(
+                            () => this.PostDispatch(CreateUnhandledExceptionAction(e)));
+                    }));
         }
 
         /// <inheritdoc />
@@ -160,6 +169,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
 
             lock (this.syncObject)
             {
+                this.postDispatch = this.PostDispatchLocked;
                 var done = false;
                 foreach (var actionMiddlewareSubject in this.actionMiddlewareSubjects)
                 {
@@ -178,6 +188,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
 
                 postDispatchRequests = this.actionsToDispatch.ToArray();
                 this.actionsToDispatch.Clear();
+                this.postDispatch = this.PostDispatchUnlocked;
             }
 
             foreach (var postDispatchRequest in postDispatchRequests)
@@ -191,16 +202,19 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
             var actionBase = (AAction<TRootState>)action;
             try
             {
-                var oldState = this.state.Value;
-                var oldVersion = oldState.Version;
-                var newState = action.Apply(this, oldState);
-                actionBase.State = ActionState.Success;
-                if (newState != null && newState.Version != oldVersion)
+                lock (this.syncObject)
                 {
-                    this.state.OnNext(newState);
-                }
+                    var oldState = this.state.Value;
+                    var oldVersion = oldState.Version;
+                    var newState = action.Apply(this, oldState);
+                    actionBase.State = ActionState.Success;
+                    if (newState != null && newState.Version != oldVersion)
+                    {
+                        this.state.OnNext(newState);
+                    }
 
-                this.TriggerObservers(action);
+                    this.TriggerObservers(action);
+                }
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
@@ -212,7 +226,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
                 if (!(action.Behavior is UnhandledExceptionBehavior<TRootState>))
                 {
                     // We are already in a dispatch operation so we need to post a dispatch in order to properly
-                    // terminate the current one inside the _syncObject lock monitor.
+                    // terminate the current one inside the syncObject lock monitor.
                     this.PostDispatch(CreateUnhandledExceptionAction(e));
                 }
             }
@@ -221,7 +235,20 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
 
         private void PostDispatch(IAction<TRootState, IActionBehavior> action)
         {
+            lock (this.syncObject)
+            {
+                this.postDispatch(action);
+            }
+        }
+
+        private void PostDispatchLocked(IAction<TRootState, IActionBehavior> action)
+        {
             this.actionsToDispatch.Add(action);
+        }
+
+        private void PostDispatchUnlocked(IAction<TRootState, IActionBehavior> action)
+        {
+            this.Dispatch(action);
         }
 
         private void TriggerObservers(IAction<TRootState, IActionBehavior> action)
@@ -239,52 +266,6 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
                 }
 #pragma warning restore CA1031 // Do not catch general exception types
             });
-        }
-
-        private class ActionMiddlewareSubject : IDisposable
-        {
-            private readonly Subject<IAction<TRootState, IActionBehavior>> actionSubject;
-            private readonly IDisposable subscription;
-
-            public ActionMiddlewareSubject(
-                IActionMiddleware<TRootState> actionMiddleware,
-                Action<IAction<TRootState, IActionBehavior>> publish,
-                Action<Exception> errorReport)
-            {
-                this.ActionMiddleware = actionMiddleware;
-                this.actionSubject = new Subject<IAction<TRootState, IActionBehavior>>();
-                this.subscription = actionMiddleware
-                    .Setup(this.actionSubject.AsObservable())
-                    .CatchAndContinue(errorReport)
-                    .Subscribe(publish);
-            }
-
-            public IActionMiddleware<TRootState> ActionMiddleware { get; }
-
-            public bool Dispatch(IAction<TRootState, IActionBehavior> action)
-            {
-                if (this.ActionMiddleware.IsApplying(action.Behavior))
-                {
-                    this.actionSubject.OnNext(action);
-                    return true;
-                }
-
-                return false;
-            }
-
-            public void Dispose()
-            {
-                this.Dispose(true);
-            }
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    this.subscription.Dispose();
-                    this.actionSubject.Dispose();
-                }
-            }
         }
     }
 }
