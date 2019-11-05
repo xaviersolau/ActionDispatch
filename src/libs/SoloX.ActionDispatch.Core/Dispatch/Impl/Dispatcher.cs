@@ -199,7 +199,6 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
 
         private void Publish(IAction<TRootState, IActionBehavior> action)
         {
-            var actionBase = (AAction<TRootState>)action;
             try
             {
                 lock (this.syncObject)
@@ -207,7 +206,6 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
                     var oldState = this.state.Value;
                     var oldVersion = oldState.Version;
                     var newState = action.Apply(this, oldState);
-                    actionBase.State = ActionState.Success;
                     if (newState != null && newState.Version != oldVersion)
                     {
                         this.state.OnNext(newState);
@@ -219,7 +217,6 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
-                actionBase.State = ActionState.Failed;
                 this.logger.LogError(e, "ERROR in action subscription");
 
                 // Check we are not already in an UnhandledExceptionAction to avoid a recursive exception handling.

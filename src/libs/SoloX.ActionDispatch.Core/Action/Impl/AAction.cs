@@ -16,11 +16,6 @@ namespace SoloX.ActionDispatch.Core.Action.Impl
     internal abstract class AAction<TRootState> : IAction<TRootState>
         where TRootState : IState
     {
-        /// <summary>
-        /// Gets or sets action state.
-        /// </summary>
-        public ActionState State { get; set; }
-
         /// <inheritdoc/>
         public abstract TRootState Apply(IDispatcher<TRootState> dispatcher, TRootState rootState);
     }
