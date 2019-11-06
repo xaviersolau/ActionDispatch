@@ -22,6 +22,11 @@ namespace SoloX.ActionDispatch.Core.Dispatch
         where TRootState : IState
     {
         /// <summary>
+        /// Gets the registered action middle-ware list.
+        /// </summary>
+        IEnumerable<IActionMiddleware<TRootState>> Middlewares { get; }
+
+        /// <summary>
         /// Add an action middle ware.
         /// </summary>
         /// <param name="middleware">The middle ware to add.</param>
