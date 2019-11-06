@@ -15,7 +15,7 @@ using SoloX.ActionDispatch.Core.State;
 namespace SoloX.ActionDispatch.Core.Dispatch
 {
     /// <summary>
-    /// Dispatcher middle ware interface. Used before an action is actually published.
+    /// Dispatcher action middle-ware interface. Used before an action is actually published.
     /// </summary>
     /// <typeparam name="TRootState">Type of the root state object on witch actions will apply.</typeparam>
     public interface IActionMiddleware<TRootState>

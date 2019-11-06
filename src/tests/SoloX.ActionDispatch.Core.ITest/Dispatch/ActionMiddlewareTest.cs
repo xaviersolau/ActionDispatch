@@ -15,6 +15,7 @@ using Moq;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior;
+using SoloX.ActionDispatch.Core.ITest.Utils;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
 using Xunit;
@@ -48,11 +49,13 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch
                         IActionBehavior observedBehavior = null;
 
                         dispatcher.AddMidlleware(middlewareMock.Object);
-                        dispatcher.AddObserver(a =>
-                        {
-                            observedBehavior = a.Behavior;
-                            waitHandler.Set();
-                        });
+
+                        dispatcher.AddObserver(MockHelpers.SetupObserver<IStateA>(
+                            (a, s) =>
+                            {
+                                observedBehavior = a.Behavior;
+                                waitHandler.Set();
+                            }));
 
                         dispatcher.Dispatch(actionBehavior1, s => s);
                         dispatcher.Dispatch(actionBehavior2, s => s);

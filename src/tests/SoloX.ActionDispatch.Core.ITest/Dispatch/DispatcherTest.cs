@@ -14,6 +14,7 @@ using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Dispatch.Impl;
 using SoloX.ActionDispatch.Core.ITest.Dispatch.Behavior;
+using SoloX.ActionDispatch.Core.ITest.Utils;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
 using SoloX.ActionDispatch.Core.State;
@@ -36,7 +37,8 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch
                     var actionBehavior2 = new SetTextActionBehavior(myText2);
                     IActionBehavior observedBehavior = null;
 
-                    dispatcher.AddObserver(a => observedBehavior = a.Behavior);
+                    dispatcher.AddObserver(
+                        MockHelpers.SetupObserver<IStateA>((a, s) => observedBehavior = a.Behavior));
 
                     dispatcher.Dispatch(actionBehavior1, s => s);
 
@@ -97,7 +99,8 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch
                 {
                     IActionBehavior observedBehavior = null;
 
-                    dispatcher.AddObserver(a => observedBehavior = a.Behavior);
+                    dispatcher.AddObserver(
+                        MockHelpers.SetupObserver<IStateA>((a, s) => observedBehavior = a.Behavior));
 
                     var throwBehavior = new ThrowActionBehavior();
                     dispatcher.Dispatch(throwBehavior, s => s);
@@ -120,14 +123,14 @@ namespace SoloX.ActionDispatch.Core.ITest.Dispatch
                     var delayBehavior = new DelayActionBehavior(300, behaviorToDelay);
 
                     dispatcher.AddObserver(
-                        a =>
+                        MockHelpers.SetupObserver<IStateA>((a, s) =>
                         {
                             // Unlock the wait handle as soon as we observed the expected SetTextAction.
                             if (ReferenceEquals(a.Behavior, behaviorToDelay))
                             {
                                 waitHandle.Set();
                             }
-                        });
+                        }));
 
                     IStateA lastState = null;
                     using (var subscription = dispatcher.State

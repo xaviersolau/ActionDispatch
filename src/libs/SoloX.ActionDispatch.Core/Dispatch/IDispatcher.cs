@@ -27,6 +27,11 @@ namespace SoloX.ActionDispatch.Core.Dispatch
         IEnumerable<IActionMiddleware<TRootState>> Middlewares { get; }
 
         /// <summary>
+        /// Gets the registered action observer list.
+        /// </summary>
+        IEnumerable<IActionObserver<TRootState>> Observers { get; }
+
+        /// <summary>
         /// Add an action middle ware.
         /// </summary>
         /// <param name="middleware">The middle ware to add.</param>
@@ -36,6 +41,6 @@ namespace SoloX.ActionDispatch.Core.Dispatch
         /// Add an action observer.
         /// </summary>
         /// <param name="observer">The action observer to add.</param>
-        void AddObserver(Action<IAction<TRootState, IActionBehavior>> observer);
+        void AddObserver(IActionObserver<TRootState> observer);
     }
 }
