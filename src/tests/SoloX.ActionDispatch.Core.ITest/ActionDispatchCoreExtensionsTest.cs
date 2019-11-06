@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
+using SoloX.ActionDispatch.Core.ITest.Utils;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
 using SoloX.ActionDispatch.Core.State;
@@ -45,22 +46,34 @@ namespace SoloX.ActionDispatch.Core.ITest
         }
 
         [Fact]
+        public void ServiceCollectionSetupWithActionObserverTest()
+        {
+            var expectedState = new StateA();
+
+            var observer = MockHelpers.SetupObserver<IStateA>((a, s) => { });
+
+            IServiceCollection sc = new ServiceCollection();
+            sc.AddSingleton(observer);
+
+            sc.AddActionDispatchSupport<IStateA>(sf => expectedState);
+            using (var provider = sc.BuildServiceProvider())
+            {
+                var dispatcher = provider.GetService<IDispatcher<IStateA>>();
+
+                Assert.NotNull(dispatcher.Observers);
+                var observers = dispatcher.Observers.ToArray();
+                Assert.Single(observers);
+                Assert.True(object.ReferenceEquals(observers[0], observer));
+            }
+        }
+
+        [Fact]
         public void ServiceCollectionSetupWithActionMiddlewareTest()
         {
             var expectedState = new StateA();
 
-            var middleware1Mock = new Mock<IActionMiddleware<IStateA>>();
-            var middleware2Mock = new Mock<IActionMiddleware<IStateA>>();
-
-            middleware1Mock
-                .Setup(mw => mw.Setup(It.IsAny<IObservable<IAction<IStateA, IActionBehavior>>>()))
-                .Returns((IObservable<IAction<IStateA, IActionBehavior>> obs) => obs);
-            middleware2Mock
-                .Setup(mw => mw.Setup(It.IsAny<IObservable<IAction<IStateA, IActionBehavior>>>()))
-                .Returns((IObservable<IAction<IStateA, IActionBehavior>> obs) => obs);
-
-            var middleware1 = middleware1Mock.Object;
-            var middleware2 = middleware2Mock.Object;
+            var middleware1 = MockHelpers.SetupMiddleware<IStateA>(obs => obs);
+            var middleware2 = MockHelpers.SetupMiddleware<IStateA>(obs => obs);
 
             IServiceCollection sc = new ServiceCollection();
             sc.AddSingleton(middleware1);

@@ -41,8 +41,8 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         private readonly List<IAction<TRootState, IActionBehavior>> actionsToDispatch =
             new List<IAction<TRootState, IActionBehavior>>();
 
-        private readonly List<Action<IAction<TRootState, IActionBehavior>>> observers =
-            new List<Action<IAction<TRootState, IActionBehavior>>>();
+        private readonly List<IActionObserver<TRootState>> observers =
+            new List<IActionObserver<TRootState>>();
 
         private readonly ICallingStrategy callingStrategy;
 
@@ -78,6 +78,10 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         /// <inheritdoc />
         public IEnumerable<IActionMiddleware<TRootState>> Middlewares
             => this.actionMiddlewareSubjects.Select(ams => ams.ActionMiddleware);
+
+        /// <inheritdoc />
+        public IEnumerable<IActionObserver<TRootState>> Observers
+            => this.observers;
 
         /// <inheritdoc />
         public void Dispatch<TState>(IActionBehavior<TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
@@ -126,7 +130,7 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
         }
 
         /// <inheritdoc />
-        public void AddObserver(Action<IAction<TRootState, IActionBehavior>> observer)
+        public void AddObserver(IActionObserver<TRootState> observer)
         {
             if (observer == null)
             {
@@ -214,9 +218,12 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
                     if (newState != null && newState.Version != oldVersion)
                     {
                         this.state.OnNext(newState);
+                        this.TriggerObservers(action, newState);
                     }
-
-                    this.TriggerObservers(action);
+                    else
+                    {
+                        this.TriggerObservers(action, oldState);
+                    }
                 }
             }
 #pragma warning disable CA1031 // Do not catch general exception types
@@ -253,13 +260,16 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
             this.Dispatch(action);
         }
 
-        private void TriggerObservers(IAction<TRootState, IActionBehavior> action)
+        private void TriggerObservers(IAction<TRootState, IActionBehavior> action, TRootState state)
         {
             this.observers.ForEach(observer =>
             {
                 try
                 {
-                    observer(action);
+                    if (observer.IsObserving(action.Behavior))
+                    {
+                        observer.Observe(action, state);
+                    }
                 }
 #pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception e)

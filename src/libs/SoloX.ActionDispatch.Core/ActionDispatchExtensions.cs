@@ -107,12 +107,23 @@ namespace SoloX.ActionDispatch.Core
                         provider.GetService<ILogger<Dispatcher<TRootState>>>(),
                         useSynchronizationContext ? new SynchronizedCallingStrategy(SynchronizationContext.Current) : null);
 
+                    // Register the action middle-wares
                     var actionMiddlewares = provider.GetServices<IActionMiddleware<TRootState>>();
                     if (actionMiddlewares != null)
                     {
                         foreach (var middleware in actionMiddlewares)
                         {
                             dispatcher.AddMidlleware(middleware);
+                        }
+                    }
+
+                    // Register the action observers
+                    var actionObservers = provider.GetServices<IActionObserver<TRootState>>();
+                    if (actionObservers != null)
+                    {
+                        foreach (var observer in actionObservers)
+                        {
+                            dispatcher.AddObserver(observer);
                         }
                     }
 

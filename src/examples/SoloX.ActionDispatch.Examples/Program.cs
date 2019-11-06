@@ -75,17 +75,7 @@ namespace SoloX.ActionDispatch.Examples
             var actionSerializer = this.Service.GetService<IActionSerializer>();
             var stateSerializer = this.Service.GetService<IStateSerializer>();
 
-            dispatcher.AddObserver(a =>
-            {
-                this.logger.LogWarning($"Observing action with behavior: {a.Behavior}");
-
-                this.logger.LogWarning(actionSerializer.Serialize(a));
-
-                // if (!(a.Behavior is IUnhandledExceptionBehavior<IExampleAppState>))
-                // {
-                //     throw new NotImplementedException("An error in the action observer.");
-                // }
-            });
+            dispatcher.AddObserver(new Observer(this.logger, actionSerializer));
 
             dispatcher.AddMidlleware(new Middleware());
 
@@ -121,6 +111,35 @@ namespace SoloX.ActionDispatch.Examples
                 IObservable<IAction<IExampleAppState, IActionBehavior>> actionObservable)
             {
                 return actionObservable.Throttle(TimeSpan.FromMilliseconds(3000));
+            }
+        }
+
+        internal class Observer : IActionObserver<IExampleAppState>
+        {
+            private ILogger<Program> logger;
+            private IActionSerializer actionSerializer;
+
+            public Observer(ILogger<Program> logger, IActionSerializer actionSerializer)
+            {
+                this.logger = logger;
+                this.actionSerializer = actionSerializer;
+            }
+
+            public bool IsObserving(IActionBehavior actionBehavior)
+            {
+                return true;
+            }
+
+            public void Observe(IAction<IExampleAppState, IActionBehavior> action, IExampleAppState producedState)
+            {
+                this.logger.LogWarning($"Observing action with behavior: {action.Behavior}");
+
+                this.logger.LogWarning(actionSerializer.Serialize(action));
+
+                // if (!(action.Behavior is IUnhandledExceptionBehavior<IExampleAppState>))
+                // {
+                //     throw new NotImplementedException("An error in the action observer.");
+                // }
             }
         }
     }
