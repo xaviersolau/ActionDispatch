@@ -107,6 +107,15 @@ namespace SoloX.ActionDispatch.Core
                         provider.GetService<ILogger<Dispatcher<TRootState>>>(),
                         useSynchronizationContext ? new SynchronizedCallingStrategy(SynchronizationContext.Current) : null);
 
+                    var actionMiddlewares = provider.GetServices<IActionMiddleware<TRootState>>();
+                    if (actionMiddlewares != null)
+                    {
+                        foreach (var middleware in actionMiddlewares)
+                        {
+                            dispatcher.AddMidlleware(middleware);
+                        }
+                    }
+
                     return dispatcher;
                 },
                 serviceLifetime));

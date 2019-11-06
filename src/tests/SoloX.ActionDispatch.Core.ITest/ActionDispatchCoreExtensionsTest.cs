@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using SoloX.ActionDispatch.Core.Action;
 using SoloX.ActionDispatch.Core.Dispatch;
 using SoloX.ActionDispatch.Core.Sample.State.Basic;
 using SoloX.ActionDispatch.Core.Sample.State.Basic.Impl;
@@ -40,6 +41,41 @@ namespace SoloX.ActionDispatch.Core.ITest
                 var state = dispatcher.State.Latest().First();
 
                 Assert.Same(expectedState, state);
+            }
+        }
+
+        [Fact]
+        public void ServiceCollectionSetupWithActionMiddlewareTest()
+        {
+            var expectedState = new StateA();
+
+            var middleware1Mock = new Mock<IActionMiddleware<IStateA>>();
+            var middleware2Mock = new Mock<IActionMiddleware<IStateA>>();
+
+            middleware1Mock
+                .Setup(mw => mw.Setup(It.IsAny<IObservable<IAction<IStateA, IActionBehavior>>>()))
+                .Returns((IObservable<IAction<IStateA, IActionBehavior>> obs) => obs);
+            middleware2Mock
+                .Setup(mw => mw.Setup(It.IsAny<IObservable<IAction<IStateA, IActionBehavior>>>()))
+                .Returns((IObservable<IAction<IStateA, IActionBehavior>> obs) => obs);
+
+            var middleware1 = middleware1Mock.Object;
+            var middleware2 = middleware2Mock.Object;
+
+            IServiceCollection sc = new ServiceCollection();
+            sc.AddSingleton(middleware1);
+            sc.AddSingleton(middleware2);
+
+            sc.AddActionDispatchSupport<IStateA>(sf => expectedState);
+            using (var provider = sc.BuildServiceProvider())
+            {
+                var dispatcher = provider.GetService<IDispatcher<IStateA>>();
+
+                Assert.NotNull(dispatcher.Middlewares);
+                var middlewares = dispatcher.Middlewares.ToArray();
+                Assert.Equal(2, middlewares.Length);
+                Assert.True((object.ReferenceEquals(middlewares[0], middleware1) && object.ReferenceEquals(middlewares[1], middleware2))
+                    || (object.ReferenceEquals(middlewares[0], middleware2) && object.ReferenceEquals(middlewares[1], middleware1)));
             }
         }
     }

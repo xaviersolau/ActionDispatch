@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -73,6 +74,10 @@ namespace SoloX.ActionDispatch.Core.Dispatch.Impl
 
         /// <inheritdoc />
         public IObservable<TRootState> State => this.state.AsObservable();
+
+        /// <inheritdoc />
+        public IEnumerable<IActionMiddleware<TRootState>> Middlewares
+            => this.actionMiddlewareSubjects.Select(ams => ams.ActionMiddleware);
 
         /// <inheritdoc />
         public void Dispatch<TState>(IActionBehavior<TState> actionBehavior, Expression<Func<TRootState, TState>> selector)
